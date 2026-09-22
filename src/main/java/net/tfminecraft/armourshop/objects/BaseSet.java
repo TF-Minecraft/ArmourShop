@@ -7,7 +7,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import net.tfminecraft.tlibs.TLibs;
-import net.tfminecraft.tlibs.enums.APIType;
 import net.tfminecraft.tlibs.objects.api.ItemAPI;
 import net.tfminecraft.tlibs.objects.api.subapi.ItemCreator;
 import net.tfminecraft.armourshop.enums.ArmorType;
@@ -22,7 +21,7 @@ public class BaseSet {
 	
 	public BaseSet(String key, ConfigurationSection config) {
 		this.id = key;
-		ItemAPI api = (ItemAPI) TLibs.getApiInstance(APIType.ITEM_API);
+		ItemAPI api = TLibs.getItemAPI();
 		ItemCreator c = api.getCreator();
 		if(config.contains("helmet")) {
 			for(String s : config.getStringList("helmet")) {

@@ -23,6 +23,8 @@ import net.tfminecraft.armourshop.ArmourShop;
  */
 public final class BookSignSkinListener implements Listener {
 
+	// Retain the originating book slot for deferred restoration; this API exposes no replacement.
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onSignBook(PlayerEditBookEvent event) {
 		BookEditSkinPreserver.preserve(event);
