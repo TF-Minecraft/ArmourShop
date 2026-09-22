@@ -1,19 +1,19 @@
 package net.tfminecraft.armourshop.utils;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 /**
  * Prefixed chat helpers, including click-to-copy codes.
  */
 public final class ChatMessages {
 
-	public static final String PREFIX = ChatColor.GREEN + "[ArmourShop] " + ChatColor.RESET;
+	public static final String PREFIX = "\u00A7a[ArmourShop] \u00A7r";
 
 	private ChatMessages() {}
 
@@ -22,7 +22,7 @@ public final class ChatMessages {
 	}
 
 	public static void error(Player player, String message) {
-		player.sendMessage(PREFIX + ChatColor.RED + message);
+		player.sendMessage(PREFIX + "\u00A7c" + message);
 	}
 
 	/**
@@ -36,27 +36,15 @@ public final class ChatMessages {
 			return;
 		}
 
-		TextComponent label = new TextComponent("Code: ");
-		label.setColor(net.md_5.bungee.api.ChatColor.GRAY);
+		Component label = Component.text("Code: ", NamedTextColor.GRAY);
+		Component codeComp = Component.text(code, NamedTextColor.AQUA)
+				.decorate(TextDecoration.BOLD)
+				.clickEvent(ClickEvent.copyToClipboard(code))
+				.hoverEvent(HoverEvent.showText(Component.text("Click to copy")));
+		Component hint = Component.text(" (click to copy)", NamedTextColor.DARK_GRAY)
+				.decorate(TextDecoration.ITALIC);
 
-		TextComponent codeComp = new TextComponent(code);
-		codeComp.setColor(net.md_5.bungee.api.ChatColor.AQUA);
-		codeComp.setBold(true);
-		codeComp.setClickEvent(
-			new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, code)
-		);
-		@SuppressWarnings("deprecation")
-		HoverEvent hover = new HoverEvent(
-			HoverEvent.Action.SHOW_TEXT,
-			new ComponentBuilder("Click to copy").create()
-		);
-		codeComp.setHoverEvent(hover);
-
-		TextComponent hint = new TextComponent(" (click to copy)");
-		hint.setColor(net.md_5.bungee.api.ChatColor.DARK_GRAY);
-		hint.setItalic(true);
-
-		player.spigot().sendMessage(label, codeComp, hint);
+		player.sendMessage(Component.empty().append(label).append(codeComp).append(hint));
 	}
 
 	/**
@@ -68,33 +56,15 @@ public final class ChatMessages {
 		}
 		String owner = ownerLabel == null || ownerLabel.isBlank() ? "?" : ownerLabel.trim();
 
-		TextComponent line = new TextComponent(code);
-		line.setColor(net.md_5.bungee.api.ChatColor.AQUA);
+		Component line = Component.text(code, NamedTextColor.AQUA);
+		Component sep = Component.text(" - ", NamedTextColor.GRAY);
+		Component ownerComp = Component.text(owner, NamedTextColor.YELLOW);
+		Component space = Component.text(" ");
+		Component delete = Component.text("[Delete]", NamedTextColor.RED)
+				.decorate(TextDecoration.BOLD)
+				.clickEvent(ClickEvent.runCommand("/armourshop token delete " + code))
+				.hoverEvent(HoverEvent.showText(Component.text("Click to delete")));
 
-		TextComponent sep = new TextComponent(" - ");
-		sep.setColor(net.md_5.bungee.api.ChatColor.GRAY);
-
-		TextComponent ownerComp = new TextComponent(owner);
-		ownerComp.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
-
-		TextComponent space = new TextComponent(" ");
-
-		TextComponent delete = new TextComponent("[Delete]");
-		delete.setColor(net.md_5.bungee.api.ChatColor.RED);
-		delete.setBold(true);
-		delete.setClickEvent(
-			new ClickEvent(
-				ClickEvent.Action.RUN_COMMAND,
-				"/armourshop token delete " + code
-			)
-		);
-		@SuppressWarnings("deprecation")
-		HoverEvent hover = new HoverEvent(
-			HoverEvent.Action.SHOW_TEXT,
-			new ComponentBuilder("Click to delete").create()
-		);
-		delete.setHoverEvent(hover);
-
-		player.spigot().sendMessage(line, sep, ownerComp, space, delete);
+		player.sendMessage(Component.empty().append(line).append(sep).append(ownerComp).append(space).append(delete));
 	}
 }

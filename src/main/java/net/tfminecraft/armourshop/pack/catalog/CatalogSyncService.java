@@ -25,6 +25,8 @@ public final class CatalogSyncService {
 	private CatalogSyncService() {}
 
 	/** Build payload from in-memory categories + Cache.scrolls + entitlements. */
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	public static String buildPayloadJson() {
 		StringBuilder sb = new StringBuilder(768);
 		sb.append("{\"categories\":[");

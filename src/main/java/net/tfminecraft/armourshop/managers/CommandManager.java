@@ -37,6 +37,8 @@ import net.tfminecraft.armourshop.utils.Permissions;
 public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 	public String cmd1 = "armourshop";
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!cmd.getName().equalsIgnoreCase(cmd1)) {
@@ -157,6 +159,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 		return false;
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private boolean handleModelApply(CommandSender sender, String categoryId, String skinId) {
 		if (!Permissions.isAdmin(sender)) {
 			sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
@@ -283,6 +287,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 	}
 
 	/** setType inside the merger clears book meta. Put the writing back. */
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private static void restoreBook(ItemStack merged, BookMeta previous, boolean replaceName) {
 		ItemMeta meta = merged.getItemMeta();
 		if (!(meta instanceof BookMeta bookMeta)) {
@@ -314,6 +320,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 		merged.setItemMeta(bookMeta);
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private boolean handleSubmissionDelete(CommandSender sender, String submissionId) {
 		if (!Permissions.isAdmin(sender)) {
 			sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
@@ -335,6 +343,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 		return true;
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private boolean handleSkinDelete(CommandSender sender, String skinId) {
 		if (!Permissions.isAdmin(sender)) {
 			sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
@@ -356,6 +366,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 		return true;
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private boolean handlePackPull(CommandSender sender) {
 		if (!Permissions.isAdmin(sender)) {
 			sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
@@ -390,6 +402,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 		return true;
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private boolean handlePackSync(CommandSender sender) {
 		if (!Permissions.isAdmin(sender)) {
 			sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
@@ -419,6 +433,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 		return true;
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private boolean handleCatalogSync(CommandSender sender) {
 		if (!Permissions.isAdmin(sender)) {
 			sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
@@ -446,6 +462,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 		return true;
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private boolean handleListTokens(CommandSender sender) {
 		if (!Permissions.isAdmin(sender)) {
 			sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
@@ -488,6 +506,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 		return true;
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private boolean handleTokenDelete(CommandSender sender, String codeArg) {
 		if (!Permissions.isAdmin(sender)) {
 			sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "

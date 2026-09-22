@@ -29,12 +29,16 @@ import net.tfminecraft.gunsandgadgets.loader.SkinLoader;
 
 public class InventoryManager {
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	public void typeView(Player player) {
 		Inventory i = ArmourShop.plugin.getServer().createInventory(new ASInventoryHolder(false), 9, "\u00A77Armourshop Type");
 		i.setItem(0, createArmourItem());
 		i.setItem(1, createItemItem());
 		player.openInventory(i);
 	}
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	public void categoryView(Player player, boolean item) {
 		Inventory i = ArmourShop.plugin.getServer().createInventory(new ASInventoryHolder(item), 54, "\u00A77Armourshop Categories");
 		int c = 0;
@@ -61,6 +65,8 @@ public class InventoryManager {
 		i.setItem(53, createBackButton());
 		player.openInventory(i);
 	}
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	public void skinView(Player player, SkinCategory cat, int page, boolean item) {
 		Inventory inv = ArmourShop.plugin.getServer().createInventory(new ASInventoryHolder(item), 54, cat.getName());
 		int slot = 0;
@@ -158,6 +164,8 @@ public class InventoryManager {
 		return visible;
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	public ItemStack createArmourItem(){
 		ItemStack i = new ItemStack(Material.IRON_CHESTPLATE, 1);
 		ItemMeta m = i.getItemMeta();
@@ -172,6 +180,8 @@ public class InventoryManager {
 		return i;
 	}
 
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	public ItemStack createItemItem(){
 		ItemStack i = new ItemStack(Material.IRON_SWORD, 1);
 		ItemMeta m = i.getItemMeta();
@@ -186,6 +196,8 @@ public class InventoryManager {
 		return i;
 	}
 	
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	public ItemStack createCategoryItem(SkinCategory c) {
 		ItemAPI api = TLibs.getItemAPI();
 		ItemStack i = api.getCreator().getItemFromPath(c.getItem());
@@ -284,6 +296,8 @@ public class InventoryManager {
 		return i;
 	}
 	
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	public ItemStack createBackButton() {
 		ItemStack i = new ItemStack(Material.BARRIER, 1);
 		ItemMeta m = i.getItemMeta();

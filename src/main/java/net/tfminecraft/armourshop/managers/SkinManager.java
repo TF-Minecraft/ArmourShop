@@ -72,6 +72,8 @@ public class SkinManager implements Listener{
 	}
 	*/
 	
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void invenClick(InventoryClickEvent e) {
 		if(e.getClickedInventory() == null) return;
@@ -127,6 +129,8 @@ public class SkinManager implements Listener{
 		}
 	}
 	
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	private void applySkin(Player p, ItemStack i) {
 		ItemMeta m = i.getItemMeta();
 		NamespacedKey key = new NamespacedKey(ArmourShop.plugin, "set");
