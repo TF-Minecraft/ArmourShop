@@ -1,4 +1,4 @@
-main: net.tfminecraft.ArmourShop.ArmourShop
+main: net.tfminecraft.armourshop.ArmourShop
 api-version: '1.21.10'
 name: "ArmourShop"
 version: ${project.version}
