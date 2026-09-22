@@ -11,8 +11,8 @@
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gunsandgadgets.version>1.0.7</gunsandgadgets.version>
-        <tlibs.version>1.1.1</tlibs.version>
+        <gunsandgadgets.version>2.0.0</gunsandgadgets.version>
+        <tlibs.version>2.0.0</tlibs.version>
     </properties>
 
     <dependencies>
