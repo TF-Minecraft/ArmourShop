@@ -1,0 +1,24 @@
+minor_healing_magic:
+  name: "Minor Healing Magic"
+  colour: "#c6b192"
+  set: minor health
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(SLIME_BALL.264)
+major_healing_magic:
+  name: "Major Healing Magic"
+  colour: "#c6b192"
+  set: major health
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(SLIME_BALL.265)
+minor_mana_magic:
+  name: "Minor Mana Magic"
+  colour: "#411b76"
+  set: minor mana
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(SLIME_BALL.266)
+major_mana_magic:
+  name: "Major Mana Magic"
+  colour: "#411b76"
+  set: major mana
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(SLIME_BALL.267)

@@ -1,14 +1,21 @@
 package net.tfminecraft.ArmourShop.objects;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 import me.Plugins.TLibs.Objects.API.SubAPI.StringFormatter;
+import me.plugins.tlibs.shaded.lang3.text.WordUtils;
+import net.tfminecraft.ArmourShop.enums.ArmorType;
 import net.tfminecraft.ArmourShop.loaders.BaseSetLoader;
+import net.tfminecraft.ArmourShop.utils.NameDisplay;
 
 public class SkinSet {
 	private String id;
+	private String plainName;
+	private List<String> colours;
+	private List<String> styles;
 	private String name;
 	private BaseSet set;
 	private Optional<String> scroll = Optional.empty();
@@ -22,7 +29,11 @@ public class SkinSet {
 	
 	public SkinSet(String key, ConfigurationSection config) {
 		this.id = key;
-		this.name = StringFormatter.formatHex(config.getString("name"));
+		NameDisplay.ParsedName parsed = NameDisplay.parseFromConfig(config, "name");
+		this.plainName = parsed.plain;
+		this.colours = parsed.colours;
+		this.styles = parsed.styles;
+		this.name = StringFormatter.formatDisplayName(plainName, colours, styles);
 		this.set = BaseSetLoader.getByString(config.getString("set"));
 		if(config.contains("scroll")) {
 			scroll = Optional.of(config.getString("scroll"));
@@ -64,6 +75,18 @@ public class SkinSet {
 
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Display name with colour/gradient applied across the full piece string
+	 * (e.g. "Blue Knight Chestplate"), not only the set prefix.
+	 */
+	public String getFormattedPieceName(ArmorType type) {
+		String plain = plainName;
+		if (type != null && !type.equals(ArmorType.ITEM)) {
+			plain = plain + " " + WordUtils.capitalize(type.toString().toLowerCase());
+		}
+		return StringFormatter.formatDisplayName(plain, colours, styles);
 	}
 
 	public BaseSet getSet() {

@@ -1,0 +1,44 @@
+green_mage:
+  name: "Green Mage"
+  colour: "#1b5c1c"
+  set: mage
+  helmet: ia.tfmc_armor:iron_mage_helmet
+  chestplate: ia.tfmc_armor:iron_mage_chestplate
+  leggings: ia.tfmc_armor:iron_mage_leggings
+  boots: ia.tfmc_armor:iron_mage_boots
+brown_mage:
+  name: "Brown Mage"
+  colour: "#596113"
+  set: mage
+  scroll: m.loot.common_item_skin_scroll
+  helmet: ia.tfmc_armor:brown_mage_helmet
+  chestplate: ia.tfmc_armor:brown_mage_chestplate
+  leggings: ia.tfmc_armor:brown_mage_leggings
+  boots: ia.tfmc_armor:brown_mage_boots
+malevorian_mage:
+  name: "Malevorian Mage"
+  colour: "#ab0a0a"
+  set: mage
+  scroll: m.loot.rare_item_skin_scroll
+  helmet: ia.tfmc_armor:malevoriamage_helmet
+  chestplate: ia.tfmc_armor:malevoriamage_chestplate
+  leggings: ia.tfmc_armor:malevoriamage_leggings
+  boots: ia.tfmc_armor:malevoriamage_boots
+threadholm_mage:
+  name: "Threadholm Mage"
+  colour: "#571e1e"
+  set: mage
+  scroll: m.loot.rare_item_skin_scroll
+  helmet: ia.tfmc_armor:threadholm_helmet
+  chestplate: ia.tfmc_armor:threadholm_chestplate
+  leggings: ia.tfmc_armor:threadholm_leggings
+  boots: ia.tfmc_armor:threadholm_boots
+cultist_mage:
+  name: "Cultist Mage"
+  colour: "#540202"
+  set: mage
+  scroll: m.loot.epic_item_skin_scroll
+  helmet: ia.tfmc_armor:cult_chain_helmet
+  chestplate: ia.tfmc_armor:cult_chain_chestplate
+  leggings: ia.tfmc_armor:cult_chain_leggings
+  boots: ia.tfmc_armor:cult_chain_boots

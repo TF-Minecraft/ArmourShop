@@ -1,0 +1,10 @@
+female_bloodmage:
+  name: "Female Bloodmage"
+  colour: "#aa0000"
+  set: bloodmagic
+  add-name: false
+  permission: armourshop.female_bloodmage
+  helmet: ia.tfmc_armor:female_bloodmage_helmet
+  chestplate: ia.tfmc_armor:female_bloodmage_chestplate
+  leggings: ia.tfmc_armor:female_bloodmage_leggings
+  boots: ia.tfmc_armor:female_bloodmage_boots

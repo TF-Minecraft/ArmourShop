@@ -1,0 +1,180 @@
+blue_helmet:
+  name: "Blue Helmet"
+  colour: "#304bd1"
+  set: helmets
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.2)
+knight_helmet:
+  name: "Knight Helmet"
+  colour: "#9e9d95"
+  set: helmets
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.13)
+open_helmet:
+  name: "Open Helmet"
+  colour: "#9e9d95"
+  set: helmets
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.4)
+golden_helmet:
+  name: "Golden Helmet"
+  colour: "#f0d332"
+  set: helmets
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.7)
+chain_helmet:
+  name: "Chain Helmet"
+  colour: "#9e9d95"
+  set: helmets
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.8)
+tower_helmet:
+  name: "Tower Helmet"
+  colour: "#9e9d95"
+  set: helmets
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.10)
+horn_helmet:
+  name: "Horn Helmet"
+  colour: "#9e9d95"
+  set: helmets
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.15)
+black_helmet:
+  name: "Black Helmet"
+  colour: "#4f4e46"
+  set: helmets
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.17)
+tricorn_helmet:
+  name: "Tricorn"
+  colour: "#4f4e46"
+  set: helmets
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.30)
+hat_helmet:
+  name: "Hat"
+  colour: "#d1d0c2"
+  set: helmets
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.31)
+tricorn2_helmet:
+  name: "White Tricorn"
+  colour: "#d1d0c2"
+  set: helmets
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.32)
+tricorn3_helmet:
+  name: "White Tricorn"
+  colour: "#d1d0c2"
+  set: helmets
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.52)
+adventurer_helmet:
+  name: "Adventurer Hat"
+  colour: "#ad5e1d"
+  set: helmets
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.34)
+pilot_helmet:
+  name: "Pilot Helmet"
+  colour: "#ad5e1d"
+  set: helmets
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.36)
+steampunk_tophat:
+  name: "Steam Tophat"
+  colour: "#f0d332"
+  set: helmets
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.37)
+steampunk_tophat_goggles:
+  name: "Steam Goggles Tophat"
+  colour: "#f0d332"
+  set: helmets
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.38)
+steampunk_tophat_green:
+  name: "Steam Green Goggles Tophat"
+  colour: "#f0d332"
+  set: helmets
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.39)
+steampunk_tophat_short:
+  name: "Steam Short Tophat"
+  colour: "#f0d332"
+  set: helmets
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(CARVED_PUMPKIN.40)
+ravoukar_cap:
+  name: "Ravoukar Cap"
+  colour: "#96544b"
+  set: helmets
+  permission: armourshop.ravoukar
+  item: localmodel(CARVED_PUMPKIN.45)
+ravoukar_cap_relaxed:
+  name: "Ravoukar Cap (Relaxed)"
+  colour: "#96544b"
+  set: helmets
+  permission: armourshop.ravoukar
+  item: localmodel(CARVED_PUMPKIN.46)
+ravoukar_cap_gray:
+  name: "Ravoukar Cap (Gray)"
+  colour: "#96544b"
+  set: helmets
+  permission: armourshop.ravoukar
+  item: localmodel(CARVED_PUMPKIN.49)
+ravoukar_guard_cap:
+  name: "Ravoukar Guard Cap"
+  colour: "#96544b"
+  set: helmets
+  permission: armourshop.ravoukar
+  item: localmodel(CARVED_PUMPKIN.47)
+ravoukar_guard_cap_officer:
+  name: "Ravoukar Guard Cap (Officer)"
+  colour: "#96544b"
+  set: helmets
+  permission: armourshop.ravoukar
+  item: localmodel(CARVED_PUMPKIN.48)
+papalmitre:
+  name: "Papal Mitre"
+  colour: "§5"
+  set: helmets
+  permission: armourshop.papal
+  item: localmodel(CARVED_PUMPKIN.44)
+mafia_hat_red:
+  name: "Mafia Hat (Red)"
+  colour: "§c"
+  set: helmets
+  permission: armourshop.mafia_hat
+  item: localmodel(CARVED_PUMPKIN.50)
+toupe:
+  name: "Toupe"
+  colour: "§f"
+  set: helmets
+  permission: armourshop.toupe
+  item: localmodel(CARVED_PUMPKIN.51)
+xmas_hat:
+    name: "X-Mas #62A564Hat"
+    colour: "#a12a23"
+    set: helmets
+    permission: armourshop.xmas
+    item: localmodel(CARVED_PUMPKIN.55)
+elf_hat:
+    name: "Elf #62A564Hat"
+    colour: "#a12a23"
+    set: helmets
+    permission: armourshop.elf
+    item: localmodel(CARVED_PUMPKIN.56)
+cherri_antlers:
+    name: "Cherri Antlers"
+    colour: "#e08bca"
+    set: helmets
+    permission: armourshop.cherri
+    item: localmodel(CARVED_PUMPKIN.57)
+ivocynoxia_mask:
+    name: "Ivorynoxia Mask"
+    colour: "#8ea3a1"
+    set: helmets
+    permission: armourshop.caution
+    item: localmodel(CARVED_PUMPKIN.58)

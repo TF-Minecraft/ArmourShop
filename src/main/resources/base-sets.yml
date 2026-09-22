@@ -8,77 +8,191 @@ leather:
   boots:
     - armors.leather_boots
 
-chainmail:
+iron:
   helmet:
     - helmets.light_chainmail_helmet
     - helmets.medium_chainmail_helmet
     - helmets.heavy_chainmail_helmet
+    - helmets.light_custom_helmet
+    - helmets.medium_custom_helmet
+    - helmets.heavy_custom_helmet
   chestplate:
     - armors.light_chainmail_chestplate
     - armors.medium_chainmail_chestplate
     - armors.heavy_chainmail_chestplate
+    - armors.light_custom_chestplate
+    - armors.medium_custom_chestplate
+    - armors.heavy_custom_chestplate
   leggings:
     - armors.light_chainmail_leggings
     - armors.medium_chainmail_leggings
     - armors.heavy_chainmail_leggings
+    - armors.light_custom_leggings
+    - armors.medium_custom_leggings
+    - armors.heavy_custom_leggings
   boots:
     - armors.light_chainmail_boots
     - armors.medium_chainmail_boots
     - armors.heavy_chainmail_boots
+    - armors.light_custom_boots
+    - armors.medium_custom_boots
+    - armors.heavy_custom_boots
 
 steel:
   helmet:
     - helmets.light_steel_helmet
     - helmets.medium_steel_helmet
     - helmets.heavy_steel_helmet
+    - helmets.light_custom_helmet
+    - helmets.medium_custom_helmet
+    - helmets.heavy_custom_helmet
   chestplate:
     - armors.light_steel_chestplate
     - armors.medium_steel_chestplate
     - armors.heavy_steel_chestplate
+    - armors.light_custom_chestplate
+    - armors.medium_custom_chestplate
+    - armors.heavy_custom_chestplate
   leggings:
     - armors.light_steel_leggings
     - armors.medium_steel_leggings
     - armors.heavy_steel_leggings
+    - armors.light_custom_leggings
+    - armors.medium_custom_leggings
+    - armors.heavy_custom_leggings
   boots:
     - armors.light_steel_boots
     - armors.medium_steel_boots
     - armors.heavy_steel_boots
+    - armors.light_custom_boots
+    - armors.medium_custom_boots
+    - armors.heavy_custom_boots
 
 abyssalite:
   helmet:
     - helmets.light_abyssalite_helmet
     - helmets.medium_abyssalite_helmet
     - helmets.heavy_abyssalite_helmet
+    - helmets.light_custom_helmet
+    - helmets.medium_custom_helmet
+    - helmets.heavy_custom_helmet
   chestplate:
     - armors.light_abyssalite_chestplate
     - armors.medium_abyssalite_chestplate
     - armors.heavy_abyssalite_chestplate
+    - armors.light_custom_chestplate
+    - armors.medium_custom_chestplate
+    - armors.heavy_custom_chestplate
   leggings:
     - armors.light_abyssalite_leggings
     - armors.medium_abyssalite_leggings
     - armors.heavy_abyssalite_leggings
+    - armors.light_custom_leggings
+    - armors.medium_custom_leggings
+    - armors.heavy_custom_leggings
   boots:
     - armors.light_abyssalite_boots
     - armors.medium_abyssalite_boots
     - armors.heavy_abyssalite_boots
+    - armors.light_custom_boots
+    - armors.medium_custom_boots
+    - armors.heavy_custom_boots
 
 mythril:
   helmet:
     - helmets.light_mythril_helmet
     - helmets.medium_mythril_helmet
     - helmets.heavy_mythril_helmet
+    - helmets.light_custom_helmet
+    - helmets.medium_custom_helmet
+    - helmets.heavy_custom_helmet
   chestplate:
     - armors.light_mythril_chestplate
     - armors.medium_mythril_chestplate
     - armors.heavy_mythril_chestplate
+    - armors.light_custom_chestplate
+    - armors.medium_custom_chestplate
+    - armors.heavy_custom_chestplate
   leggings:
     - armors.light_mythril_leggings
     - armors.medium_mythril_leggings
     - armors.heavy_mythril_leggings
+    - armors.light_custom_leggings
+    - armors.medium_custom_leggings
+    - armors.heavy_custom_leggings
   boots:
     - armors.light_mythril_boots
     - armors.medium_mythril_boots
     - armors.heavy_mythril_boots
+    - armors.light_custom_boots
+    - armors.medium_custom_boots
+    - armors.heavy_custom_boots
+
+any:
+  helmet:
+    - helmets.light_chainmail_helmet
+    - helmets.medium_chainmail_helmet
+    - helmets.heavy_chainmail_helmet
+    - helmets.light_steel_helmet
+    - helmets.medium_steel_helmet
+    - helmets.heavy_steel_helmet
+    - helmets.light_abyssalite_helmet
+    - helmets.medium_abyssalite_helmet
+    - helmets.heavy_abyssalite_helmet
+    - helmets.light_mythril_helmet
+    - helmets.medium_mythril_helmet
+    - helmets.heavy_mythril_helmet
+    - helmets.light_custom_helmet
+    - helmets.medium_custom_helmet
+    - helmets.heavy_custom_helmet
+  chestplate:
+    - armors.light_chainmail_chestplate
+    - armors.medium_chainmail_chestplate
+    - armors.heavy_chainmail_chestplate
+    - armors.light_steel_chestplate
+    - armors.medium_steel_chestplate
+    - armors.heavy_steel_chestplate
+    - armors.light_abyssalite_chestplate
+    - armors.medium_abyssalite_chestplate
+    - armors.heavy_abyssalite_chestplate
+    - armors.light_mythril_chestplate
+    - armors.medium_mythril_chestplate
+    - armors.heavy_mythril_chestplate
+    - armors.light_custom_chestplate
+    - armors.medium_custom_chestplate
+    - armors.heavy_custom_chestplate
+  leggings:
+    - armors.light_chainmail_leggings
+    - armors.medium_chainmail_leggings
+    - armors.heavy_chainmail_leggings
+    - armors.light_steel_leggings
+    - armors.medium_steel_leggings
+    - armors.heavy_steel_leggings
+    - armors.light_abyssalite_leggings
+    - armors.medium_abyssalite_leggings
+    - armors.heavy_abyssalite_leggings
+    - armors.light_mythril_leggings
+    - armors.medium_mythril_leggings
+    - armors.heavy_mythril_leggings
+    - armors.light_custom_leggings
+    - armors.medium_custom_leggings
+    - armors.heavy_custom_leggings
+  boots:
+    - armors.light_chainmail_boots
+    - armors.medium_chainmail_boots
+    - armors.heavy_chainmail_boots
+    - armors.light_steel_boots
+    - armors.medium_steel_boots
+    - armors.heavy_steel_boots
+    - armors.light_abyssalite_boots
+    - armors.medium_abyssalite_boots
+    - armors.heavy_abyssalite_boots
+    - armors.light_mythril_boots
+    - armors.medium_mythril_boots
+    - armors.heavy_mythril_boots
+    - armors.light_custom_boots
+    - armors.medium_custom_boots
+    - armors.heavy_custom_boots
 
 mage:
   helmet:
@@ -102,27 +216,157 @@ mage:
     - mage_armors.mage_abyssalite_boots
     - mage_armors.mage_mythril_boots
 
+illusion:
+  helmet:
+    - mage_armors.illusion_mage_helmet
+  chestplate:
+    - mage_armors.illusion_mage_chestplate
+  leggings:
+    - mage_armors.illusion_mage_leggings
+  boots:
+    - mage_armors.illusion_mage_boots
+
+spiritual:
+  helmet:
+    - mage_armors.spiritual_mage_helmet
+  chestplate:
+    - mage_armors.spiritual_mage_chestplate
+  leggings:
+    - mage_armors.spiritual_mage_leggings
+  boots:
+    - mage_armors.spiritual_mage_boots
+
+bloodmagic:
+  helmet:
+    - mage_armors.bloodmagic_mage_helmet
+  chestplate:
+    - mage_armors.bloodmagic_mage_chestplate
+  leggings:
+    - mage_armors.bloodmagic_mage_leggings
+  boots:
+    - mage_armors.bloodmagic_mage_boots
+
+necromancy:
+  helmet:
+    - mage_armors.necromancy_mage_helmet
+  chestplate:
+    - mage_armors.necromancy_mage_chestplate
+  leggings:
+    - mage_armors.necromancy_mage_leggings
+  boots:
+    - mage_armors.necromancy_mage_boots
+
+arcanum:
+  helmet:
+    - mage_armors.arcanum_mage_helmet
+  chestplate:
+    - mage_armors.arcanum_mage_chestplate
+  leggings:
+    - mage_armors.arcanum_mage_leggings
+  boots:
+    - mage_armors.arcanum_mage_boots
+
+shadowmancy:
+  helmet:
+    - mage_armors.shadowmancy_mage_helmet
+  chestplate:
+    - mage_armors.shadowmancy_mage_chestplate
+  leggings:
+    - mage_armors.shadowmancy_mage_leggings
+  boots:
+    - mage_armors.shadowmancy_mage_boots
+
+wild mage:
+  helmet:
+    - mage_armors.illusion_mage_helmet
+    - mage_armors.spiritual_mage_helmet
+    - mage_armors.bloodmagic_mage_helmet
+    - mage_armors.necromancy_mage_helmet
+    - mage_armors.arcanum_mage_helmet
+    - mage_armors.shadowmancy_mage_helmet
+  chestplate:
+    - mage_armors.illusion_mage_chestplate
+    - mage_armors.spiritual_mage_chestplate
+    - mage_armors.bloodmagic_mage_chestplate
+    - mage_armors.necromancy_mage_chestplate
+    - mage_armors.arcanum_mage_chestplate
+    - mage_armors.shadowmancy_mage_chestplate
+  leggings:
+    - mage_armors.illusion_mage_leggings
+    - mage_armors.spiritual_mage_leggings
+    - mage_armors.bloodmagic_mage_leggings
+    - mage_armors.necromancy_mage_leggings
+    - mage_armors.arcanum_mage_leggings
+    - mage_armors.shadowmancy_mage_leggings
+  boots:
+    - mage_armors.illusion_mage_boots
+    - mage_armors.spiritual_mage_boots
+    - mage_armors.bloodmagic_mage_boots
+    - mage_armors.necromancy_mage_boots
+    - mage_armors.arcanum_mage_boots
+    - mage_armors.shadowmancy_mage_boots
+
+light mage:
+  helmet:
+    - mage_armors.illusion_mage_helmet
+    - mage_armors.spiritual_mage_helmet
+    - mage_armors.arcanum_mage_helmet
+  chestplate:
+    - mage_armors.illusion_mage_chestplate
+    - mage_armors.spiritual_mage_chestplate
+    - mage_armors.arcanum_mage_chestplate
+  leggings:
+    - mage_armors.illusion_mage_leggings
+    - mage_armors.spiritual_mage_leggings
+    - mage_armors.arcanum_mage_leggings
+  boots:
+    - mage_armors.illusion_mage_boots
+    - mage_armors.spiritual_mage_boots
+    - mage_armors.arcanum_mage_boots
+
+dark mage:
+  helmet:
+    - mage_armors.bloodmagic_mage_helmet
+    - mage_armors.necromancy_mage_helmet
+    - mage_armors.shadowmancy_mage_helmet
+  chestplate:
+    - mage_armors.bloodmagic_mage_chestplate
+    - mage_armors.necromancy_mage_chestplate
+    - mage_armors.shadowmancy_mage_chestplate
+  leggings:
+    - mage_armors.bloodmagic_mage_leggings
+    - mage_armors.necromancy_mage_leggings
+    - mage_armors.shadowmancy_mage_leggings
+  boots:
+    - mage_armors.bloodmagic_mage_boots
+    - mage_armors.necromancy_mage_boots
+    - mage_armors.shadowmancy_mage_boots
+
 infantry:
   helmet:
     - helmets.infantry_iron_helmet
     - helmets.infantry_steel_helmet
     - helmets.infantry_abyssalite_helmet
     - helmets.infantry_mythril_helmet
+    - helmets.infantry_custom_helmet
   chestplate:
     - armors.infantry_iron_chestplate
     - armors.infantry_steel_chestplate
     - armors.infantry_abyssalite_chestplate
     - armors.infantry_mythril_chestplate
+    - armors.infantry_custom_chestplate
   leggings:
     - armors.infantry_iron_leggings
     - armors.infantry_steel_leggings
     - armors.infantry_abyssalite_leggings
     - armors.infantry_mythril_leggings
+    - armors.infantry_custom_leggings
   boots:
     - armors.infantry_iron_boots
     - armors.infantry_steel_boots
     - armors.infantry_abyssalite_boots
     - armors.infantry_mythril_boots
+    - armors.infantry_custom_boots
 
 exploration:
   helmet:
@@ -145,6 +389,214 @@ exploration:
 ##Items
 
 swords:
-  item: true
-  items:
-    - swords.iron_sword
+  item:
+    - sword.iron_sword
+    - sword.steel_sword
+    - sword.abyssalite_sword
+    - sword.mythril_sword
+    - sword.custom_sword
+
+battleaxes:
+  item:
+    - battleaxes.iron_battleaxe
+    - battleaxes.steel_battleaxe
+    - battleaxes.abyssalite_battleaxe
+    - battleaxes.mythril_battleaxe
+    - battleaxes.custom_battleaxe
+
+daggers:
+  item:
+    - daggers.iron_dagger
+    - daggers.steel_dagger
+    - daggers.abyssalite_dagger
+    - daggers.mythril_dagger
+    - daggers.custom_dagger
+
+warhammers:
+  item:
+    - warhammers.iron_warhammer
+    - warhammers.steel_warhammer
+    - warhammers.abyssalite_warhammer
+    - warhammers.mythril_warhammer
+    - warhammers.custom_warhammer
+
+spears:
+  item:
+    - spears.iron_spear
+    - spears.steel_spear
+    - spears.abyssalite_spear
+    - spears.mythril_spear
+    - spears.custom_spear
+
+polearms:
+  item:
+    - polearms.iron_polearm
+    - polearms.steel_polearm
+    - polearms.abyssalite_polearm
+    - polearms.mythril_polearm
+    - polearms.custom_polearm
+
+greathammers:
+  item:
+    - greathammers.iron_greathammer
+    - greathammers.steel_greathammer
+    - greathammers.abyssalite_greathammer
+    - greathammers.mythril_greathammer
+    - greathammers.custom_greathammer
+
+longswords:
+  item:
+    - longswords.iron_longsword
+    - longswords.steel_longsword
+    - longswords.abyssalite_longsword
+    - longswords.mythril_longsword
+    - longswords.custom_longsword
+
+greataxes:
+  item:
+    - greataxes.iron_greataxe
+    - greataxes.steel_greataxe
+    - greataxes.abyssalite_greataxe
+    - greataxes.mythril_greataxe
+    - greataxes.custom_greataxe
+
+shortbows:
+  item:
+    - shortbows.barkwood_shortbow
+    - shortbows.maplewood_shortbow
+    - shortbows.elderwood_shortbow
+    - shortbows.demonwood_shortbow
+    - shortbows.custom_shortbow
+
+longbows:
+  item:
+    - longbows.barkwood_longbow
+    - longbows.maplewood_longbow
+    - longbows.elderwood_longbow
+    - longbows.demonwood_longbow
+    - longbows.custom_longbow
+
+crossbows:
+  item:
+    - crossbows.barkwood_crossbow
+    - crossbows.maplewood_crossbow
+    - crossbows.elderwood_crossbow
+    - crossbows.demonwood_crossbow
+    - crossbows.custom_crossbow
+
+staffs:
+  item:
+    - mage_staffs.mage_iron_staff
+    - mage_staffs.mage_steel_staff
+    - mage_staffs.mage_abyssalite_staff
+    - mage_staffs.mage_mythril_staff
+
+shortswords:
+  item:
+    - shortswords.iron_shortsword
+    - shortswords.steel_shortsword
+    - shortswords.abyssalite_shortsword
+    - shortswords.mythril_shortsword
+#    - shortswords.custom_shortsword
+
+shields:
+  item:
+    - shields.iron_shield
+    - shields.steel_shield
+    - shields.abyssalite_shield
+    - shields.mythril_shield
+
+battle standards:
+  item:
+    - banners.barkwood_banner
+    - banners.maplewood_banner
+    - banners.elderwood_banner
+    - banners.demonwood_banner
+
+helmets:
+  item:
+    - helmets.light_chainmail_helmet
+    - helmets.medium_chainmail_helmet
+    - helmets.heavy_chainmail_helmet
+    - helmets.light_steel_helmet
+    - helmets.medium_steel_helmet
+    - helmets.heavy_steel_helmet
+    - helmets.light_abyssalite_helmet
+    - helmets.medium_abyssalite_helmet
+    - helmets.heavy_abyssalite_helmet
+    - helmets.light_mythril_helmet
+    - helmets.medium_mythril_helmet
+    - helmets.heavy_mythril_helmet
+    - helmets.light_custom_helmet
+    - helmets.medium_custom_helmet
+    - helmets.heavy_custom_helmet
+    - mage_armors.mage_iron_helmet
+    - mage_armors.mage_steel_helmet
+    - mage_armors.mage_abyssalite_helmet
+    - mage_armors.mage_mythril_helmet
+    - helmets.infantry_iron_helmet
+    - helmets.infantry_steel_helmet
+    - helmets.infantry_abyssalite_helmet
+    - helmets.infantry_mythril_helmet
+    - helmets.infantry_custom_helmet
+
+rifles:
+  item:
+    - guns.rifle_template
+
+pistols:
+  item:
+    - guns.pistol_template
+
+shotguns:
+  item:
+    - guns.shotgun_template
+
+launchers:
+  item:
+    - guns.launcher_template
+
+mage blades:
+  item:
+    - mage_swords.mage_iron_sword
+    - mage_swords.mage_steel_sword
+    - mage_swords.mage_abyssalite_sword
+    - mage_swords.mage_mythril_sword
+
+hatchets:
+  item:
+    - tools.iron_axe
+    - tools.steel_axe
+    - tools.abyssalite_axe
+    - tools.mythril_axe
+
+hoes:
+  item:
+    - tools.iron_hoe
+    - tools.steel_hoe
+    - tools.abyssalite_hoe
+    - tools.mythril_hoe
+
+knives:
+  item:
+    - tools.iron_hunting_knife
+
+books:
+  item:
+    - books.LETTER
+
+minor health:
+  item:
+    - consumables.minor_health_potion
+
+major health:
+  item:
+    - consumables.major_health_potion
+
+minor mana:
+  item:
+    - consumables.minor_mana_potion
+
+major mana:
+  item:
+    - consumables.major_mana_potion

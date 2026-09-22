@@ -1,0 +1,18 @@
+bronze_spear:
+  name: "Bronze Spear"
+  colour: "#b38e58"
+  set: spears
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_HOE.10)
+tribal_spear:
+  name: "Tribal Spear"
+  colour: "#4b873b"
+  set: spears
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_HOE.12)
+jellyfish_sting_spear:
+  name: "Jellyfish Sting Spear"
+  colour: "#cf728d"
+  set: spears
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_HOE.13)

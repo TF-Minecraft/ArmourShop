@@ -1,0 +1,36 @@
+bronze_dagger:
+  name: "Bronze Dagger"
+  colour: "#b38e58"
+  set: daggers
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_SWORD.24)
+smithing_dagger:
+  name: "Smithing Dagger"
+  colour: "#828080"
+  set: daggers
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_SWORD.34)
+sickle_dagger:
+  name: "Sickle"
+  colour: "#d8f1d8"
+  set: daggers
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_SWORD.35)
+shark_tooth_knife:
+  name: "Shark Tooth Dagger"
+  colour: "#b99c85"
+  set: daggers
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_SWORD.36)
+tribal_dagger:
+  name: "Tribal Dagger"
+  colour: "#4b873b"
+  set: daggers
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(IRON_SWORD.37)
+drakhanate_dagger:
+  name: "Drakhanate Dagger"
+  colour: "#750000"
+  set: daggers
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(IRON_SWORD.38)

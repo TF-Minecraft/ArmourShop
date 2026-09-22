@@ -1,0 +1,91 @@
+line_red:
+  name: "Red Line Infantry"
+  colour: "#b31010"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  helmet: m.helmets.shako
+  chestplate: ia.tfmc_armor:line_red_chestplate
+  leggings: ia.tfmc_armor:line_leggings
+
+line_blue:
+  name: "Blue Line Infantry"
+  colour: "#061294"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  chestplate: ia.tfmc_armor:line_blue_chestplate
+
+line_green:
+  name: "Green Line Infantry"
+  colour: "#055c05"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  chestplate: ia.tfmc_armor:line_green_chestplate
+
+line_white:
+  name: "White Line Infantry"
+  colour: "#fcfffc"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  chestplate: ia.tfmc_armor:line_white_chestplate
+
+line_brown:
+  name: "Brown Line Infantry"
+  colour: "#805906"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  chestplate: ia.tfmc_armor:line_brown_chestplate
+  
+green_infantry:
+  name: "Green Infantry"
+  colour: "#45a14a"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  helmet: m.helmets.green_infantry_helmet
+  chestplate: ia.tfmc_armor:industrial_green_chestplate
+  leggings: ia.tfmc_armor:industrial_green_leggings
+
+blue_infantry:
+  name: "Blue Infantry"
+  colour: "#137ebd"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  helmet: m.helmets.blue_infantry_helmet
+  chestplate: ia.tfmc_armor:industrial_blue_chestplate
+  leggings: ia.tfmc_armor:industrial_blue_leggings
+
+brown_infantry:
+  name: "Brown Infantry"
+  colour: "#694504"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  helmet: m.helmets.brown_infantry_helmet
+  chestplate: ia.tfmc_armor:industrial_brown_chestplate
+  leggings: ia.tfmc_armor:industrial_brown_leggings
+
+tan_infantry:
+  name: "Tan Infantry"
+  colour: "#c9a767"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  helmet: m.helmets.tan_infantry_helmet
+  chestplate: ia.tfmc_armor:industrial_tan_chestplate
+  leggings: ia.tfmc_armor:industrial_tan_leggings
+
+red_infantry:
+  name: "Red Infantry"
+  colour: "#820303"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  helmet: m.helmets.red_infantry_helmet
+  chestplate: ia.tfmc_armor:industrial_red_chestplate
+  leggings: ia.tfmc_armor:industrial_red_leggings
+
+eastern_hillman_infantry:
+  name: "Eastern Hillman"
+  colour: "#9c8965"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  helmet: m.helmets.eastern_hillman_hat
+  chestplate: ia.tfmc_armor:eastern_hillman_chestplate
+  leggings: ia.tfmc_armor:eastern_hillman_leggings
+  boots: ia.tfmc_armor:eastern_hillman_boots

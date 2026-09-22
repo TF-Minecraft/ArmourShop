@@ -1,0 +1,24 @@
+bronze_battleaxe:
+  name: "Bronze Battleaxe"
+  colour: "#b38e58"
+  set: swords
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_AXE.12)
+black_battleaze:
+  name: "Black Battleaxe"
+  colour: "#363531"
+  set: battleaxes
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_AXE.15)
+tribal_battleaxe:
+  name: "Tribal Battleaxe"
+  colour: "#4b873b"
+  set: battleaxes
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_AXE.14)
+aemg_battleaxe:
+  name: "A.E.M.G Battleaxe"
+  colour: "#6d0a29"
+  set: battleaxes
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(IRON_AXE.16)

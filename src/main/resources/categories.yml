@@ -1,50 +1,308 @@
-medieval:
-  name: "§7Medieval"
+# Armors
+a_medieval:
+  name: "Medieval"
+  colour: "#959e97"
   item: ia.tfmc_armor:decorated_iron_chestplate
 
-forest:
-  name: "§2Forest"
+a_forest:
+  name: "Forest"
+  colour: "#088228"
   item: ia.tfmc_armor:forestman_iron_chestplate
 
-viking:
-  name: "§9Viking"
+a_viking:
+  name: "Viking"
+  colour: "#444f4b"
   item: ia.tfmc_armor:hraftar_iron_chestplate
 
-imperial:
-  name: "§6Imperial"
-  item: ia.tfmc_armor:imperial_iron_chestplate
-
-samurai:
-  name: "§cSamurai"
+a_samurai:
+  name: "Samurai"
+  colour: "#de4545"
   item: ia.tfmc_samurai:samurai_iron_chestplate
 
-mage:
-  name: "§3Mage"
+a_mage:
+  name: "Mage"
+  colour: "#0fa863"
   item: ia.tfmc_armor:mage_steel_chestplate
 
-pirate:
-  name: "§6Pirate"
+a_pirate:
+  name: "Pirate"
+  colour: "#e86b8c"
   item: ia.tfmc_armor:pirate_iron_chestplate
 
-infantry:
-  name: "§7Infantry"
+a_osenic:
+  name: "Osenic"
+  colour: "#c22b2b"
+  item: ia.tfmc_armor:osenic_chain_chestplate
+
+a_ravoukar:
+  name: "Ravoukar"
+  colour: "#96544b"
+  permission: armourshop.ravoukar
+  item: ia.tfmc_armor:ravoukar_chestplate
+
+a_infantry:
+  name: "Infantry"
+  colour: "#bebfbd"
   item: ia.tfmc_armor:line_blue_chestplate
 
-other:
-  name: "§7Other"
+a_mythril:
+  name: "Mythril"
+  colour: "#9be1f3"
   item: ia.tfmc_armor:aemg_steel_chestplate
 
-dwarf:
-  name: "§6Dwarven"
-  permission: armourshop.dwarven
-  item: ia.tfmc_armor:dwardenred_heavy_chain_chestplate
-
-dryad_exploration:
-  name: "§aDryad Exploration"
-  permission: armourshop.dryad_exploration
+a_exploration:
+  name: "Exploration"
+  colour: "#8aed66"
   item: ia.tfmc_armor:dryad_exploration_chestplate
 
-swords:
-  name: "§7Swords"
-  item: m.swords.iron_sword
+a_wildmagic:
+  name: "Wild Magic"
+  colour: "#df4ff6"
+  item: ia.tfmc_armor:illusion_mage_chestplate
+  permission: armourshop.wildmagic
+
+ca_krung:
+  name: "Krung/Ladybird"
+  colour: "#d1a473"
+  item: ia.tfmc_armor:krung_chestplate
+  permission: armourshop.krung
+
+ca_pinkhoney:
+  name: "Cherri Mage"
+  colour: "#944ebf"
+  item: ia.tfmc_armor:pinkhoney_mage_chestplate
+  permission: armourshop.cherri
+
+ca_valanaar:
+  name: "Valanaar"
+  colour: "#eb9d02"
+  item: ia.tfmc_armor:valanaar_chainmail_chestplate
+  permission: armourshop.valanaar
+
+ca_prism:
+  name: "Prism"
+  colour: "#808080"
+  item: ia.tfmc_armor:prism_chainmail_chestplate
+  permission: armourshop.prism
+
+ca_grimshaw:
+  name: "Grimshaw"
+  colour: "#9c001a"
+  item: ia.tfmc_armor:grimshaw_iron_chestplate
+  permission: armourshop.grimshaw
+
+ca_lucilinburhuc:
+  name: "Lucilinburhuc"
+  colour: "#0000ff"
+  item: ia.tfmc_armor:lucilinburhuc_chainmail_chestplate
+  permission: armourshop.lucilinburhuc
+
+ca_roseyginger:
+  name: "Runebound Aegis"
+  colour: "#808080"
+  item: ia.tfmc_armor:roseyginger_chestplate
+  permission: armourshop.roseyginger
+
+ca_papal:
+  name: "Papal"
+  colour: "#dd51ed"
+  item: ia.tfmc_armor:papal_robes_chestplate
+  permission: armourshop.papal
+
+ca_whiteraven:
+  name: "White Raven"
+  colour: "#4f4240"
+  item: ia.tfmc_armor:white_raven_chestplate
+  permission: armourshop.whiteraven
+
+ca_babylon:
+  name: "Babylon"
+  colour: "#e3df4d"
+  item: ia.tfmc_armor:babylon_chestplate
+  permission: armourshop.babylon
+
+ca_zerratoris:
+  name: "Rothil #A12A23Zerratoris"
+  colour: "#3c44aa"
+  item: ia.tfmc_armor:zerratoris_medium_chestplate
+  permission: armourshop.zerratoris
+
+ca_gourmet:
+  name: "Gourmet"
+  colour: "#540a64"
+  item: ia.tfmc_armor:gourmet_chestplate
+  permission: armourshop.gourmet
+
+ca_female_bloodmage:
+  name: "Female Bloodmage"
+  colour: "#aa0000"
+  item: ia.tfmc_armor:female_bloodmage_chestplate
+  permission: armourshop.female_bloodmage
+
+ca_tenceur:
+  name: "House #FFFFFFTenceur"
+  colour: "#0000aa"
+  item: ia.tfmc_armor:tenceur_helmet
+  permission: armourshop.tenceur
+
+ca_nurrithian:
+  name: "Nurrithian Mage"
+  item: ia.tfmc_armor:nurrithian_mage_green_chestplate
+  permission: armourshop.nurrithian
+
+ca_sacred_safeguard:
+  name: "Sacred Safeguard"
+  colour: "#cecece"
+  item: ia.tfmc_armor:sacred_safeguard_chestplate
+  permission: armourshop.sacred_safeguard_armor
+
+ca_frankie:
+  name: "Frankie Illusion"
+  item: ia.tfmc_armor:babylon_helmet
+  permission: armourshop.frankie
+
+ca_evil:
+  name: "Evil fucking chuds"
+  item: ia.tfmc_armor:yorimir_chestplate
+  permission: armourshop.evil
+
+i_swords:
+  name: "Swords"
+  colour: "#7f7d80"
+  item: m.sword.steel_sword
+  is-item: true
+
+i_battleaxes:
+  name: "Battleaxes"
+  colour: "#7f7d80"
+  item: m.battleaxes.steel_battleaxe
+  is-item: true
+
+i_daggers:
+  name: "Daggers"
+  colour: "#7f7d80"
+  item: m.daggers.steel_dagger
+  is-item: true
+
+i_warhammers:
+  name: "Warhammers"
+  colour: "#7f7d80"
+  item: m.warhammers.steel_warhammer
+  is-item: true
+
+i_spears:
+  name: "Spears"
+  colour: "#7f7d80"
+  item: m.spears.steel_spear
+  is-item: true
+
+i_polearms:
+  name: "Polearms"
+  colour: "#7f7d80"
+  item: m.polearms.steel_polearm
+  is-item: true
+
+i_greathammers:
+  name: "Greathammers"
+  colour: "#7f7d80"
+  item: m.greathammers.steel_greathammer
+  is-item: true
+
+i_longswords:
+  name: "Longswords"
+  colour: "#7f7d80"
+  item: m.longswords.steel_longsword
+  is-item: true
+
+i_greataxes:
+  name: "Greataxes"
+  colour: "#7f7d80"
+  item: m.greataxes.steel_greataxe
+  is-item: true
+
+i_shortbows:
+  name: "Shortbows"
+  colour: "#7f7d80"
+  item: m.shortbows.maplewood_shortbow
+  is-item: true
+
+i_longbows:
+  name: "Longbows"
+  colour: "#7f7d80"
+  item: m.longbows.maplewood_longbow
+  is-item: true
+
+i_crossbows:
+  name: "Crossbows"
+  colour: "#7f7d80"
+  item: m.miscellanea.maplewood_crossbows
+  is-item: true
+
+i_mage_staffs:
+  name: "Mage Staffs"
+  colour: "#7f7d80"
+  item: m.mage_staffs.mage_steel_staff
+  is-item: true
+
+i_mage_wands:
+  name: "Mage Wands"
+  colour: "#7f7d80"
+  item: m.mage_wands.mage_steel_wand
+  is-item: true
+
+i_mage_blades:
+  name: "Mage Blades"
+  colour: "#7f7d80"
+  item: m.mage_swords.mage_steel_sword
+  is-item: true
+
+i_shortswords:
+  name: "Shortswords"
+  colour: "#7f7d80"
+  item: m.shortswords.steel_shortsword
+  is-item: true
+
+i_shields:
+  name: "Shields"
+  colour: "#7f7d80"
+  item: m.shields.steel_shield
+  is-item: true
+
+i_battle_standards:
+  name: "Battle Standards"
+  colour: "#7f7d80"
+  item: m.banners.maplewood_banner
+  is-item: true
+
+i_helmets:
+  name: "Helmets"
+  colour: "#7f7d80"
+  item: m.helmets.shako
+  is-item: true
+
+i_guns:
+  name: "Guns"
+  colour: "#7f7d80"
+  item: m.guns.rifle_template
+  is-item: true
+
+i_tools:
+  name: "Tools"
+  colour: "#7f7d80"
+  item: m.miscellanea.steel_tools
+  is-item: true
+
+i_consumables:
+  name: "Consumables"
+  colour: "#7f7d80"
+  item: m.consumables.major_health_potion
+  is-item: true
+ps_armor:
+  name: "Player Armor"
+  colour: "#a0a0a0"
+  item: ia.tfmc_armor:decorated_iron_chestplate
+ps_items:
+  name: "Player Items"
+  colour: "#a0a0a0"
+  item: m.sword.iron_sword
   is-item: true

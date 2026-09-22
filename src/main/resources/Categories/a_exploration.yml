@@ -1,0 +1,9 @@
+dryad_exploration:
+  name: "Dryad Exploration"
+  colour: "§a"
+  set: exploration
+  scroll: m.loot.common_item_skin_scroll
+  helmet: ia.tfmc_armor:dryad_exploration_helmet
+  chestplate: ia.tfmc_armor:dryad_exploration_chestplate
+  leggings: ia.tfmc_armor:dryad_exploration_leggings
+  boots: ia.tfmc_armor:dryad_exploration_boots

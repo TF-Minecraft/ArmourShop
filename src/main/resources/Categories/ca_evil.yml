@@ -1,0 +1,43 @@
+yorimir_Warrior:
+  name: "Yorimir"
+  colour: "#808080"
+  set: mythril
+  add-name: true
+  permission: armourshop.evil
+  helmet: ia.tfmc_armor:yorimir_helmet
+  chestplate: ia.tfmc_armor:yorimir_chestplate
+  leggings: ia.tfmc_armor:yorimir_leggings
+  boots: ia.tfmc_armor:yorimir_boots
+
+yorimir_bloodmagic:
+  name: "Yorimir"
+  colour: "#808080"
+  set: bloodmagic
+  add-name: true
+  permission: armourshop.evil
+  helmet: ia.tfmc_armor:yorimir_helmet
+  chestplate: ia.tfmc_armor:yorimir_chestplate
+  leggings: ia.tfmc_armor:yorimir_leggings
+  boots: ia.tfmc_armor:yorimir_boots
+
+yorimir_necromancy:
+  name: "Yorimir"
+  colour: "#808080"
+  set: necromancy
+  add-name: true
+  permission: armourshop.evil
+  helmet: ia.tfmc_armor:yorimir_helmet
+  chestplate: ia.tfmc_armor:yorimir_chestplate
+  leggings: ia.tfmc_armor:yorimir_leggings
+  boots: ia.tfmc_armor:yorimir_boots
+  
+benjamin_light:
+  name: "Benjamin"
+  colour: "#808080"
+  set: mythril
+  add-name: true
+  permission: armourshop.evil
+  chestplate: ia.tfmc_armor:benjamin_chestplate
+  leggings: ia.tfmc_armor:benjamin_leggings
+  boots: ia.tfmc_armor:benjamin_boots
+

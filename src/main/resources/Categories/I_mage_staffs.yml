@@ -1,0 +1,204 @@
+purple_staff:
+  name: "Purple Staff"
+  colour: "#a805a8"
+  set: staffs
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(STICK.6)
+aqua_staff:
+  name: "Aqua Staff"
+  colour: "#15abc2"
+  set: staffs
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(STICK.8)
+brown_staff:
+  name: "Brown Staff"
+  colour: "#966317"
+  set: staffs
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(STICK.10)
+dark_staff:
+  name: "Dark Staff"
+  colour: "#5e5b52"
+  set: staffs
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(STICK.12)
+gray_staff:
+  name: "Gray Staff"
+  colour: "#adaba5"
+  set: staffs
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(STICK.13)
+light_staff:
+  name: "Light Staff"
+  colour: "#edf263"
+  set: staffs
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(STICK.14)
+ruby_staff:
+  name: "Ruby Staff"
+  colour: "#fa4343"
+  set: staffs
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(STICK.15)
+cloud_staff:
+  name: "Cloud Staff"
+  colour: "#69e7fa"
+  set: staffs
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(STICK.16)
+mechanical_staff:
+  name: "Mechanical Staff"
+  colour: "#bf8675"
+  set: staffs
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(STICK.18)
+fire_staff:
+  name: "Fire Staff"
+  colour: "#d1250a"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.7)
+leaf_staff:
+  name: "Leaf Staff"
+  colour: "#71de0b"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.9)
+gold_staff:
+  name: "Gold Staff"
+  colour: "#e3af05"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.11)
+whiter_staff:
+  name: "Whither Staff"
+  colour: "#666564"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.20)
+rose_staff:
+  name: "Rose Staff"
+  colour: "#c21527"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.29)
+green_staff:
+  name: "Green Staff"
+  colour: "#0aa60f"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.22)
+lava_staff:
+  name: "Lava Staff"
+  colour: "#f04141"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.23)
+sun_staff:
+  name: "Sun Staff"
+  colour: "#edda2f"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.24)
+glove_staff:
+  name: "Glove Staff"
+  colour: "#fccc62"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.28)
+blue_staff:
+  name: "Blue Staff"
+  colour: "#126ede"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.33)
+spear_staff:
+  name: "Spear Staff"
+  colour: "#694f6e"
+  set: staffs
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(STICK.31)
+heart_staff:
+  name: "Heart Staff"
+  colour: "#f7d0e0"
+  set: staffs
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(STICK.27)
+glass_staff:
+  name: "Glass Staff"
+  colour: "#e1f7f1"
+  set: staffs
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(STICK.32)
+water_staff:
+  name: "Water Staff"
+  colour: "#3a7acf"
+  set: staffs
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(STICK.21)
+star_staff:
+  name: "Star Staff"
+  colour: "#faf600"
+  set: staffs
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(STICK.35)
+feather_staff:
+  name: "Feather Staff"
+  colour: "#db88c9"
+  set: staffs
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(STICK.30)
+dragon_staff:
+  name: "Dragon Staff"
+  colour: "#66039c"
+  set: staffs
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(STICK.25)
+winged_staff:
+  name: "Winged Staff"
+  colour: "#f299a6"
+  set: staffs
+  permission: armourshop.kleinovac
+  item: localmodel(STICK.82)
+alok_staff:
+  name: "Valor Staff"
+  colour: "#f1d850"
+  set: staffs
+  permission: armourshop.alok
+  item: localmodel(STICK.85)
+gourmet_book:
+   name: "Necromancy Tome"
+   colour: "#4d3a86"
+   set: staffs
+   permission: armourshop.babylon
+   item: localmodel(STICK.88)
+prism_staff:
+  name: "P#FF6355r#FBA949i#FAE442s#8BD448m #2AA8F2S#9C4F96t#FF6355a#FBA949f#FAE442f"
+  colour: "#9c4f96"
+  set: staffs
+  permission: armourshop.prism
+  item: localmodel(STICK.89)
+klein_staff:
+  name: "Grovekeeper's Staff"
+  colour: "#faf600"
+  set: staffs
+  permission: armourshop.grovekeeper
+  item: localmodel(STICK.90)
+conviction_staff:
+  name: "Staff of Conviction"
+  colour: "#7a4e99"
+  set: staffs
+  permission: armourshop.conviction
+  item: localmodel(STICK.91)
+astria_staff:
+  name: "Astria Staff"
+  set: staffs
+  permission: armourshop.astria
+  item: localmodel(STICK.92)
+frankie_staff:
+  name: "Frankie Staff"
+  set: staffs
+  permission: armourshop.frankie
+  item: localmodel(STICK.94)
+
+  

@@ -1,0 +1,27 @@
+forestman_chain:
+  name: "Forestman Scout"
+  colour: "#088228"
+  set: iron
+  scroll: m.loot.common_item_skin_scroll
+  helmet: ia.tfmc_armor:forestman_chain_helmet
+  chestplate: ia.tfmc_armor:forestman_chain_chestplate
+  leggings: ia.tfmc_armor:forestman_chain_leggings
+  boots: ia.tfmc_armor:forestman_chain_boots
+forestman_steel:
+  name: "Forestman Warrior"
+  colour: "#088228"
+  set: steel
+  scroll: m.loot.rare_item_skin_scroll
+  helmet: ia.tfmc_armor:forestman_iron_helmet
+  chestplate: ia.tfmc_armor:forestman_iron_chestplate
+  leggings: ia.tfmc_armor:forestman_iron_leggings
+  boots: ia.tfmc_armor:forestman_iron_boots
+forestman_abyssalite:
+  name: "Forestman Guardian"
+  colour: "#088228"
+  set: abyssalite
+  scroll: m.loot.epic_item_skin_scroll
+  helmet: ia.tfmc_armor:forestman_steel_helmet
+  chestplate: ia.tfmc_armor:forestman_steel_chestplate
+  leggings: ia.tfmc_armor:forestman_steel_leggings
+  boots: ia.tfmc_armor:forestman_steel_boots

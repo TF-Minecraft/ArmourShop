@@ -1,0 +1,36 @@
+samurai_levy:
+  name: "Samurai Soldier"
+  colour: "#de4545"
+  set: iron
+  scroll: m.loot.common_item_skin_scroll
+  helmet: m.helmets.samurai_chain_helmet
+  chestplate: ia.tfmc_samurai:samurai_chain_chestplate
+  leggings: ia.tfmc_samurai:samurai_chain_leggings
+  boots: ia.tfmc_samurai:samurai_chain_boots
+samurai_soldier:
+  name: "Samurai Warrior"
+  colour: "#de4545"
+  set: steel
+  scroll: m.loot.rare_item_skin_scroll
+  helmet: m.helmets.samurai_iron_helmet
+  chestplate: ia.tfmc_samurai:samurai_iron_chestplate
+  leggings: ia.tfmc_samurai:samurai_iron_leggings
+  boots: ia.tfmc_samurai:samurai_iron_boots
+samurai_knight:
+  name: "Samurai Shimin"
+  colour: "#de4545"
+  set: abyssalite
+  scroll: m.loot.epic_item_skin_scroll
+  helmet: m.helmets.samurai_steel_helmet
+  chestplate: ia.tfmc_samurai:samurai_steel_chestplate
+  leggings: ia.tfmc_samurai:samurai_steel_leggings
+  boots: ia.tfmc_samurai:samurai_steel_boots
+samurai_infantry:
+  name: "Samurai Arquebusier"
+  colour: "#de4545"
+  set: infantry
+  scroll: m.loot.common_item_skin_scroll
+  helmet: m.helmets.samurai_arquebus_helmet
+  chestplate: ia.tfmc_samurai:samurai_infantry_chestplate
+  leggings: ia.tfmc_samurai:samurai_infantry_leggings
+  boots: ia.tfmc_samurai:samurai_infantry_boots

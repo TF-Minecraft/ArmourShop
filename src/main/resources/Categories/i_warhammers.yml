@@ -1,0 +1,36 @@
+bronze_warhammer:
+  name: "Bronze Warhammer"
+  colour: "#b38e58"
+  set: warhammers
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_SHOVEL.14)
+smithing_hammer:
+  name: "Smithing Hammer"
+  colour: "#828080"
+  set: warhammers
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_SHOVEL.16)
+tribal_club:
+  name: "Tribal Club"
+  colour: "#4b873b"
+  set: warhammers
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_SHOVEL.17)
+war_mace:
+  name: "War Mace"
+  colour: "#3b3535"
+  set: warhammers
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_SHOVEL.18)
+aemg_warhammer:
+  name: "A.E.M.G Warhammer"
+  colour: "#6d0a29"
+  set: warhammers
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(IRON_SHOVEL.19)
+drakhanate_warhammer:
+  name: "Drakhanate Warhammer"
+  colour: "#750000"
+  set: warhammers
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(IRON_SHOVEL.20)

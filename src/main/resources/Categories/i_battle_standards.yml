@@ -1,0 +1,24 @@
+red_banner:
+  name: "Red Battle Standard"
+  colour: "#5f0c0c"
+  set: battle standards
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(BONE.5)
+serai_banner:
+  name: "Watch Battle Standard"
+  colour: "#85761e"
+  set: battle standards
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(BONE.6)
+zerratoris_banner:
+  name: "Rothil Zerratoris Battle Standard"
+  colour: "#3c44aa"
+  set: battle standards
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(BONE.7)
+drakhanate_banner:
+  name: "Drakhanate Battle Standard"
+  colour: "#781313"
+  set: battle standards
+  permission: armourshop.ravoukar
+  item: localmodel(BONE.8)

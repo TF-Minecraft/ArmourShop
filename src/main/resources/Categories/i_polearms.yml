@@ -1,0 +1,54 @@
+bronze_polearm:
+  name: "Bronze Polearm"
+  colour: "#b38e58"
+  set: polearms
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_HOE.11)
+voulge:
+  name: "Voulge"
+  colour: "#aba9a9"
+  set: polearms
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_HOE.14)
+trihead_polearm:
+  name: "Trihead Polearm"
+  colour: "#6e6966"
+  set: polearms
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_HOE.15)
+makeshift_polearm:
+  name: "Makeshift Polearm"
+  colour: "#e6c28c"
+  set: polearms
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_HOE.18)
+broken_polearm:
+  name: "Broken Polearm"
+  colour: "#434343"
+  set: polearms
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_HOE.17)
+halberd:
+  name: "Halberd"
+  colour: "#302727"
+  set: polearms
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_HOE.16)
+bloody_forked_polearm:
+  name: "Bloody Forked Polearm"
+  colour: "#99192d"
+  set: polearms
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_HOE.19)
+gilded_voulge:
+  name: "Gilded Voulge"
+  colour: "#b79829"
+  set: polearms
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(IRON_HOE.20)
+royal_voulge:
+  name: "Royal Voulge"
+  colour: "#f2ead8"
+  set: polearms
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(IRON_HOE.21)

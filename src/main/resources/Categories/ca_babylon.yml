@@ -1,0 +1,22 @@
+babylon_illusion:
+  name: "Babylon"
+  colour: "#e3df4d"
+  set: illusion
+  add-name: true
+  permission: armourshop.babylon
+  helmet: ia.tfmc_armor:babylon_helmet
+  chestplate: ia.tfmc_armor:babylon_chestplate
+  leggings: ia.tfmc_armor:babylon_leggings
+  boots: ia.tfmc_armor:babylon_boots
+
+babylon_mage:
+  name: "Babylon"
+  colour: "#e3df4d"
+  set: mage
+  add-name: true
+  permission: armourshop.babylon
+  helmet: ia.tfmc_armor:babylon_helmet
+  chestplate: ia.tfmc_armor:babylon_chestplate
+  leggings: ia.tfmc_armor:babylon_leggings
+  boots: ia.tfmc_armor:babylon_boots
+  

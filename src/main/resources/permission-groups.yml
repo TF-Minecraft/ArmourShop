@@ -1,0 +1,50 @@
+# Skin-upload entitlements (ProvinceSystem /skins). Same LP nodes as RPCharacters.
+#
+# Resolve (player):
+#   1. Highest matching LP group tier T
+#   2. skin-kinds = UNION of skin-kinds on all groups with tier <= T
+#   3. skin-token-cooldown-days / allow-armor-3d-helmet = value on tier T
+#      (walk down lower tiers if missing; else defaults)
+#   4. Int perks name-colour-stops / max-3d-pair-bytes = MAX across matching groups
+#
+# skin-token-cooldown-days: -1 = cannot mint skin tokens (default for non-ranked).
+# Staff mint (skin_staff) bypasses cooldown, kinds, and armor-3d-helmet gates.
+defaults:
+  name-colour-stops: 0
+  max-3d-pair-bytes: 30720
+  skin-token-cooldown-days: -1
+  skin-kinds: []
+  allow-armor-3d-helmet: false
+
+groups:
+  noble:
+    tier: 1
+    permission: rpchar.group.noble
+    display-name: "&#2981C4N&#276EC1o&#265CBEb&#2549BBl&#2337B8e&#2224B5"
+    name-colour-stops: 1
+    skin-token-cooldown-days: 28
+    skin-kinds: [handheld, large_handheld, bow, large_bow, crossbow, book]
+  gilded:
+    tier: 2
+    permission: rpchar.group.gilded
+    display-name: "&#FDAA17G&#FB9C14i&#F98E12l&#F67F10d&#F4710Ee&#F2630Bd&#F05509"
+    name-colour-stops: 2
+    skin-token-cooldown-days: 21
+    skin-kinds: [armor_set]
+  ascended:
+    tier: 3
+    permission: rpchar.group.ascended
+    display-name: "&#8939EE&lA&#9033DD&ls&#972DCC&lc&#9E27BB&le&#A620AB&ln&#AD1A9A&ld&#B41489&le&#BB0E78&ld&#C20867"
+    name-colour-stops: 20
+    skin-token-cooldown-days: 14
+    skin-kinds: [item_3d, shield, helmet_3d, gun]
+    allow-armor-3d-helmet: true
+    # Uncomment to raise the combined texture+model budget for this rank:
+    # max-3d-pair-bytes: 40960
+  legacy:
+    tier: 4
+    permission: rpchar.group.legacy
+    display-name: "&#3AE38C&lL&#33CB7C&le&#2CB36C&lg&#259C5D&la&#1E844D&lc&#176C3D&ly&#10542D&l"
+    name-colour-stops: 20
+    skin-token-cooldown-days: 7
+    allow-armor-3d-helmet: true

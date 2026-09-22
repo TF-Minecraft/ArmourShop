@@ -1,0 +1,34 @@
+papal_robes_iron:
+  name: "Papal Robes"
+  colour: "#dd51ed"
+  set: iron
+  add-name: true
+  permission: armourshop.papal
+  helmet: ia.tfmc_armor:papal_robes_helmet
+  chestplate: ia.tfmc_armor:papal_robes_chestplate
+  leggings: ia.tfmc_armor:papal_robes_leggings
+  boots: ia.tfmc_armor:papal_robes_boots
+
+papal_robes_steel:
+  name: "Papal Robes"
+  colour: "#dd51ed"
+  set: steel
+  add-name: true
+  permission: armourshop.papal
+  helmet: ia.tfmc_armor:papal_robes_helmet
+  chestplate: ia.tfmc_armor:papal_robes_chestplate
+  leggings: ia.tfmc_armor:papal_robes_leggings
+  boots: ia.tfmc_armor:papal_robes_boots
+
+papal_robes_abyssalite:
+  name: "Papal Robes"
+  colour: "#dd51ed"
+  set: abyssalite
+  add-name: true
+  permission: armourshop.papal
+  helmet: ia.tfmc_armor:papal_robes_helmet
+  chestplate: ia.tfmc_armor:papal_robes_chestplate
+  leggings: ia.tfmc_armor:papal_robes_leggings
+  boots: ia.tfmc_armor:papal_robes_boots
+
+
