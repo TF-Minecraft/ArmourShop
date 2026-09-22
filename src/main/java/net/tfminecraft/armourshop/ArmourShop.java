@@ -138,6 +138,8 @@ public class ArmourShop extends JavaPlugin{
 			}
 		});
 	}
+	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
+	@SuppressWarnings("deprecation")
 	public void reloadMessage(Player p) {
 		p.sendMessage(ChatColor.GREEN + "[ArmourShop]" + ChatColor.YELLOW + " Reloading plugin...");
 		reload();
