@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import me.Plugins.TLibs.Objects.API.SubAPI.StringFormatter;
+import net.tfminecraft.ArmourShop.utils.NameDisplay;
 
 public class SkinCategory {
 	private String id;
@@ -18,7 +18,7 @@ public class SkinCategory {
 	
 	public SkinCategory(String key, ConfigurationSection config) {
 		this.id = key;
-		this.name = StringFormatter.formatHex(config.getString("name"));
+		this.name = NameDisplay.formatFromConfig(config, "name");
 		this.item = config.getString("item");
 		if(config.contains("permission")) {
 			this.permission = Optional.of(config.getString("permission"));

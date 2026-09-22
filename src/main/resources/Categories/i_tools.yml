@@ -1,0 +1,30 @@
+sickle_tool:
+  name: "Sickle"
+  colour: "#d8f1d8"
+  set: hoes
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_HOE.22)
+smithing_knife:
+  name: "Smithing Knife"
+  colour: "#828080"
+  set: knives
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_SWORD.34)
+shark_tooth_knife:
+  name: "Shark Tooth Knife"
+  colour: "#b99c85"
+  set: knives
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_SWORD.36)
+tribal_hatchet:
+  name: "Tribal Hatchet"
+  colour: "#4b873b"
+  set: hatchets
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_AXE.14)
+drakhanate_knife:
+  name: "Drakhanate Knife"
+  colour: "#750000"
+  set: knives
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(IRON_SWORD.38

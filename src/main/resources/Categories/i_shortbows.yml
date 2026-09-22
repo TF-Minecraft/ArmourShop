@@ -1,0 +1,18 @@
+thornwood_shortbow:
+  name: "Thornwood Shortbow"
+  colour: "#398c8a"
+  set: shortbows
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(BOW.9)
+tribal_shortbow:
+  name: "Tribal Shortbow"
+  colour: "#4b873b"
+  set: shortbows
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(BOW.10)
+royal_shortbow:
+  name: "Royal Shortbow"
+  colour: "#f2ead8"
+  set: shortbows
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(BOW.11)

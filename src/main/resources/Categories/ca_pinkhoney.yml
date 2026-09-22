@@ -1,0 +1,10 @@
+pinkhoney_mage:
+  name: "Mage"
+  colour: "#ad5fc9"
+  set: mage
+  add-name: true
+  permission: armourshop.cherri
+  helmet: ia.tfmc_armor:pinkhoney_mage_helmet
+  chestplate: ia.tfmc_armor:pinkhoney_mage_chestplate
+  leggings: ia.tfmc_armor:pinkhoney_mage_leggings
+  boots: ia.tfmc_armor:pinkhoney_mage_boots

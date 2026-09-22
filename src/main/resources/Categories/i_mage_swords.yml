@@ -1,0 +1,6 @@
+the_planewalkers_blade:
+  name: "The Planewalker's Blade"
+  colour: "#3b8268"
+  set: mage swords
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(IRON_SWORD.57)

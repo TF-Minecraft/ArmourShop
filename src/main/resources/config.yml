@@ -1,1 +1,24 @@
 start-points: [9, 18, 27, 36, 45, 14, 23, 32, 41, 50]
+item-start-points: [9, 10, 11, 12, 18, 19, 20, 21, 27, 28, 29, 30, 36, 37, 38, 39, 45, 46, 47, 48, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35, 41, 42, 43, 44, 50, 51, 52, 53]
+
+# ItemsAdder pack apply + shop YAML
+pack-apply:
+  ia-contents-path: "plugins/ItemsAdder/contents"
+  categories-path: "plugins/ArmourShop/Categories"
+  # GunsAndGadgets skins.yml (Step 15 — IA ids; no CMD dual-write)
+  guns-skins-yml: "plugins/GunsAndGadgets/skins.yml"
+  # Daily force pull + IA refresh at this server-local time (HH:mm). Blank disables.
+  force-reload-time: "06:00"
+  # Seconds to wait after /iareload before /iazip
+  ia-reload-delay-seconds: 5
+
+# Scrolls offered to staff skins UI (synced to ProvinceSystem catalog)
+scrolls:
+  - id: m.loot.common_item_skin_scroll
+    label: Common
+  - id: m.loot.rare_item_skin_scroll
+    label: Rare
+  - id: m.loot.epic_item_skin_scroll
+    label: Epic
+  - id: m.loot.legendary_item_skin_scroll
+    label: Legendary

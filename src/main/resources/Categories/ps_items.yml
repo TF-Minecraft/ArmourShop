@@ -1,0 +1,5 @@
+banana:
+  name: "Banana Sword"
+  set: swords
+  permission: armourshop.submission.banana
+  item: ia.tfmc_submissions:banana

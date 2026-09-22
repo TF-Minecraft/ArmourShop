@@ -1,0 +1,20 @@
+tenceur_abyssalite:
+  name: "Tenceur"
+  set: abyssalite
+  add-name: true
+  permission: armourshop.tenceur
+  helmet: ia.tfmc_armor:tenceur_helmet
+  chestplate: ia.tfmc_armor:tenceur_chestplate
+  leggings: ia.tfmc_armor:tenceur_leggings
+  boots: ia.tfmc_armor:tenceur_boots
+
+tenceur_mythril:
+  name: "Tenceur"
+  set: mythril
+  add-name: true
+  permission: armourshop.tenceur
+  helmet: ia.tfmc_armor:tenceur_helmet
+  chestplate: ia.tfmc_armor:tenceur_chestplate
+  leggings: ia.tfmc_armor:tenceur_leggings
+  boots: ia.tfmc_armor:tenceur_boots
+

@@ -1,0 +1,43 @@
+valanaar_chainmail:
+  name: "Valanaar Iron"
+  colour: "#eb9d02"
+  set: iron
+  add-name: true
+  permission: armourshop.valanaar
+  helmet: ia.tfmc_armor:valanaar_chainmail_helmet
+  chestplate: ia.tfmc_armor:valanaar_chainmail_chestplate
+  leggings: ia.tfmc_armor:valanaar_chainmail_leggings
+  boots: ia.tfmc_armor:valanaar_chainmail_boots
+
+valanaar_steel:
+  name: "Valanaar Steel"
+  colour: "#eb9d02"
+  set: steel
+  add-name: true
+  permission: armourshop.valanaar
+  helmet: ia.tfmc_armor:valanaar_steel_helmet
+  chestplate: ia.tfmc_armor:valanaar_steel_chestplate
+  leggings: ia.tfmc_armor:valanaar_steel_leggings
+  boots: ia.tfmc_armor:valanaar_steel_boots
+
+valanaar_mage:
+  name: "Valanaar Mage"
+  colour: "#eb9d02"
+  set: mage
+  add-name: true
+  permission: armourshop.valanaar
+  helmet: ia.tfmc_armor:valanaar_mage_helmet
+  chestplate: ia.tfmc_armor:valanaar_mage_chestplate
+  leggings: ia.tfmc_armor:valanaar_mage_leggings
+  boots: ia.tfmc_armor:valanaar_mage_boots
+
+valanaar_mage2:
+  name: "Valanaar Mage"
+  colour: "#eb9d02"
+  set: mage
+  add-name: true
+  permission: armourshop.valanaar
+  helmet: ia.tfmc_armor:valanaar_mage2_helmet
+  chestplate: ia.tfmc_armor:valanaar_mage2_chestplate
+  leggings: ia.tfmc_armor:valanaar_mage2_leggings
+  boots: ia.tfmc_armor:valanaar_mage2_boots

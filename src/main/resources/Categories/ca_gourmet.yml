@@ -1,0 +1,10 @@
+gourmet:
+  name: "Gourmet"
+  set: mage
+  add-name: false
+  permission: armourshop.gourmet
+  helmet: ia.tfmc_armor:gourmet_helmet
+  chestplate: ia.tfmc_armor:gourmet_chestplate
+  leggings: ia.tfmc_armor:gourmet_leggings
+  boots: ia.tfmc_armor:gourmet_boots
+

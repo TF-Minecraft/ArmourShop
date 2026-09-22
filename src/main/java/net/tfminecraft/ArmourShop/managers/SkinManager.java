@@ -80,7 +80,7 @@ public class SkinManager implements Listener{
 		Player p = (Player) e.getWhoClicked();
 		if(!(e.getView().getTopInventory().getHolder() instanceof ASInventoryHolder)) return;
 		ASInventoryHolder holder = (ASInventoryHolder) e.getView().getTopInventory().getHolder();
-		if(e.getView().getTitle().equalsIgnoreCase("§7Armourshop Categories")) {
+		if(e.getView().getTitle().equalsIgnoreCase("\u00A77Armourshop Categories")) {
 			e.setCancelled(true);
 			if(e.getSlot() == 53) {
 				inv.typeView(p);
@@ -94,7 +94,7 @@ public class SkinManager implements Listener{
 			
 			inv.skinView(p, c, 0, holder.isItem());
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 1f, 1f);
-		} else if(e.getView().getTitle().equalsIgnoreCase("§7Armourshop Type")) {
+		} else if(e.getView().getTitle().equalsIgnoreCase("\u00A77Armourshop Type")) {
 			e.setCancelled(true);
 			ItemStack item = e.getCurrentItem();
 			if(item == null) return;
@@ -141,7 +141,7 @@ public class SkinManager implements Listener{
 		if(set.hasScroll()) {
 			scroll = findScroll(p, set.getScroll());
 			if(scroll == null) {
-				p.sendMessage("§cLacking Scroll");
+				p.sendMessage("\u00A7cLacking Scroll");
 				p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
 				return;
 			}
@@ -174,7 +174,7 @@ public class SkinManager implements Listener{
 				return;
 			}
 		}
-		p.sendMessage("§cNo item to apply skin on in your inventory");
+		p.sendMessage("\u00A7cNo item to apply skin on in your inventory");
 		p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
 	}
 	

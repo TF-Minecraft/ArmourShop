@@ -1,0 +1,30 @@
+krung_abyssalite:
+  name: "Heavy Abyssalite"
+  colour: "#a19381"
+  set: abyssalite
+  add-name: true
+  permission: armourshop.krung
+  helmet: ia.tfmc_armor:krung_helmet
+  chestplate: ia.tfmc_armor:krung_chestplate
+  leggings: ia.tfmc_armor:krung_leggings
+  boots: ia.tfmc_armor:krung_boots
+krung_mythril:
+  name: "Heavy Mythril"
+  colour: "#a19381"
+  set: mythril
+  add-name: true
+  permission: armourshop.krung
+  helmet: ia.tfmc_armor:krung_helmet
+  chestplate: ia.tfmc_armor:krung_chestplate
+  leggings: ia.tfmc_armor:krung_leggings
+  boots: ia.tfmc_armor:krung_boots
+ladybird_mage:
+  name: "Heavy Mage"
+  colour: "#bd6fc7"
+  set: mage
+  add-name: true
+  permission: armourshop.krung
+  helmet: ia.tfmc_armor:ladybird_helmet
+  chestplate: ia.tfmc_armor:ladybird_chestplate
+  leggings: ia.tfmc_armor:ladybird_leggings
+  boots: ia.tfmc_armor:ladybird_boots

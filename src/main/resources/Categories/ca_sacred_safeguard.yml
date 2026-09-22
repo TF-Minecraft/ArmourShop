@@ -1,0 +1,23 @@
+sacred_safeguard_abyssalite:
+  name: "Sacred Safeguard"
+  colour: "#cecece"
+  set: abyssalite
+  add-name: true
+  permission: armourshop.sacred_safeguard_armor
+  helmet: ia.tfmc_armor:sacred_safeguard_helmet
+  chestplate: ia.tfmc_armor:sacred_safeguard_chestplate
+  leggings: ia.tfmc_armor:sacred_safeguard_leggings
+  boots: ia.tfmc_armor:sacred_safeguard_boots
+
+sacred_safeguard_mythril:
+  name: "Sacred Safeguard"
+  colour: "#cecece"
+  set: mythril
+  add-name: true
+  permission: armourshop.sacred_safeguard_armor
+  helmet: ia.tfmc_armor:sacred_safeguard_helmet
+  chestplate: ia.tfmc_armor:sacred_safeguard_chestplate
+  leggings: ia.tfmc_armor:sacred_safeguard_leggings
+  boots: ia.tfmc_armor:sacred_safeguard_boots
+
+

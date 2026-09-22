@@ -24,7 +24,6 @@ import net.tfminecraft.ArmourShop.holder.ASInventoryHolder;
 import net.tfminecraft.ArmourShop.loaders.CategoryLoader;
 import net.tfminecraft.ArmourShop.objects.SkinCategory;
 import net.tfminecraft.ArmourShop.objects.SkinSet;
-import net.tfminecraft.gunsandgadgets.GunsAndGadgets;
 import net.tfminecraft.gunsandgadgets.guns.skins.SkinData;
 import net.tfminecraft.gunsandgadgets.guns.skins.SkinState;
 import net.tfminecraft.gunsandgadgets.loader.SkinLoader;
@@ -32,13 +31,13 @@ import net.tfminecraft.gunsandgadgets.loader.SkinLoader;
 public class InventoryManager {
 
 	public void typeView(Player player) {
-		Inventory i = ArmourShop.plugin.getServer().createInventory(new ASInventoryHolder(false), 9, "§7Armourshop Type");
+		Inventory i = ArmourShop.plugin.getServer().createInventory(new ASInventoryHolder(false), 9, "\u00A77Armourshop Type");
 		i.setItem(0, createArmourItem());
 		i.setItem(1, createItemItem());
 		player.openInventory(i);
 	}
 	public void categoryView(Player player, boolean item) {
-		Inventory i = ArmourShop.plugin.getServer().createInventory(new ASInventoryHolder(item), 54, "§7Armourshop Categories");
+		Inventory i = ArmourShop.plugin.getServer().createInventory(new ASInventoryHolder(item), 54, "\u00A77Armourshop Categories");
 		int c = 0;
 		for(int y = 0; y<CategoryLoader.get().size();y++) {
 			if(c > 53) break;
@@ -64,72 +63,109 @@ public class InventoryManager {
 		player.openInventory(i);
 	}
 	public void skinView(Player player, SkinCategory cat, int page, boolean item) {
-		Inventory i = ArmourShop.plugin.getServer().createInventory(new ASInventoryHolder(item), 54, cat.getName());
+		Inventory inv = ArmourShop.plugin.getServer().createInventory(new ASInventoryHolder(item), 54, cat.getName());
 		int slot = 0;
-		while(slot < 9) {
+		while (slot < 9) {
 			ItemStack fill = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
 			ItemMeta fm = fill.getItemMeta();
-			fm.setDisplayName("§8 ");
+			fm.setDisplayName("\u00A78 ");
 			fill.setItemMeta(fm);
-			i.setItem(slot, fill);
+			inv.setItem(slot, fill);
 			slot++;
 		}
-		int c = 0;
-		List<Integer> points = new ArrayList<>();
-		if(item) {
-			points = Cache.itemPoints;
-			c = page*Cache.itemPoints.size();
-		} else {
-			points = Cache.points;
-			c = page*Cache.points.size();
+
+		List<Integer> points = item ? Cache.itemPoints : Cache.points;
+		// Pack only sets this player can see (no holes from skipped permission / bad base set).
+		List<SkinSet> visible = visibleSets(player, cat);
+		int pageSize = points.size();
+		if (page < 0) {
+			page = 0;
 		}
-		
-		for(Integer x : points) {
-			if(c == cat.getSets().size()) break;
-			SkinSet set = cat.getSets().get(c);
-			if(set.hasPermission() && !player.hasPermission(set.getPermission())) {
-				c++;
+		int start = page * pageSize;
+		int pointIdx = 0;
+		for (int i = start; i < visible.size() && pointIdx < pageSize; i++) {
+			SkinSet set = visible.get(i);
+			int x = points.get(pointIdx++);
+			if (set.hasItem()) {
+				ItemStack stack = createSkinItem(set, set.getItem(), ArmorType.ITEM);
+				if (stack != null) {
+					inv.setItem(x, stack);
+				}
 				continue;
 			}
-			if(set.hasItem()){
-				i.setItem(x, createSkinItem(set, set.getItem(), ArmorType.ITEM));
-				c++;
+			if (set.hasHelmet()) {
+				ItemStack stack = createSkinItem(set, set.getHelmet(), ArmorType.HELMET);
+				if (stack != null) {
+					inv.setItem(x, stack);
+				}
+			}
+			if (set.hasChestplate()) {
+				ItemStack stack = createSkinItem(set, set.getChestplate(), ArmorType.CHESTPLATE);
+				if (stack != null) {
+					inv.setItem(x + 1, stack);
+				}
+			}
+			if (set.hasLeggings()) {
+				ItemStack stack = createSkinItem(set, set.getLeggings(), ArmorType.LEGGINGS);
+				if (stack != null) {
+					inv.setItem(x + 2, stack);
+				}
+			}
+			if (set.hasBoots()) {
+				ItemStack stack = createSkinItem(set, set.getBoots(), ArmorType.BOOTS);
+				if (stack != null) {
+					inv.setItem(x + 3, stack);
+				}
+			}
+		}
+
+		inv.setItem(4, createBackButton());
+		if (page > 0) {
+			inv.setItem(3, getPageItem("mcicons:icon_back_orange", page));
+		}
+		if (visible.size() - start > pageSize) {
+			inv.setItem(5, getPageItem("mcicons:icon_next_orange", page));
+		}
+		player.openInventory(inv);
+	}
+
+	/**
+	 * Sets the player may see in this category: permission OK and base set resolved.
+	 * Unresolved sets are logged once per view and omitted so the grid has no holes.
+	 */
+	private List<SkinSet> visibleSets(Player player, SkinCategory cat) {
+		List<SkinSet> visible = new ArrayList<>();
+		if (cat == null || cat.getSets() == null) {
+			return visible;
+		}
+		for (SkinSet set : cat.getSets()) {
+			if (set == null) {
 				continue;
 			}
-			if(set.hasHelmet()) {
-				i.setItem(x, createSkinItem(set, set.getHelmet(), ArmorType.HELMET));
+			if (set.hasPermission() && !player.hasPermission(set.getPermission())) {
+				continue;
 			}
-			x++;
-			if(set.hasChestplate()) {
-				i.setItem(x, createSkinItem(set, set.getChestplate(), ArmorType.CHESTPLATE));
+			if (set.getSet() == null) {
+				ArmourShop.plugin.getLogger().warning(
+						"[shop] skipping skin '" + set.getId()
+								+ "' in category '" + cat.getName()
+								+ "': base set unresolved (missing/invalid 'set' in YAML "
+								+ "or not present in live base-sets.yml)"
+				);
+				continue;
 			}
-			x++;
-			if(set.hasLeggings()) {
-				i.setItem(x, createSkinItem(set, set.getLeggings(), ArmorType.LEGGINGS));
-			}
-			x++;
-			if(set.hasBoots()) {
-				i.setItem(x, createSkinItem(set, set.getBoots(), ArmorType.BOOTS));
-			}
-			c++;
+			visible.add(set);
 		}
-		i.setItem(4, createBackButton());
-		if(page > 0) {
-			i.setItem(3, getPageItem("mcicons:icon_back_orange", page));
-		}
-		if(cat.getSets().size()-(page*points.size()) > points.size()) {
-			i.setItem(5, getPageItem("mcicons:icon_next_orange", page));
-		}
-		player.openInventory(i);
+		return visible;
 	}
 
 	public ItemStack createArmourItem(){
 		ItemStack i = new ItemStack(Material.IRON_CHESTPLATE, 1);
 		ItemMeta m = i.getItemMeta();
-		m.setDisplayName(StringFormatter.formatHex("#52de81§lArmour"));
+		m.setDisplayName(StringFormatter.formatHex("#52de81\u00A7lArmour"));
 		m.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		List<String> lore = new ArrayList<>();
-		lore.add("§7Armour skins");
+		lore.add("\u00A77Armour skins");
 		lore.add("");
 		lore.add(StringFormatter.formatHex("#21de21Click to View"));
 		m.setLore(lore);
@@ -140,10 +176,10 @@ public class InventoryManager {
 	public ItemStack createItemItem(){
 		ItemStack i = new ItemStack(Material.IRON_SWORD, 1);
 		ItemMeta m = i.getItemMeta();
-		m.setDisplayName(StringFormatter.formatHex("#52de81§lItems"));
+		m.setDisplayName(StringFormatter.formatHex("#52de81\u00A7lItems"));
 		m.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		List<String> lore = new ArrayList<>();
-		lore.add("§7Item skins");
+		lore.add("\u00A77Item skins");
 		lore.add("");
 		lore.add(StringFormatter.formatHex("#21de21Click to View"));
 		m.setLore(lore);
@@ -159,8 +195,8 @@ public class InventoryManager {
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.setDisplayName(c.getName());
 		List<String> lore = new ArrayList<String>();
-		if(c.isItem()) lore.add("§a"+c.getSets().size()+" §eItems");
-		else lore.add("§a"+c.getSets().size()+" §eArmor Sets");
+		if(c.isItem()) lore.add("\u00A7a"+c.getSets().size()+" \u00A7eItems");
+		else lore.add("\u00A7a"+c.getSets().size()+" \u00A7eArmor Sets");
 		meta.setLore(lore);
 		i.setItemMeta(meta);
 		return i;
@@ -168,6 +204,16 @@ public class InventoryManager {
 	
 	@SuppressWarnings("deprecation")
 	public ItemStack createSkinItem(SkinSet set, String id, ArmorType type) {
+		if (set == null || id == null || id.isBlank()) {
+			return null;
+		}
+		if (set.getSet() == null) {
+			ArmourShop.plugin.getLogger().warning(
+					"[shop] createSkinItem skipped '" + set.getId()
+							+ "': base set is null"
+			);
+			return null;
+		}
 		ItemStack i = null;
 		ItemAPI api = (ItemAPI) TLibs.getApiInstance(APIType.ITEM_API);
 		if(id.split("\\(")[0].equalsIgnoreCase("localmodel")){
@@ -185,7 +231,7 @@ public class InventoryManager {
 			String value = id.split("\\(")[1].replace(")", "");
 			SkinData gunskin = SkinLoader.getByString(value);
 			if(gunskin == null) {
-				System.out.println("no skin called "+value);
+				ArmourShop.plugin.getLogger().warning("No gunskin called " + value);
 				i = new ItemStack(Material.DIRT, 1);
 			} else {
 				i = gunskin.parseModel(SkinState.CARRY);
@@ -193,16 +239,34 @@ public class InventoryManager {
 		} else{
 			i = api.getCreator().getItemFromPath(id);
 		}
-		
+		if (i == null || i.getType().isAir()) {
+			ArmourShop.plugin.getLogger().warning(
+					"[shop] createSkinItem skipped '" + set.getId()
+							+ "': could not resolve path '" + id + "'"
+			);
+			return null;
+		}
+
 		ItemMeta meta = i.getItemMeta();
+		if (meta == null) {
+			ArmourShop.plugin.getLogger().warning(
+					"[shop] createSkinItem skipped '" + set.getId() + "': null ItemMeta"
+			);
+			return null;
+		}
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		if(type.equals(ArmorType.ITEM)) meta.setDisplayName(set.getName());
-		else meta.setDisplayName(set.getName()+" "+ WordUtils.capitalize(type.toString().toLowerCase()));
+		meta.setDisplayName(set.getFormattedPieceName(type));
 		List<String> lore = new ArrayList<String>();
-		lore.add("§eTier: §f"+WordUtils.capitalize(set.getSet().getId()));
+		lore.add("\u00A7eTier: \u00A7f"+WordUtils.capitalize(set.getSet().getId()));
 		if(set.hasScroll()) {
 			lore.add(" ");
-			lore.add("§7Scroll: "+ api.getCreator().getItemFromPath(set.getScroll()).getItemMeta().getDisplayName());
+			ItemStack scrollStack = api.getCreator().getItemFromPath(set.getScroll());
+			String scrollName = set.getScroll();
+			if (scrollStack != null && scrollStack.getItemMeta() != null
+					&& scrollStack.getItemMeta().hasDisplayName()) {
+				scrollName = scrollStack.getItemMeta().getDisplayName();
+			}
+			lore.add("\u00A77Scroll: " + scrollName);
 		}
 		NamespacedKey key = new NamespacedKey(ArmourShop.plugin, "set");
 		meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, set.getId()+"."+type.toString().toLowerCase());
@@ -224,7 +288,7 @@ public class InventoryManager {
 	public ItemStack createBackButton() {
 		ItemStack i = new ItemStack(Material.BARRIER, 1);
 		ItemMeta m = i.getItemMeta();
-		m.setDisplayName("§cBACK");
+		m.setDisplayName("\u00A7cBACK");
 		i.setItemMeta(m);
 		return i;
 	}

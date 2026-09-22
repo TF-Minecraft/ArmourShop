@@ -1,0 +1,5 @@
+#test:
+#  name: "#4f4e46test"
+#  set: rifles
+#  scroll: m.loot.common_item_skin_scroll
+#  item: gunskin(rifle_matchlock)

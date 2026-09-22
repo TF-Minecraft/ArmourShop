@@ -1,0 +1,48 @@
+bronze_sword:
+  name: "Bronze Sword"
+  colour: "#b38e58"
+  set: swords
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_SWORD.23)
+gladius_sword:
+  name: "Gladius Sword"
+  colour: "#897f65"
+  set: swords
+  scroll: m.loot.common_item_skin_scroll
+  item: localmodel(IRON_SWORD.27)
+tribal_sword:
+  name: "Tribal Sword"
+  colour: "#4b873b"
+  set: swords
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_SWORD.29)
+broken_sword:
+  name: "Broken Sword"
+  colour: "#434343"
+  set: swords
+  scroll: m.loot.rare_item_skin_scroll
+  item: localmodel(IRON_SWORD.28)
+gilded_sword:
+  name: "Gilded Sword"
+  colour: "#b79829"
+  set: swords
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(IRON_SWORD.30)
+cutlass:
+  name: "Cutlass"
+  colour: "#aeaec7"
+  set: swords
+  scroll: m.loot.epic_item_skin_scroll
+  item: localmodel(IRON_SWORD.31)
+aemg_sword:
+  name: "A.E.M.G Sword"
+  colour: "#6d0a29"
+  set: swords
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(IRON_SWORD.33)
+drakhanate_sword:
+  name: "Drakhanate Sword"
+  colour: "#750000"
+  set: swords
+  scroll: m.loot.legendary_item_skin_scroll
+  item: localmodel(IRON_SWORD.32)

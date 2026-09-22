@@ -1,13 +1,18 @@
 main: net.tfminecraft.ArmourShop.ArmourShop
 api-version: 1.20
-name: ArmourShop
+name: "ArmourShop"
 version: 1.0
 author: Drefvelin
 
-depend: [TLibs, ItemsAdder]
-softdepend: [MMOItems, MythicLib]
+depend: [TLibs, ItemsAdder, TFMCWeb]
+softdepend: [MMOItems, MythicLib, LuckPerms]
 
 commands:
   armourshop:
-      useage: /<command>
-      description: ArmourShop Command
+      usage: /<command> | /<command> reload | /<command> token delete <code> | /<command> listtokens | /<command> pack pull | /<command> catalog sync | /<command> submission delete <id> | /<command> skin delete <id> | /<command> model apply <category_id> <skin_id>
+      description: Open ArmourShop, reload, admin token tools, or pull approved packs
+
+permissions:
+  armourshop.admin:
+    description: Admin perms for ArmourShop (reload, listtokens, token delete, pack pull)
+    default: false
