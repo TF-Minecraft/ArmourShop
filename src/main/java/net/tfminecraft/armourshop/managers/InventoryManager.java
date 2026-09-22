@@ -13,7 +13,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import net.tfminecraft.tlibs.TLibs;
-import net.tfminecraft.tlibs.enums.APIType;
 import net.tfminecraft.tlibs.objects.api.ItemAPI;
 import net.tfminecraft.tlibs.objects.api.subapi.StringFormatter;
 import net.tfminecraft.tlibs.shaded.lang3.text.WordUtils;
@@ -188,7 +187,7 @@ public class InventoryManager {
 	}
 	
 	public ItemStack createCategoryItem(SkinCategory c) {
-		ItemAPI api = (ItemAPI) TLibs.getApiInstance(APIType.ITEM_API);
+		ItemAPI api = TLibs.getItemAPI();
 		ItemStack i = api.getCreator().getItemFromPath(c.getItem());
 		if(i == null) i = new ItemStack(Material.DIRT, 1);
 		ItemMeta meta = i.getItemMeta();
@@ -215,7 +214,7 @@ public class InventoryManager {
 			return null;
 		}
 		ItemStack i = null;
-		ItemAPI api = (ItemAPI) TLibs.getApiInstance(APIType.ITEM_API);
+		ItemAPI api = TLibs.getItemAPI();
 		if(id.split("\\(")[0].equalsIgnoreCase("localmodel")){
 			String info = id.split("\\(")[1].replace(")", "");
 			try {
@@ -276,7 +275,7 @@ public class InventoryManager {
 	}
 	
 	public ItemStack getPageItem(String s, int page) {
-		ItemAPI api = (ItemAPI) TLibs.getApiInstance(APIType.ITEM_API);
+		ItemAPI api = TLibs.getItemAPI();
 		ItemStack i = api.getCreator().getItemsAdderItem(s);
 		ItemMeta m = i.getItemMeta();
 		NamespacedKey key = new NamespacedKey(ArmourShop.plugin, "page");

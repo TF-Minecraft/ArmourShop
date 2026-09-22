@@ -81,6 +81,8 @@ public class SkinSet {
 	 * Display name with colour/gradient applied across the full piece string
 	 * (e.g. "Blue Knight Chestplate"), not only the set prefix.
 	 */
+	// Keep the existing display-name capitalization rules used by configuration and item names.
+	@SuppressWarnings("deprecation")
 	public String getFormattedPieceName(ArmorType type) {
 		String plain = plainName;
 		if (type != null && !type.equals(ArmorType.ITEM)) {

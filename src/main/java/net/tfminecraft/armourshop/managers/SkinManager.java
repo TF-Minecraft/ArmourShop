@@ -19,7 +19,6 @@ import dev.lone.itemsadder.api.CustomStack;
 import io.lumine.mythic.lib.api.item.ItemTag;
 import io.lumine.mythic.lib.api.item.NBTItem;
 import net.tfminecraft.tlibs.TLibs;
-import net.tfminecraft.tlibs.enums.APIType;
 import net.tfminecraft.tlibs.objects.api.ItemAPI;
 import net.tfminecraft.tlibs.objects.api.subapi.ArmorMerger;
 import net.Indyuce.mmoitems.ItemStats;
@@ -179,7 +178,7 @@ public class SkinManager implements Listener{
 	}
 	
 	public ItemStack findScroll(Player p, String scroll) {
-		ItemAPI api = (ItemAPI) TLibs.getApiInstance(APIType.ITEM_API);
+		ItemAPI api = TLibs.getItemAPI();
 		for(ItemStack i : p.getInventory().getContents()) {
 			if(api.getChecker().checkItemWithPath(i, scroll)) {
 				return i;

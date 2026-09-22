@@ -22,6 +22,8 @@ public final class BookEditSkinPreserver {
         new BookEditSkinPreserver(item -> CustomStack.byItemStack(item) != null).onEditBook(event);
     }
 
+    // Retain the originating book slot for deferred restoration; this API exposes no replacement.
+    @SuppressWarnings("deprecation")
     public void onEditBook(PlayerEditBookEvent event) {
         // ArmourShop owns the unsigned -> signed item conversion.
         if (event.isCancelled() || event.isSigning()) return;

@@ -21,6 +21,8 @@ class BookEditSkinPreserverTest {
     private final PlayerInventory inventory = mock(PlayerInventory.class);
     private final ItemStack item = mock(ItemStack.class);
 
+    // Retain the originating book slot for deferred restoration; this API exposes no replacement.
+    @SuppressWarnings("deprecation")
     private void slot(int slot) {
         when(event.getPlayer()).thenReturn(player);
         when(player.getInventory()).thenReturn(inventory);
@@ -65,6 +67,8 @@ class BookEditSkinPreserverTest {
         verify(event, never()).getPlayer();
     }
 
+    // Retain the originating book slot for deferred restoration; this API exposes no replacement.
+    @SuppressWarnings("deprecation")
     @Test void skipsVanillaBooksAndInvalidSlots() {
         slot(0);
         new BookEditSkinPreserver(stack -> false).onEditBook(event);
