@@ -37,7 +37,7 @@ groups:
     display-name: "&#8939EE&lA&#9033DD&ls&#972DCC&lc&#9E27BB&le&#A620AB&ln&#AD1A9A&ld&#B41489&le&#BB0E78&ld&#C20867"
     name-colour-stops: 20
     skin-token-cooldown-days: 14
-    skin-kinds: [item_3d, shield, helmet_3d, gun]
+    skin-kinds: [item_3d, shield, helmet_3d, mask, gun]
     allow-armor-3d-helmet: true
     # Uncomment to raise the combined texture+model budget for this rank:
     # max-3d-pair-bytes: 40960

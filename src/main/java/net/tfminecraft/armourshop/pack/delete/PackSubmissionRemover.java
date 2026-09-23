@@ -5,6 +5,7 @@ import net.tfminecraft.armourshop.pack.model.BowFrames;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.writer.flat.BookWriter;
 import net.tfminecraft.armourshop.pack.writer.gun.GunWriter;
+import net.tfminecraft.armourshop.pack.writer.mask.MasksYml;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,6 +81,15 @@ public final class PackSubmissionRemover {
 			removeArmorPack(contentsRoot, ns, s, removed);
 		} else if ("gun".equals(k)) {
 			removed.addAll(GunWriter.remove(contentsRoot, ns, s, gunsSkinsYmlOrNull()));
+		} else if ("mask".equals(k)) {
+			removeNonArmorPack(contentsRoot, ns, s, removed);
+			try {
+				MasksYml.remove(masksYmlOrNull(), s);
+			} catch (RuntimeException e) {
+				if (log != null) {
+					log.warning("[pack-delete] mask registry remove failed: " + e.getMessage());
+				}
+			}
 		} else if ("book".equals(k)) {
 			removed.addAll(BookWriter.remove(contentsRoot, ns, s));
 		} else {
@@ -154,6 +164,14 @@ public final class PackSubmissionRemover {
 		if (Files.deleteIfExists(path)) {
 			removed.add(path);
 		}
+	}
+
+	private static Path masksYmlOrNull() {
+		String masks = Cache.masksYmlPath;
+		if (masks == null || masks.isBlank()) {
+			return null;
+		}
+		return Path.of(masks.trim());
 	}
 
 	private static Path gunsSkinsYmlOrNull() {

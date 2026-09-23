@@ -34,6 +34,12 @@ public class ConfigLoader implements LoaderInterface{
         String gunsSkins = config.getString("pack-apply.guns-skins-yml", "");
         Cache.gunsSkinsYmlPath = gunsSkins == null ? "" : gunsSkins.trim();
 
+        String masksYml = config.getString("pack-apply.masks-yml", "");
+        if (masksYml == null || masksYml.isBlank()) {
+            masksYml = "plugins/RPCharacters/custom-masks.yml";
+        }
+        Cache.masksYmlPath = masksYml.trim();
+
         String forceTime = config.getString("pack-apply.force-reload-time", "06:00");
         Cache.forceReloadTime = forceTime == null ? "" : forceTime.trim();
 

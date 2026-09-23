@@ -13,6 +13,7 @@ import net.tfminecraft.armourshop.pack.writer.flat.BookWriter;
 import net.tfminecraft.armourshop.pack.writer.flat.FlatItemWriter;
 import net.tfminecraft.armourshop.pack.writer.gun.GunWriter;
 import net.tfminecraft.armourshop.pack.writer.large.LargeHandheldWriter;
+import net.tfminecraft.armourshop.pack.writer.mask.MasksYml;
 import net.tfminecraft.armourshop.pack.writer.model3d.Item3dWriter;
 import net.tfminecraft.armourshop.pack.writer.model3d.ShieldWriter;
 import java.nio.file.Path;
@@ -479,6 +480,15 @@ public final class PackApplyService {
 					ns
 				);
 				return;
+			case "mask":
+				requireModel3d(packFiles);
+				Item3dWriter.writeMask(
+					contentsRoot,
+					new PackSubmission(slug, display, PackKind.MASK, packFiles),
+					ns
+				);
+				MasksYml.upsert(requireMasksYml(), slug, ns);
+				return;
 			case "gun":
 				requireGun(packFiles);
 				GunWriter.write(
@@ -560,6 +570,16 @@ public final class PackApplyService {
 		if (!files.containsKey(GunWriter.AIM_CHARGED_STEM)) {
 			throw new IllegalStateException("missing stem: aim_charged");
 		}
+	}
+
+	static Path requireMasksYml() {
+		String masks = Cache.masksYmlPath;
+		if (masks == null || masks.isBlank()) {
+			throw new IllegalStateException(
+				"pack-apply.masks-yml is not set in config.yml"
+			);
+		}
+		return Path.of(masks.trim());
 	}
 
 	static Path requireGunsSkinsYml() {

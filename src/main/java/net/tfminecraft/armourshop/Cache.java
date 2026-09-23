@@ -20,6 +20,12 @@ public class Cache {
 	/** GunsAndGadgets skins.yml (Step 15). */
 	public static String gunsSkinsYmlPath = "";
 
+	/**
+	 * RPCharacters custom mask registry. Blank config falls back to this path
+	 * so an existing live config.yml still registers masks.
+	 */
+	public static String masksYmlPath = "plugins/RPCharacters/custom-masks.yml";
+
 	/** Daily force pull+reload at HH:mm server local; blank disables. */
 	public static String forceReloadTime = "06:00";
 	/** Seconds between iareload and iazip. */
