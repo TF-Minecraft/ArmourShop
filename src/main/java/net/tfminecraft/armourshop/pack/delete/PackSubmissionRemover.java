@@ -94,14 +94,6 @@ public final class PackSubmissionRemover {
 		return removed;
 	}
 
-	/** @deprecated use {@link #remove(Path, String, String, List, Logger)} */
-	@Deprecated
-	public static List<Path> remove(Path contentsRoot, String kind, String slug, Logger log)
-		throws IOException
-	{
-		return remove(contentsRoot, kind, slug, List.of(), log);
-	}
-
 	private static void removeArmorPack(
 		Path contentsRoot,
 		String namespace,

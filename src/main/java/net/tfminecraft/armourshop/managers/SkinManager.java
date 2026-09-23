@@ -1,6 +1,5 @@
 package net.tfminecraft.armourshop.managers;
 
-import java.util.HashMap;
 import java.util.Optional;
 
 import org.bukkit.Material;
@@ -13,7 +12,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import dev.lone.itemsadder.api.CustomStack;
 import io.lumine.mythic.lib.api.item.ItemTag;
@@ -21,10 +19,6 @@ import io.lumine.mythic.lib.api.item.NBTItem;
 import net.tfminecraft.tlibs.TLibs;
 import net.tfminecraft.tlibs.objects.api.ItemAPI;
 import net.tfminecraft.tlibs.objects.api.subapi.ArmorMerger;
-import net.Indyuce.mmoitems.ItemStats;
-import net.Indyuce.mmoitems.api.event.item.ApplyGemStoneEvent;
-import net.Indyuce.mmoitems.api.item.mmoitem.MMOItem;
-import net.Indyuce.mmoitems.stat.data.DoubleData;
 import net.tfminecraft.armourshop.ArmourShop;
 import net.tfminecraft.armourshop.enums.ArmorType;
 import net.tfminecraft.armourshop.holder.ASInventoryHolder;
@@ -34,43 +28,12 @@ import net.tfminecraft.armourshop.objects.SkinSet;
 
 public class SkinManager implements Listener{
 	InventoryManager inv = new InventoryManager();
-	private HashMap<Player, Boolean> usedGem = new HashMap<>();
 	private boolean isCategoryInventory(String name) {
 		for(SkinCategory c : CategoryLoader.get()) {
 			if(c.getName().equalsIgnoreCase(name)) return true;
 		}
 		return false;
 	}
-	/*
-	@EventHandler
-	public void applyGem(ApplyGemStoneEvent e) {
-		Player p = e.getPlayer();
-		MMOItem mmoitem = e.getTargetItem();
-		DoubleData oldModel = null;
-		if(mmoitem.hasData(ItemStats.CUSTOM_MODEL_DATA)) {
-			oldModel = (DoubleData) mmoitem.getData(ItemStats.CUSTOM_MODEL_DATA);
-		}
-		ItemStack i = mmoitem.newBuilder().build();
-		NBTItem mnbt = NBTItem.get(i);
-		p.sendMessage(mnbt.getTags().toString());
-		final DoubleData fixed = oldModel;
-		if(mnbt.hasTag("amodel")) {
-			p.sendMessage("found");
-			String tag = mnbt.getString("amodel");
-			p.sendMessage("model is "+tag);
-			int model = Integer.parseInt(tag);
-			mmoitem.setData(ItemStats.CUSTOM_MODEL_DATA, new DoubleData(model));
-			if(fixed != null) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						mmoitem.setData(ItemStats.CUSTOM_MODEL_DATA, fixed);
-					}
-				}.runTaskLater(ArmourShop.plugin, 5L);
-			}
-		}
-	}
-	*/
 	
 	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
 	@SuppressWarnings("deprecation")
@@ -202,34 +165,4 @@ public class SkinManager implements Listener{
 		nbt.addTag(new ItemTag("ia", stack.getNamespace()+"."+stack.getId()));
 		e.setCurrentItem(nbt.toItem());
 	}
-	/*
-	@EventHandler
-	public void gemEvent(InventoryClickEvent e) {
-		if(!(e.getWhoClicked() instanceof Player)) return;
-		Player p = (Player) e.getWhoClicked();
-		if(!usedGem.containsKey(p)) return;
-		ItemStack i = e.getCurrentItem();
-		if(i == null) return;
-		if(!NBTItem.get(i).hasType()) return;
-		NBTItem mnbt = NBTItem.get(i);
-		if(mnbt.getString("ia") == null) return;
-		String info = mnbt.getString("ia");
-		NBT.modify(i, nbt ->{
-			nbt.getOrCreateCompound("itemsadder");
-			nbt.getCompound("itemsadder").setString("namespace", info.split("\\.")[0]);
-			nbt.getCompound("itemsadder").setString("id", info.split("\\.")[1]);
-		});
-	}
-	@EventHandler
-	public void gemstoneEvent(ApplyGemStoneEvent e) {
-		usedGem.put(e.getPlayer(), true);
-		new BukkitRunnable()
-		{
-			public void run()
-			{
-				usedGem.remove(e.getPlayer());
-			}
-		}.runTaskLater(ArmourShop.plugin, 5L);
-	}
-	*/
 }
