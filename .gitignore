@@ -55,3 +55,6 @@ Desktop.ini
 
 # Removed runtime snapshots or generated archives
 /src/main/resources/pending-reload.yml
+
+# Technical documentation is maintained in TF-Minecraft/Docs
+/docs/
