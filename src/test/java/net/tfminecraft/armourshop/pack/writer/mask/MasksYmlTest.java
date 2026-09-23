@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -47,5 +48,24 @@ class MasksYmlTest {
 			MasksYml.read(file).get("oni_mask")
 		);
 		assertTrue(Files.readString(file).contains("masks:"));
+	}
+
+	@Test
+	void deeperIndentIsKept(@TempDir Path dir) throws Exception {
+		Path file = dir.resolve("custom-masks.yml");
+		Files.writeString(
+			file,
+			"masks:\n    ghost_mask:\n        item: ia.tfmc_submissions:ghost_mask\n",
+			StandardCharsets.UTF_8
+		);
+		MasksYml.upsert(file, "oni_mask", "tfmc_armorshop");
+		assertEquals(
+			"ia.tfmc_submissions:ghost_mask",
+			MasksYml.read(file).get("ghost_mask")
+		);
+		assertEquals(
+			"ia.tfmc_armorshop:oni_mask",
+			MasksYml.read(file).get("oni_mask")
+		);
 	}
 }

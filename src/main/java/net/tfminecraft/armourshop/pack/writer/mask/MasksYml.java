@@ -4,8 +4,10 @@ import net.tfminecraft.armourshop.pack.util.YamlUtil;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -55,18 +57,28 @@ public final class MasksYml {
 		String current = null;
 		for (String raw : Files.readString(masksYml, StandardCharsets.UTF_8).split("\\R")) {
 			String line = raw.stripTrailing();
-			if (line.startsWith("  ") && !line.startsWith("    ") && line.endsWith(":")) {
-				String key = line.substring(2, line.length() - 1).trim();
-				current = key.isEmpty() ? null : key;
+			String trimmed = line.trim();
+			if (trimmed.isEmpty() || trimmed.startsWith("#")) {
 				continue;
 			}
-			if (current != null && line.startsWith("    item:")) {
-				String item = line.substring("    item:".length()).trim();
-				if (!item.isEmpty()) {
-					entries.put(current, item);
-				}
+			if ("masks:".equals(trimmed)) {
 				current = null;
+				continue;
 			}
+			if (trimmed.endsWith(":") && !trimmed.contains(" ") && !trimmed.contains("\t")) {
+				current = trimmed.substring(0, trimmed.length() - 1);
+				continue;
+			}
+			if (current != null && trimmed.startsWith("item:")) {
+				String item = trimmed.substring("item:".length()).trim();
+				if (item.isEmpty()) {
+					throw new IOException("mask '" + current + "' is missing an item path");
+				}
+				entries.put(current, item);
+				current = null;
+				continue;
+			}
+			throw new IOException("unrecognized custom-masks.yml line: " + trimmed);
 		}
 		return entries;
 	}
@@ -79,7 +91,21 @@ public final class MasksYml {
 			sb.append("  ").append(entry.getKey()).append(":\n");
 			sb.append("    item: ").append(entry.getValue()).append('\n');
 		}
-		Files.writeString(masksYml, sb.toString(), StandardCharsets.UTF_8);
+		Path parent = masksYml.getParent();
+		Path tmp = parent == null
+			? Path.of(masksYml.getFileName().toString() + ".tmp")
+			: parent.resolve(masksYml.getFileName().toString() + ".tmp");
+		Files.writeString(tmp, sb.toString(), StandardCharsets.UTF_8);
+		try {
+			Files.move(
+				tmp,
+				masksYml,
+				StandardCopyOption.ATOMIC_MOVE,
+				StandardCopyOption.REPLACE_EXISTING
+			);
+		} catch (AtomicMoveNotSupportedException e) {
+			Files.move(tmp, masksYml, StandardCopyOption.REPLACE_EXISTING);
+		}
 	}
 
 	private static String requireSlug(String slug) {
