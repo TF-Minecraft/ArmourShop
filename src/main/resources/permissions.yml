@@ -1,3 +1,0 @@
-armourshop.admin:
-       description: Admin Perms for armourshop plugin.
-       default: false

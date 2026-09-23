@@ -72,18 +72,6 @@ public final class DeferredIaReloadService implements Listener {
 		});
 	}
 
-	/** @deprecated use {@link #requestFlush()} */
-	@Deprecated
-	public void tryFlush() {
-		requestFlush(false, false);
-	}
-
-	/** @deprecated use {@link #requestFlush(boolean)} */
-	@Deprecated
-	public void tryFlush(boolean force) {
-		requestFlush(force, false);
-	}
-
 	/**
 	 * Replace the pending-reload queue with ProvinceSystem approved-not-applied ids.
 	 * Call off the main thread (HTTP). Thread-safe for the queue.

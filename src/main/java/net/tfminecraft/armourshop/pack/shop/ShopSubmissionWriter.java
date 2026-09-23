@@ -311,28 +311,6 @@ public final class ShopSubmissionWriter {
 		}
 	}
 
-	/** Legacy overload: remove SkinSet key from both ps_armor and ps_items (no-op if missing). */
-	public static void remove(String slug, Logger log) throws IOException {
-		String categoriesDir = Cache.categoriesPath;
-		if (categoriesDir == null || categoriesDir.isBlank()) {
-			throw new IllegalStateException("pack-apply.categories-path is not set in config.yml");
-		}
-		String key = require(slug, "slug");
-		Path categoriesPath = Path.of(categoriesDir.trim());
-		File psArmor = categoriesPath.resolve("ps_armor.yml").toFile();
-		File psItems = categoriesPath.resolve("ps_items.yml").toFile();
-		boolean changed = false;
-		if (psArmor.exists()) {
-			changed |= clearRoot(psArmor, key);
-		}
-		if (psItems.exists()) {
-			changed |= clearRoot(psItems, key);
-		}
-		if (log != null) {
-			log.info("[shop] removed SkinSet key=" + key + " changed=" + changed);
-		}
-	}
-
 	private static boolean clearRoot(File file, String root) throws IOException {
 		FileConfiguration config = loadOrEmpty(file);
 		if (!config.contains(root)) {
