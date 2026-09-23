@@ -76,6 +76,30 @@ public final class Item3dWriter {
 	}
 
 	/**
+	 * Writes mask skins as an unplaceable carved pumpkin hat, same pack shape as helmet_3d.
+	 * RPCharacters identity comes from the mask registry, not from this YAML.
+	 */
+	public static List<Path> writeMask(
+		Path contentsRoot,
+		PackSubmission submission,
+		String namespace
+	) throws IOException {
+		if (submission.kind() != PackKind.MASK) {
+			throw new IllegalArgumentException(
+				"writeMask requires MASK, got " + submission.kind()
+			);
+		}
+		return writeModelItem(
+			contentsRoot,
+			submission,
+			"CARVED_PUMPKIN",
+			null,
+			true,
+			namespace
+		);
+	}
+
+	/**
 	 * Shared pack write for standalone 3D items (item_3d / helmet_3d).
 	 *
 	 * @param material IA material name

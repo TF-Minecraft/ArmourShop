@@ -540,6 +540,19 @@ helmets:
     - helmets.infantry_mythril_helmet
     - helmets.infantry_custom_helmet
 
+masks:
+  item:
+    - masks.ghost_mask
+    - masks.monster_mask
+    - masks.oni_mask
+    - masks.urukhai_mask
+    - masks.samurai_mask
+    - masks.steampunk_mask
+    - masks.steampunk_robot_mask
+    - masks.skeleton_mask
+    - masks.skeleton_mask2
+    - masks.zerratoris_mask
+
 rifles:
   item:
     - guns.rifle_template

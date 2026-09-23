@@ -7,6 +7,8 @@ pack-apply:
   categories-path: "plugins/ArmourShop/Categories"
   # GunsAndGadgets skins.yml (Step 15 — IA ids; no CMD dual-write)
   guns-skins-yml: "plugins/GunsAndGadgets/skins.yml"
+  # RPCharacters custom mask registry (mask skin kind)
+  masks-yml: "plugins/RPCharacters/custom-masks.yml"
   # Daily force pull + IA refresh at this server-local time (HH:mm). Blank disables.
   force-reload-time: "06:00"
   # Seconds to wait after /iareload before /iazip

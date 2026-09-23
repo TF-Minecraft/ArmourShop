@@ -280,6 +280,12 @@ i_helmets:
   item: m.helmets.shako
   is-item: true
 
+i_masks:
+  name: "Masks"
+  colour: "#7f7d80"
+  item: m.masks.ghost_mask
+  is-item: true
+
 i_guns:
   name: "Guns"
   colour: "#7f7d80"
