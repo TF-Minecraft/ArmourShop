@@ -396,6 +396,14 @@ swords:
     - sword.mythril_sword
     - sword.custom_sword
 
+lutes:
+  item:
+    - lutes.custom_lute
+    - lutes.iron_lute
+    - lutes.steel_lute
+    - lutes.mythril_lute
+    - lutes.abyssalite_lute
+
 battleaxes:
   item:
     - battleaxes.iron_battleaxe
