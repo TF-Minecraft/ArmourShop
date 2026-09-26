@@ -8,9 +8,12 @@ import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /** Keep the original custom item intact while accepting the final edited pages. */
 public final class BookEditSkinPreserver {
+    private static final int OFF_HAND_SLOT = 40;
+
     private final Predicate<ItemStack> isCustomBook;
 
     public BookEditSkinPreserver(Predicate<ItemStack> isCustomBook) {
@@ -19,7 +22,16 @@ public final class BookEditSkinPreserver {
 
     // Called by ArmourShop's existing MONITOR listener, registered after ItemsAdder.
     public static void preserve(PlayerEditBookEvent event) {
-        new BookEditSkinPreserver(item -> CustomStack.byItemStack(item) != null).onEditBook(event);
+        new BookEditSkinPreserver(BookEditSkinPreserver::isCustomBook).onEditBook(event);
+    }
+
+    // Letters and other skinned books carry a model without always being an IA item.
+    // Keep the legacy custom model data check that skinned books were written with.
+    @SuppressWarnings("deprecation")
+    static boolean isCustomBook(ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        return meta != null && (meta.hasCustomModelData() || meta.hasItemModel())
+            || CustomStack.byItemStack(item) != null;
     }
 
     // Retain the originating book slot for deferred restoration; this API exposes no replacement.
@@ -29,6 +41,8 @@ public final class BookEditSkinPreserver {
         if (event.isCancelled() || event.isSigning()) return;
         PlayerInventory inventory = event.getPlayer().getInventory();
         int slot = event.getSlot();
+        // Paper reports off-hand edits as -1.
+        if (slot == -1) slot = OFF_HAND_SLOT;
         if (slot < 0 || slot >= inventory.getSize()) return;
         ItemStack item = inventory.getItem(slot);
         if (item == null || item.getType() != Material.WRITABLE_BOOK || !isCustomBook.test(item)) return;

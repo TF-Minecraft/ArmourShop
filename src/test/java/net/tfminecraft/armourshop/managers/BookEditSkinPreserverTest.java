@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.junit.jupiter.api.Test;
 
 class BookEditSkinPreserverTest {
@@ -75,11 +76,35 @@ class BookEditSkinPreserverTest {
         slot(0);
         new BookEditSkinPreserver(stack -> false).onEditBook(event);
         verify(event, never()).setNewBookMeta(any());
-        when(event.getSlot()).thenReturn(-1);
+        when(event.getSlot()).thenReturn(-2);
         new BookEditSkinPreserver(stack -> true).onEditBook(event);
         when(event.getSlot()).thenReturn(41);
         new BookEditSkinPreserver(stack -> true).onEditBook(event);
         verify(event, never()).getPreviousBookMeta();
+    }
+
+    // Retain the originating book slot for deferred restoration; this API exposes no replacement.
+    @SuppressWarnings({"deprecation", "removal"})
+    @Test void readsOffHandBookWhenPaperReportsMinusOne() {
+        slot(40);
+        when(event.getSlot()).thenReturn(-1);
+        new BookEditSkinPreserver(stack -> false).onEditBook(event);
+        verify(inventory).getItem(40);
+        verify(inventory, never()).getItem(-1);
+    }
+
+    // Legacy custom model data is how existing skinned books are identified.
+    @SuppressWarnings("deprecation")
+    @Test void treatsModelledBooksAsCustom() {
+        ItemMeta withModelData = mock(ItemMeta.class);
+        when(withModelData.hasCustomModelData()).thenReturn(true);
+        when(item.getItemMeta()).thenReturn(withModelData);
+        assertTrue(BookEditSkinPreserver.isCustomBook(item));
+
+        ItemMeta withItemModel = mock(ItemMeta.class);
+        when(withItemModel.hasItemModel()).thenReturn(true);
+        when(item.getItemMeta()).thenReturn(withItemModel);
+        assertTrue(BookEditSkinPreserver.isCustomBook(item));
     }
 
     @Test void skipsEmptySlotsAndNonBooks() {
