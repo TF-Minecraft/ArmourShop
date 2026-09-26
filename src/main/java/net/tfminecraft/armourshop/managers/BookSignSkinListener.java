@@ -33,7 +33,7 @@ public final class BookSignSkinListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
-		int slot = event.getSlot();
+		int slot = BookEditSkinPreserver.inventorySlot(event);
 		ItemStack current = player.getInventory().getItem(slot);
 		if (current == null || current.getType().isAir()) {
 			return;

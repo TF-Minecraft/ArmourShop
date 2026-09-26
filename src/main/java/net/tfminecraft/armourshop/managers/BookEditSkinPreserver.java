@@ -34,15 +34,20 @@ public final class BookEditSkinPreserver {
             || CustomStack.byItemStack(item) != null;
     }
 
+    // Paper reports off-hand edits as -1; map them to the off-hand inventory slot.
+    @SuppressWarnings({"deprecation", "removal"})
+    static int inventorySlot(PlayerEditBookEvent event) {
+        int slot = event.getSlot();
+        return slot == -1 ? OFF_HAND_SLOT : slot;
+    }
+
     // Retain the originating book slot for deferred restoration; this API exposes no replacement.
     @SuppressWarnings({"deprecation", "removal"})
     public void onEditBook(PlayerEditBookEvent event) {
         // ArmourShop owns the unsigned -> signed item conversion.
         if (event.isCancelled() || event.isSigning()) return;
         PlayerInventory inventory = event.getPlayer().getInventory();
-        int slot = event.getSlot();
-        // Paper reports off-hand edits as -1.
-        if (slot == -1) slot = OFF_HAND_SLOT;
+        int slot = inventorySlot(event);
         if (slot < 0 || slot >= inventory.getSize()) return;
         ItemStack item = inventory.getItem(slot);
         if (item == null || item.getType() != Material.WRITABLE_BOOK || !isCustomBook.test(item)) return;
