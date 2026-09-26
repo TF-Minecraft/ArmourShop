@@ -15,4 +15,4 @@ commands:
 permissions:
   armourshop.admin:
     description: Admin perms for ArmourShop (reload, listtokens, token delete, pack pull)
-    default: false
+    default: op
