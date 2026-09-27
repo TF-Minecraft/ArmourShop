@@ -43,7 +43,7 @@ public final class BookEditSkinPreserver {
     static boolean isCustomBook(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         return meta != null && (meta.hasCustomModelData() || meta.hasItemModel())
-            || NBTItem.get(item).hasType()
+            || Bukkit.getPluginManager().isPluginEnabled("MythicLib") && NBTItem.get(item).hasType()
             || CustomStack.byItemStack(item) != null;
     }
 

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.PluginManager;
 import org.junit.jupiter.api.Test;
 
 class BookEditSkinPreserverTest {
@@ -118,7 +120,10 @@ class BookEditSkinPreserverTest {
         NBTItem mmoBook = mock(NBTItem.class);
         when(mmoBook.hasType()).thenReturn(true);
         // Checked before ItemsAdder, whose API cannot load without the server.
-        try (var nbt = mockStatic(NBTItem.class)) {
+        PluginManager plugins = mock(PluginManager.class);
+        when(plugins.isPluginEnabled("MythicLib")).thenReturn(true);
+        try (var bukkit = mockStatic(Bukkit.class); var nbt = mockStatic(NBTItem.class)) {
+            bukkit.when(Bukkit::getPluginManager).thenReturn(plugins);
             nbt.when(() -> NBTItem.get(item)).thenReturn(mmoBook);
             assertTrue(BookEditSkinPreserver.isCustomBook(item));
         }
