@@ -1,5 +1,6 @@
 package net.tfminecraft.armourshop.pack.reload;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -19,17 +20,24 @@ import net.tfminecraft.armourshop.api.ProvinceSystemClient.AppliedResult;
 import net.tfminecraft.armourshop.api.ProvinceSystemClient.ApprovedSubmission;
 import net.tfminecraft.armourshop.api.ProvinceSystemClient.ListResult;
 import net.tfminecraft.armourshop.pack.apply.PackPullRunner;
+import net.tfminecraft.armourshop.pack.reload.ApplyAckPlanner.Plan;
 
 /**
  * Defers ItemsAdder refresh until the server is empty (or force), runs
- * {@code iareload} then delayed {@code iazip}, and acks applied after pack compression.
- * Syncs {@code pending-reload.yml} from ProvinceSystem before every flush.
+ * {@code iareload} then delayed {@code iazip}, and acks applied after that zip.
+ *
+ * <p>The pending queue holds ids whose pack files were already written.
+ * A flush drops ids that are no longer approved. It never imports other
+ * approved ids. After {@code iazip}, an id is marked applied only when its
+ * ItemsAdder config is on disk.
  */
 public final class DeferredIaReloadService implements Listener {
 
 	private final JavaPlugin plugin;
 	private final PendingReloadQueue queue;
 	private volatile boolean inFlight;
+	/** True only after this flush has dispatched {@code iazip}. */
+	private volatile boolean awaitingZipEvent;
 	private BukkitTask delayedZipTask;
 
 	public DeferredIaReloadService(JavaPlugin plugin, PendingReloadQueue queue) {
@@ -65,7 +73,7 @@ public final class DeferredIaReloadService implements Listener {
 
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			Logger log = plugin.getLogger();
-			SyncResult sync = syncQueueFromWebsite(log);
+			SyncResult sync = pruneQueueToApproved(log);
 			Bukkit.getScheduler().runTask(plugin, () ->
 				beginFlush(force, refreshEvenIfEmpty, sync)
 			);
@@ -73,29 +81,30 @@ public final class DeferredIaReloadService implements Listener {
 	}
 
 	/**
-	 * Replace the pending-reload queue with ProvinceSystem approved-not-applied ids.
-	 * Call off the main thread (HTTP). Thread-safe for the queue.
+	 * Drop queued ids that ProvinceSystem no longer lists as approved.
+	 * Does not add approved ids that were never written. Call off the main
+	 * thread (HTTP). Thread-safe for the queue.
 	 */
-	public SyncResult syncQueueFromWebsite(Logger log) {
+	public SyncResult pruneQueueToApproved(Logger log) {
 		ListResult list = ProvinceSystemClient.listApproved();
 		if (!list.ok) {
 			String err = list.error != null ? list.error : "unknown error";
 			if (log != null) {
-				log.warning("[ia-reload] pre-flush sync failed: " + err
+				log.warning("[ia-reload] pre-flush prune failed: " + err
 					+ " — using local queue");
 			}
 			return SyncResult.failed(err);
 		}
 		int before = queue.size();
-		List<String> ids = new ArrayList<>();
+		List<String> stillApproved = new ArrayList<>();
 		for (ApprovedSubmission sub : list.submissions) {
 			if (sub != null && sub.id != null && !sub.id.isBlank()) {
-				ids.add(sub.id.trim());
+				stillApproved.add(sub.id.trim());
 			}
 		}
-		queue.replaceAll(ids);
+		queue.retainAll(stillApproved);
 		if (log != null) {
-			log.info("[ia-reload] synced pending queue from website: "
+			log.info("[ia-reload] pending queue kept written ids still approved: "
 				+ before + " → " + queue.size());
 		}
 		return SyncResult.ok(before, queue.size());
@@ -108,7 +117,7 @@ public final class DeferredIaReloadService implements Listener {
 		if (queue.isEmpty() && !refreshEvenIfEmpty) {
 			Logger log = plugin.getLogger();
 			if (sync != null && sync.ok && sync.before > 0) {
-				log.info("[ia-reload] queue empty after website sync — skipping IA refresh");
+				log.info("[ia-reload] queue empty after prune — skipping IA refresh");
 			}
 			return;
 		}
@@ -120,6 +129,7 @@ public final class DeferredIaReloadService implements Listener {
 		}
 
 		inFlight = true;
+		awaitingZipEvent = false;
 		Logger log = plugin.getLogger();
 		int delaySec = Math.max(0, Cache.iaReloadDelaySeconds);
 		log.info("[ia-reload] running iareload then iazip in " + delaySec
@@ -139,8 +149,10 @@ public final class DeferredIaReloadService implements Listener {
 		long delayTicks = delaySec * 20L;
 		delayedZipTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			delayedZipTask = null;
+			awaitingZipEvent = true;
 			boolean ok = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iazip");
 			if (!ok) {
+				awaitingZipEvent = false;
 				inFlight = false;
 				log.severe("[ia-reload] failed to dispatch iazip — will retry later");
 			}
@@ -149,9 +161,10 @@ public final class DeferredIaReloadService implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPackCompressed(ItemsAdderPackCompressedEvent event) {
-		if (!inFlight) {
+		if (!inFlight || !awaitingZipEvent) {
 			return;
 		}
+		awaitingZipEvent = false;
 		inFlight = false;
 		List<String> ids = queue.snapshot();
 		if (ids.isEmpty()) {
@@ -159,22 +172,51 @@ public final class DeferredIaReloadService implements Listener {
 		}
 
 		Logger log = plugin.getLogger();
-		log.info("[ia-reload] pack compressed — acking " + ids.size() + " submission(s)");
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			AppliedResult result = ProvinceSystemClient.markApplied(ids);
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				if (!result.ok) {
-					log.warning("[ia-reload] applied ack failed: " + result.error
-						+ " — ids remain queued");
-					return;
-				}
-				queue.clear(result.applied);
-				log.info("[ia-reload] applied ack ok: " + result.applied.size()
-					+ " id(s); remaining queued=" + queue.size());
-				if (result.applied.size() < ids.size()) {
-					log.warning("[ia-reload] some ids were not marked applied by API; still queued");
-				}
-			});
+		log.info("[ia-reload] pack compressed — checking " + ids.size()
+			+ " written submission(s) before ack");
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> ackWritten(log, ids));
+	}
+
+	private void ackWritten(Logger log, List<String> ids) {
+		String contents = Cache.iaContentsPath;
+		if (contents == null || contents.isBlank()) {
+			log.severe("[ia-reload] pack-apply.ia-contents-path is unset — not acking; "
+				+ "ids remain queued");
+			return;
+		}
+		ListResult list = ProvinceSystemClient.listApproved();
+		if (!list.ok) {
+			String err = list.error != null ? list.error : "unknown error";
+			log.warning("[ia-reload] could not confirm approvals (" + err
+				+ ") — not acking; ids remain queued");
+			return;
+		}
+		Plan plan = ApplyAckPlanner.plan(ids, list.submissions, Path.of(contents.trim()));
+		AppliedResult result = plan.ack().isEmpty()
+			? AppliedResult.success(List.of())
+			: ProvinceSystemClient.markApplied(plan.ack());
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			queue.clear(plan.notApproved());
+			queue.clear(plan.missingFiles());
+			if (!plan.notApproved().isEmpty()) {
+				log.info("[ia-reload] dropped " + plan.notApproved().size()
+					+ " queued id(s) that are no longer approved");
+			}
+			for (String id : plan.missingFiles()) {
+				log.warning("[ia-reload] not acking " + id
+					+ " — pack config missing; still approved until pack pull");
+			}
+			if (!result.ok) {
+				log.warning("[ia-reload] applied ack failed: " + result.error
+					+ " — written ids remain queued");
+				return;
+			}
+			queue.clear(result.applied);
+			log.info("[ia-reload] applied ack ok: " + result.applied.size()
+				+ " id(s); remaining queued=" + queue.size());
+			if (result.applied.size() < plan.ack().size()) {
+				log.warning("[ia-reload] some written ids were not marked applied by API; still queued");
+			}
 		});
 	}
 

@@ -88,8 +88,8 @@ public final class SubmissionDeleteRunner {
 		ArmourShop plugin = JavaPlugin.getPlugin(ArmourShop.class);
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			plugin.reload();
-			// Do not enqueue revoked ids (website sync would drop them and they
-			// can never be marked applied). Still refresh IA so pack files clear.
+			// Do not enqueue the revoked id. Flush only zips; it acks ids that
+			// were already written, and it does not import other approvals.
 			plugin.getDeferredIaReloadService().requestFlush(false, true);
 		});
 

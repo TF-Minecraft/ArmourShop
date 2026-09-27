@@ -413,10 +413,10 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 
 		ArmourShop plugin = JavaPlugin.getPlugin(ArmourShop.class);
 		sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
-			+ ChatColor.YELLOW + "Syncing pending-reload queue from ProvinceSystem…");
+			+ ChatColor.YELLOW + "Pruning pending-reload to written skins that are still approved…");
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			DeferredIaReloadService.SyncResult sync =
-				plugin.getDeferredIaReloadService().syncQueueFromWebsite(plugin.getLogger());
+				plugin.getDeferredIaReloadService().pruneQueueToApproved(plugin.getLogger());
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				if (!sync.ok) {
 					sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
@@ -425,9 +425,10 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 					return;
 				}
 				sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
-					+ ChatColor.YELLOW + "Pending-reload synced: "
+					+ ChatColor.YELLOW + "Pending-reload pruned: "
 					+ sync.before + " → " + sync.after
-					+ " id(s) (approved, not yet applied).");
+					+ " written id(s) still approved. New approvals are not queued."
+					+ " Use /armourshop pack pull to write them.");
 			});
 		});
 		return true;

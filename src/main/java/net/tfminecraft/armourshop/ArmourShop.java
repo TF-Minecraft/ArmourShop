@@ -2,7 +2,6 @@ package net.tfminecraft.armourshop;
 
 import java.io.File;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -121,22 +120,8 @@ public class ArmourShop extends JavaPlugin{
 	public void reload() {
 		loadConfigs();
 		net.tfminecraft.armourshop.pack.catalog.CatalogSyncService.pushAsync(this);
-		DeferredIaReloadService reloadService = getDeferredIaReloadService();
-		if (reloadService == null) {
-			return;
-		}
-		// Refresh pending-reload queue from website (same as /armourshop pack sync).
-		Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-			DeferredIaReloadService.SyncResult sync =
-				reloadService.syncQueueFromWebsite(getLogger());
-			if (sync != null && sync.ok) {
-				getLogger().info("[reload] pending-reload synced from website: "
-					+ sync.before + " → " + sync.after);
-			} else if (sync != null && !sync.ok) {
-				getLogger().warning("[reload] pending-reload sync failed: "
-					+ (sync.error != null ? sync.error : "unknown"));
-			}
-		});
+		// Do not touch the pending-reload queue. Importing approved-but-unwritten
+		// ids here caused the next zip to mark those skins applied.
 	}
 	// Keep the existing legacy text representation, formatting, and exact-string comparisons.
 	@SuppressWarnings("deprecation")

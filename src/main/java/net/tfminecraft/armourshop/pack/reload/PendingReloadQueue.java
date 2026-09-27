@@ -100,19 +100,25 @@ public final class PendingReloadQueue {
 		}
 	}
 
-	/** Replace queue contents with website pending-apply ids (may be empty). */
-	public void replaceAll(Collection<String> submissionIds) {
+	/**
+	 * Keep only ids that are in {@code stillApproved}. Never adds ids.
+	 * Returns the size before the prune.
+	 */
+	public int retainAll(Collection<String> stillApproved) {
 		synchronized (lock) {
-			ids.clear();
-			if (submissionIds != null) {
-				for (String id : submissionIds) {
-					if (id == null || id.isBlank()) {
-						continue;
+			int before = ids.size();
+			LinkedHashSet<String> keep = new LinkedHashSet<>();
+			if (stillApproved != null) {
+				for (String id : stillApproved) {
+					if (id != null && !id.isBlank()) {
+						keep.add(id.trim());
 					}
-					ids.add(id.trim());
 				}
 			}
-			saveUnlocked();
+			if (ids.retainAll(keep)) {
+				saveUnlocked();
+			}
+			return before;
 		}
 	}
 
