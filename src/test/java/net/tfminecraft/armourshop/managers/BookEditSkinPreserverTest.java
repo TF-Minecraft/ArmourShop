@@ -2,7 +2,6 @@ package net.tfminecraft.armourshop.managers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import dev.lone.itemsadder.api.CustomStack;
 import io.lumine.mythic.lib.api.item.NBTItem;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,11 +117,10 @@ class BookEditSkinPreserverTest {
         when(item.getItemMeta()).thenReturn(mock(ItemMeta.class));
         NBTItem mmoBook = mock(NBTItem.class);
         when(mmoBook.hasType()).thenReturn(true);
-        try (var ia = mockStatic(CustomStack.class); var nbt = mockStatic(NBTItem.class)) {
+        // Checked before ItemsAdder, whose API cannot load without the server.
+        try (var nbt = mockStatic(NBTItem.class)) {
             nbt.when(() -> NBTItem.get(item)).thenReturn(mmoBook);
             assertTrue(BookEditSkinPreserver.isCustomBook(item));
-            when(mmoBook.hasType()).thenReturn(false);
-            assertFalse(BookEditSkinPreserver.isCustomBook(item));
         }
     }
 
@@ -206,7 +204,8 @@ class BookEditSkinPreserverTest {
         when(inventory.getItem(0)).thenReturn(other);
         new BookEditSkinPreserver(stack -> false, tasks::add).restoreIfStripped(player, 0, original, 1);
         // Player left before the next tick.
-        when(inventory.getItem(0)).thenReturn(strippedBook(1, pages));
+        ItemStack stripped = strippedBook(1, pages);
+        when(inventory.getItem(0)).thenReturn(stripped);
         when(player.isOnline()).thenReturn(false);
         new BookEditSkinPreserver(stack -> false, tasks::add).restoreIfStripped(player, 0, original, 1);
 

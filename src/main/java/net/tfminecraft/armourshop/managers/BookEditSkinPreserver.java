@@ -43,8 +43,8 @@ public final class BookEditSkinPreserver {
     static boolean isCustomBook(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         return meta != null && (meta.hasCustomModelData() || meta.hasItemModel())
-            || CustomStack.byItemStack(item) != null
-            || NBTItem.get(item).hasType();
+            || NBTItem.get(item).hasType()
+            || CustomStack.byItemStack(item) != null;
     }
 
     // Paper reports off-hand edits as -1; map them to the off-hand inventory slot.
