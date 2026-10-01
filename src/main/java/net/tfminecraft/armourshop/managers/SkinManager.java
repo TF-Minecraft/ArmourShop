@@ -107,7 +107,7 @@ public class SkinManager implements Listener{
 		if(set.hasScroll()) {
 			scroll = findScroll(p, set.getScroll());
 			if(scroll == null) {
-				p.sendMessage("\u00A7cLacking Scroll");
+				p.sendMessage("\u00A7cYou need the right scroll for this.");
 				p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
 				return;
 			}
@@ -140,7 +140,7 @@ public class SkinManager implements Listener{
 				return;
 			}
 		}
-		p.sendMessage("\u00A7cNo item to apply skin on in your inventory");
+		p.sendMessage("\u00A7cYou carry nothing this design can be applied to.");
 		p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
 	}
 	
