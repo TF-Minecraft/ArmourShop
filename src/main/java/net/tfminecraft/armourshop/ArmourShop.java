@@ -13,6 +13,7 @@ import net.tfminecraft.armourshop.loaders.PermissionGroupsLoader;
 import net.tfminecraft.armourshop.loaders.SkinSetLoader;
 import net.tfminecraft.armourshop.managers.CommandManager;
 import net.tfminecraft.armourshop.managers.BookSignSkinListener;
+import net.tfminecraft.armourshop.managers.BookCommandSkinListener;
 import net.tfminecraft.armourshop.managers.SkinManager;
 import net.tfminecraft.armourshop.pack.reload.DeferredIaReloadService;
 import net.tfminecraft.armourshop.pack.apply.PackPullScheduler;
@@ -81,6 +82,7 @@ public class ArmourShop extends JavaPlugin{
 		getServer().getPluginManager().registerEvents(commandManager, this);
 		getServer().getPluginManager().registerEvents(skinManager, this);
 		getServer().getPluginManager().registerEvents(bookSignSkinListener, this);
+		getServer().getPluginManager().registerEvents(new BookCommandSkinListener(), this);
 		getServer().getPluginManager().registerEvents(deferredIaReloadService, this);
 	}
 	public void loadConfigs() {
