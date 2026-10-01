@@ -4,10 +4,12 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.command.CommandException;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -53,7 +55,14 @@ public final class BookCommandSkinListener implements Listener {
         event.setCancelled(true);
         // Execute the original command synchronously: permissions, ownership, formatting and
         // denial messages stay with Essentials. No deferred slot overwrite can move/duplicate books.
-        command.execute(event.getPlayer(), words[0], Arrays.copyOfRange(words, 1, words.length));
+        command.getPlugin().getLogger().info(event.getPlayer().getName()
+            + " issued server command: " + event.getMessage());
+        try {
+            command.execute(event.getPlayer(), words[0], Arrays.copyOfRange(words, 1, words.length));
+        } catch (CommandException failure) {
+            command.getPlugin().getLogger().log(Level.SEVERE, "Failed custom book command", failure);
+            event.getPlayer().sendMessage("An error occurred while editing your book. Please contact staff.");
+        }
         ItemStack converted = event.getPlayer().getInventory().getItemInMainHand();
         if (!isBook(converted) || converted.getType() == original.getType()) return;
         event.getPlayer().getInventory().setItemInMainHand(restore.apply(original, converted));

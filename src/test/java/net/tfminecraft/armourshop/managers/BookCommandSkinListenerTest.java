@@ -33,6 +33,7 @@ class BookCommandSkinListenerTest {
         when(command.getName()).thenReturn("book");
         when(command.getPlugin()).thenReturn(essentials);
         when(essentials.getName()).thenReturn("Essentials");
+        when(essentials.getLogger()).thenReturn(mock(java.util.logging.Logger.class));
     }
 
     @Test void delegatesNamespacedCommandAndRepairsImmediately() {
@@ -84,6 +85,17 @@ class BookCommandSkinListenerTest {
         new BookCommandSkinListener(label -> command, item -> true, (a, b) -> restored)
             .onBookCommand(event);
         verifyNoInteractions(command);
+    }
+
+    @Test void executionFailureReportsErrorAndPreservesPartialConversion() {
+        when(command.execute(any(), any(), any()))
+            .thenThrow(new org.bukkit.command.CommandException("test failure"));
+        new BookCommandSkinListener(label -> command, item -> true, (a, b) -> restored)
+            .onBookCommand(new PlayerCommandPreprocessEvent(player, "/book unsign"));
+        verify(player).sendMessage(contains("error occurred"));
+        verify(inventory).setItemInMainHand(restored);
+        verify(essentials.getLogger()).log(eq(java.util.logging.Level.SEVERE),
+            eq("Failed custom book command"), any(Throwable.class));
     }
 
     private static String[] aryEq(String... values) {
