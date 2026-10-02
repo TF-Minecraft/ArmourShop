@@ -37,7 +37,8 @@ class PackDeletionTest {
     private MockedStatic<Bukkit> bukkit;
     private MockedStatic<ProvinceSystemClient> client;
     private String oldContents, oldMasks, oldGuns;
-    private final Map<Field, Object> state = new LinkedHashMap<>();
+    private record CacheField(Object owner, Field field) {}
+    private final Map<CacheField, Object> state = new LinkedHashMap<>();
 
     @BeforeEach void setup() throws Exception {
         oldContents = Cache.iaContentsPath; oldMasks = Cache.masksYmlPath; oldGuns = Cache.gunsSkinsYmlPath;
@@ -51,21 +52,35 @@ class PackDeletionTest {
         when(scheduler.runTask(eq(plugin), any(Runnable.class))).thenAnswer(i -> {main.add(i.getArgument(1)); return mock(BukkitTask.class);});
         client = mockStatic(ProvinceSystemClient.class); client.when(() -> ProvinceSystemClient.revokeSubmission(anyString())).thenReturn(SimpleResult.success());
         for (Class<?> type : List.of(DeletableSubmissionCache.class, DeletableStaffSkinCache.class)) {
-            Field ids = field(type, "IDS"), fetched = field(type, "FETCHED_AT"), flight = field(type, "refreshInFlight"), generation = field(type, "generation");
-            state.put(ids, ((AtomicReference<?>) ids.get(null)).get()); state.put(fetched, ((AtomicLong) fetched.get(null)).get()); state.put(flight, flight.get(null)); state.put(generation, generation.get(null));
-            ((AtomicReference<List<String>>) ids.get(null)).set(List.of()); ((AtomicLong) fetched.get(null)).set(0); flight.set(null, false); generation.setLong(null, 0L);
+            Object cache = field(type, "CACHE").get(null);
+            for (String name : List.of("IDS", "FETCHED_AT", "refreshInFlight", "generation")) {
+                Field field = field(GenerationalIdCache.class, name);
+                Object value = field.get(cache);
+                CacheField key = new CacheField(cache, field);
+                if (value instanceof AtomicReference<?> ref) {
+                    state.put(key, ref.get()); ((AtomicReference<List<String>>) ref).set(List.of());
+                } else if (value instanceof AtomicLong number) {
+                    state.put(key, number.get()); number.set(0L);
+                } else {
+                    state.put(key, value); field.set(cache, value instanceof Boolean ? false : 0L);
+                }
+            }
         }
     }
     @AfterEach @SuppressWarnings("unchecked") void restore() throws Exception {
         for (var entry : state.entrySet()) {
-            Object value = entry.getKey().get(null);
+            CacheField key = entry.getKey();
+            Object value = key.field().get(key.owner());
             if (value instanceof AtomicReference<?> ref) ((AtomicReference<Object>) ref).set(entry.getValue());
             else if (value instanceof AtomicLong n) n.set((Long) entry.getValue());
-            else entry.getKey().set(null, entry.getValue());
+            else key.field().set(key.owner(), entry.getValue());
         }
         client.close(); bukkit.close(); plugins.close(); Cache.iaContentsPath = oldContents; Cache.masksYmlPath = oldMasks; Cache.gunsSkinsYmlPath = oldGuns;
     }
     private static Field field(Class<?> type, String name) throws Exception {Field f = type.getDeclaredField(name); f.setAccessible(true); return f;}
+    private static Object cacheValue(Class<?> type, String name) throws Exception {
+        return field(GenerationalIdCache.class, name).get(field(type, "CACHE").get(null));
+    }
     private PluginSubmission submission(boolean staff, String owner, String display, String category, String namespace) {
         return new PluginSubmission("id", owner, "skin", "item", display, "approved", null, null, staff, category, namespace);
     }
@@ -111,8 +126,8 @@ class PackDeletionTest {
         Runnable oldWorker = workers.remove();
         if (fail) assertThrows(IllegalStateException.class, oldWorker::run); else oldWorker.run();
         assertAll(type.getSimpleName(),
-            () -> assertEquals(List.of(), ((AtomicReference<?>) field(type, "IDS").get(null)).get(), "discard superseded response"),
-            () -> assertEquals(0L, ((AtomicLong) field(type, "FETCHED_AT").get(null)).get(), "stale results must not refresh the TTL"),
+            () -> assertEquals(List.of(), ((AtomicReference<?>) cacheValue(type, "IDS")).get(), "discard superseded response"),
+            () -> assertEquals(0L, ((AtomicLong) cacheValue(type, "FETCHED_AT")).get(), "stale results must not refresh the TTL"),
             () -> assertEquals(1, workers.size(), "coalesce forced invalidations into one fresh fetch"));
         workers.remove().run();
         assertEquals(List.of("current-id"), snapshot.get()); assertTrue(workers.isEmpty());

@@ -154,6 +154,9 @@ public final class PackPullRunner {
 						RUNNING.set(false);
 						throw schedulingFailure;
 					}
+				} catch (Error fatal) {
+					RUNNING.set(false);
+					throw fatal;
 				}
 			});
 		} catch (RuntimeException | Error schedulingFailure) {

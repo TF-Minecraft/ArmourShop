@@ -119,6 +119,72 @@ class ProvinceSystemClientTest {
         }
     }
 
+    @Test void listRecordsAreParsedOnceWhileReusingAllTypedFields() {
+        String submission = """
+            {"id":"skin","player_uuid":"owner","slug":"blue","kind":"armor_set",
+             "display_name":"Blue","grip_preset":"middle","base_set":"iron","tiers":["iron"],
+             "helmet_3d_tiers":["iron"],"tier_aliases":{"iron":"Scout"},"add_name":true,
+             "name_colours":["#123456"],"name_styles":["bold"],"files":["iron.png"],
+             "staff":" true ","category":"armor","scroll":"common",
+             "tier_scrolls":{"iron":"rare"},"ia_namespace":"curated"}
+            """;
+        try (var parser = mockStatic(JsonParser.class, CALLS_REAL_METHODS)) {
+            var parsed = parseApprovedSubmissions("{\"submissions\":[{}," + submission + "]}");
+            assertEquals(1, parsed.size()); var sub = parsed.getFirst();
+            assertEquals("skin", sub.id); assertEquals("owner", sub.playerUuid); assertEquals("blue", sub.slug);
+            assertEquals("Blue Scout", sub.displayNameForTier("iron")); assertEquals("middle", sub.gripPreset);
+            assertTrue(sub.addName); assertTrue(sub.staff); assertTrue(sub.isHelmet3dTier("iron"));
+            assertEquals(List.of("#123456"), sub.nameColours); assertEquals(List.of("bold"), sub.nameStyles);
+            assertEquals(List.of("iron.png"), sub.files); assertEquals("armor", sub.category); assertEquals("common", sub.scroll);
+            assertEquals(Map.of("iron", "rare"), sub.tierScrolls); assertEquals("curated", sub.resolveNamespace());
+            parser.verify(() -> JsonParser.parseString(anyString()), times(2));
+            parser.clearInvocations();
+            var codes = parseActiveCodes("{\"codes\":[{}, {\"code\":\"abc\",\"player_uuid\":\"owner\",\"minecraft_name\":\"Name\",\"created_at\":\"start\",\"expires_at\":\"end\"}]}");
+            assertEquals(1, codes.size()); assertEquals("abc", codes.getFirst().code); assertEquals("Name", codes.getFirst().minecraftName);
+            assertEquals("start", codes.getFirst().createdAt); assertEquals("end", codes.getFirst().expiresAt);
+            parser.verify(() -> JsonParser.parseString(anyString()), times(2));
+        }
+    }
+
+    @Test void lookupAndCatalogResponsesAreParsedOnceEach() {
+        String response = """
+            {"id":"skin","player_uuid":"owner","slug":"blue","kind":"armor_set","display_name":"Blue",
+             "status":"approved","base_set":"iron","tiers":["steel"],"staff":true,"category":"armor",
+             "ia_namespace":"curated","categories":2,"skin_sets":3,"scrolls":4,"updated_at":"now"}
+            """;
+        try (var gateway = mockStatic(GatewayClient.class); var parser = mockStatic(JsonParser.class, CALLS_REAL_METHODS)) {
+            gateway.when(() -> GatewayClient.request(anyString(), anyString(), nullable(String.class)))
+                .thenReturn(GatewayClient.Result.success(response));
+            var lookup = getSubmission("skin"); assertTrue(lookup.ok);
+            assertEquals("owner", lookup.submission.playerUuid); assertEquals("Blue", lookup.submission.displayName);
+            assertEquals("approved", lookup.submission.status); assertEquals(List.of("steel"), lookup.submission.tiers);
+            assertTrue(lookup.submission.staff); assertEquals("armor", lookup.submission.category);
+            assertEquals("curated", lookup.submission.resolveNamespace());
+            parser.verify(() -> JsonParser.parseString(response), times(1));
+            parser.clearInvocations();
+            var catalog = pushCatalog("{}"); assertTrue(catalog.ok);
+            assertEquals(2, catalog.categories); assertEquals(3, catalog.skinSets); assertEquals(4, catalog.scrolls);
+            assertEquals("now", catalog.updatedAt); parser.verify(() -> JsonParser.parseString(response), times(1));
+        }
+    }
+
+    @Test void typedReadersKeepRootOnlyFieldsAndTolerateMalformedResponses() {
+        String nested = "{\"nested\":{\"id\":\"wrong\",\"x\":true,\"tiers\":[\"iron\"],\"aliases\":{\"iron\":\"Scout\"}}}";
+        assertNull(jsonString(nested, "id")); assertFalse(jsonTruthy(nested, "x")); assertEquals(0, jsonInt(nested, "x"));
+        assertTrue(jsonStringArray(nested, "tiers").isEmpty()); assertTrue(jsonStringMap(nested, "aliases").isEmpty());
+        try (var gateway = mockStatic(GatewayClient.class)) {
+            for (String malformed : Arrays.asList(null, "null", "[]", "\"scalar\"", "{\"id\":")) {
+                gateway.when(() -> GatewayClient.request(anyString(), anyString(), nullable(String.class)))
+                    .thenReturn(GatewayClient.Result.success(malformed));
+                var lookup = getSubmission("skin"); assertFalse(lookup.ok);
+                assertEquals("submission response missing id/slug", lookup.error);
+                var catalog = pushCatalog("{}"); assertTrue(catalog.ok);
+                assertEquals(0, catalog.categories); assertEquals(0, catalog.skinSets); assertEquals(0, catalog.scrolls);
+                assertNull(catalog.updatedAt);
+            }
+        }
+    }
+
     @Test void remoteFailuresReachEveryResultType() {
         try (var gateway = mockStatic(GatewayClient.class)) {
             gateway.when(() -> GatewayClient.request(anyString(), anyString(), nullable(String.class)))

@@ -118,6 +118,20 @@ class PackPullRunnerTest {
         assertTrue(PackPullRunner.run(false, null)); finish(); assertFalse(PackPullRunner.isRunning());
     }
 
+    @Test void linkageFailurePropagatesAndAllowsTheNextPull() {
+        LinkageError failure = new NoClassDefFoundError("optional/plugin/Api");
+        apply.when(() -> PackApplyService.pullAndWrite(log)).thenThrow(failure);
+        assertTrue(PackPullRunner.run(false, null));
+        assertSame(failure, assertThrows(LinkageError.class, () -> workers.removeFirst().run()));
+        assertFalse(PackPullRunner.isRunning(), "A failed worker must not permanently block pulls");
+        assertTrue(main.isEmpty(), "A fatal failure must not report a successful pull");
+        apply.when(() -> PackApplyService.pullAndWrite(log)).thenReturn(
+            new PackApplyService.ApplySummary(0, 0, 0, List.of(), List.of()));
+        assertTrue(PackPullRunner.run(false, null));
+        finish();
+        assertFalse(PackPullRunner.isRunning());
+    }
+
     @Test void callbackExceptionsStillReleasePullLock() {
         assertTrue(PackPullRunner.run(false, result -> { throw new IllegalArgumentException("callback"); }));
         workers.removeFirst().run(); assertThrows(IllegalArgumentException.class, () -> main.removeFirst().run()); assertFalse(PackPullRunner.isRunning());

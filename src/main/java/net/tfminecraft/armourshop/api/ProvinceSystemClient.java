@@ -1,6 +1,7 @@
 package net.tfminecraft.armourshop.api;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
@@ -514,11 +515,12 @@ public class ProvinceSystemClient {
 		if (!raw.ok) {
 			return CatalogPushResult.fail(raw.error);
 		}
+		JsonObject response = parseObject(raw.body);
 		return CatalogPushResult.success(
-			jsonInt(raw.body, "categories"),
-			jsonInt(raw.body, "skin_sets"),
-			jsonInt(raw.body, "scrolls"),
-			jsonString(raw.body, "updated_at")
+			jsonInt(response, "categories"),
+			jsonInt(response, "skin_sets"),
+			jsonInt(response, "scrolls"),
+			jsonString(response, "updated_at")
 		);
 	}
 
@@ -611,7 +613,7 @@ public class ProvinceSystemClient {
 		if (!raw.ok) {
 			return PluginSubmissionResult.fail(raw.error);
 		}
-		String response = raw.body;
+		JsonObject response = parseObject(raw.body);
 		String sid = jsonString(response, "id");
 		String slug = jsonString(response, "slug");
 		if (sid == null || sid.isBlank() || slug == null || slug.isBlank()) {
@@ -741,7 +743,8 @@ public class ProvinceSystemClient {
 		if (array == null) {
 			return out;
 		}
-		for (String obj : splitJsonObjects(array)) {
+		for (String objectJson : splitJsonObjects(array)) {
+			JsonObject obj = parseObject(objectJson);
 			String id = jsonString(obj, "id");
 			if (id == null || id.isEmpty()) {
 				continue;
@@ -780,7 +783,8 @@ public class ProvinceSystemClient {
 		if (array == null) {
 			return out;
 		}
-		for (String obj : splitJsonObjects(array)) {
+		for (String objectJson : splitJsonObjects(array)) {
+			JsonObject obj = parseObject(objectJson);
 			String code = jsonString(obj, "code");
 			if (code == null || code.isEmpty()) {
 				continue;
@@ -887,6 +891,10 @@ public class ProvinceSystemClient {
 	}
 
 	static List<String> jsonStringArray(String json, String key) {
+		return jsonStringArray(parseObject(json), key);
+	}
+
+	private static List<String> jsonStringArray(JsonObject json, String key) {
 		List<String> out = new ArrayList<>();
 		JsonElement value = jsonField(json, key);
 		if (value == null || !value.isJsonArray()) {
@@ -953,6 +961,10 @@ public class ProvinceSystemClient {
 
 	/** Parse a JSON object of string→string values (e.g. tier_aliases). */
 	static Map<String, String> jsonStringMap(String json, String key) {
+		return jsonStringMap(parseObject(json), key);
+	}
+
+	private static Map<String, String> jsonStringMap(JsonObject json, String key) {
 		Map<String, String> out = new LinkedHashMap<>();
 		JsonElement value = jsonField(json, key);
 		if (value == null || !value.isJsonObject()) {
@@ -970,17 +982,28 @@ public class ProvinceSystemClient {
 
 	/** Extract a top-level JSON string, boolean, or number as text. */
 	static String jsonString(String json, String key) {
+		return jsonString(parseObject(json), key);
+	}
+
+	private static String jsonString(JsonObject json, String key) {
 		JsonElement value = jsonField(json, key);
 		return value != null && value.isJsonPrimitive() ? value.getAsString() : null;
 	}
 
-	private static JsonElement jsonField(String json, String key) {
+	private static JsonElement jsonField(JsonObject json, String key) {
 		if (json == null || key == null) {
+			return null;
+		}
+		return json.get(key);
+	}
+
+	private static JsonObject parseObject(String json) {
+		if (json == null) {
 			return null;
 		}
 		try {
 			JsonElement root = JsonParser.parseString(json);
-			return root.isJsonObject() ? root.getAsJsonObject().get(key) : null;
+			return root.isJsonObject() ? root.getAsJsonObject() : null;
 		} catch (JsonParseException e) {
 			return null;
 		}
@@ -988,12 +1011,20 @@ public class ProvinceSystemClient {
 
 	/** True for JSON boolean true or string "true". */
 	static boolean jsonTruthy(String json, String key) {
+		return jsonTruthy(parseObject(json), key);
+	}
+
+	private static boolean jsonTruthy(JsonObject json, String key) {
 		String raw = jsonString(json, key);
 		return raw != null && "true".equalsIgnoreCase(raw.trim());
 	}
 
 	/** Extract a top-level JSON integer field. */
 	static int jsonInt(String json, String key) {
+		return jsonInt(parseObject(json), key);
+	}
+
+	private static int jsonInt(JsonObject json, String key) {
 		String raw = jsonString(json, key);
 		if (raw == null || raw.isBlank()) {
 			return 0;
