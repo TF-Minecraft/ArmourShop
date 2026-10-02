@@ -1,6 +1,5 @@
 package net.tfminecraft.armourshop.pack.writer.flat;
 
-
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;

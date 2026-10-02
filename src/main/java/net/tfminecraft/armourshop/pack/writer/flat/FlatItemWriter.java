@@ -1,6 +1,5 @@
 package net.tfminecraft.armourshop.pack.writer.flat;
 
-
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
@@ -58,10 +57,6 @@ public final class FlatItemWriter {
 		Files.writeString(yamlPath, buildYaml(submission, ns), StandardCharsets.UTF_8);
 		written.add(yamlPath);
 		return written;
-	}
-
-	static String buildYaml(PackSubmission submission) {
-		return buildYaml(submission, PackPaths.playerNamespace());
 	}
 
 	static String buildYaml(PackSubmission submission, String namespace) {

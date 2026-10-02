@@ -2,6 +2,7 @@ package net.tfminecraft.armourshop.managers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -140,9 +141,6 @@ public class InventoryManager {
 	 */
 	private List<SkinSet> visibleSets(Player player, SkinCategory cat) {
 		List<SkinSet> visible = new ArrayList<>();
-		if (cat == null || cat.getSets() == null) {
-			return visible;
-		}
 		for (SkinSet set : cat.getSets()) {
 			if (set == null) {
 				continue;
@@ -227,19 +225,20 @@ public class InventoryManager {
 		}
 		ItemStack i = null;
 		ItemAPI api = TLibs.getItemAPI();
-		if(id.split("\\(")[0].equalsIgnoreCase("localmodel")){
-			String info = id.split("\\(")[1].replace(")", "");
+		String[] path = id.split("\\(", 2);
+		if(path[0].equalsIgnoreCase("localmodel")){
 			try {
-				i = new ItemStack(Material.valueOf(info.split("\\.")[0].toUpperCase()), 1);
+				String info = path[1].replace(")", "");
+				i = new ItemStack(Material.valueOf(info.split("\\.")[0].toUpperCase(Locale.ROOT)), 1);
 				ItemMeta m = i.getItemMeta();
 				m.setCustomModelData(Integer.parseInt(info.split("\\.")[1]));
 				i.setItemMeta(m);
 			} catch (Exception e) {
-				e.printStackTrace();
+				ArmourShop.plugin.getLogger().warning("[shop] invalid local model path: " + id);
 				i = new ItemStack(Material.DIRT, 1);
 			}
-		} else if(id.split("\\(")[0].equalsIgnoreCase("gunskin")) {
-			String value = id.split("\\(")[1].replace(")", "");
+		} else if(path[0].equalsIgnoreCase("gunskin")) {
+			String value = path.length > 1 ? path[1].replace(")", "") : "";
 			SkinData gunskin = SkinLoader.getByString(value);
 			if(gunskin == null) {
 				ArmourShop.plugin.getLogger().warning("No gunskin called " + value);
@@ -280,7 +279,7 @@ public class InventoryManager {
 			lore.add("\u00A77Scroll: " + scrollName);
 		}
 		NamespacedKey key = new NamespacedKey(ArmourShop.plugin, "set");
-		meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, set.getId()+"."+type.toString().toLowerCase());
+		meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, set.getId()+"."+type.toString().toLowerCase(Locale.ROOT));
 		meta.setLore(lore);
 		i.setItemMeta(meta);
 		return i;

@@ -47,109 +47,122 @@ public final class PackPullRunner {
 			return false;
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			Logger log = plugin.getLogger();
-			try {
-				PackApplyService.ApplySummary summary = PackApplyService.pullAndWrite(log);
+		try {
+			Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+				Logger log = plugin.getLogger();
+				try {
+					PackApplyService.ApplySummary summary = PackApplyService.pullAndWrite(log);
 
-				int shopOk = 0;
-				int shopFail = 0;
-				int lpOk = 0;
-				int lpFail = 0;
-				List<String> readyForReload = new ArrayList<>();
-				List<String> messages = new ArrayList<>(summary.messages);
+					int shopOk = 0;
+					int shopFail = 0;
+					int lpOk = 0;
+					int lpFail = 0;
+					List<String> readyForReload = new ArrayList<>();
+					List<String> messages = new ArrayList<>(summary.messages);
 
-				for (ApprovedSubmission sub : summary.writtenSubmissions) {
-					boolean shopSucceeded = false;
-					try {
-						ShopSubmissionWriter.write(sub, log);
-						shopOk++;
-						shopSucceeded = true;
-					} catch (Exception e) {
-						shopFail++;
-						log.warning("[shop] fail " + sub.id + ": " + e.getMessage());
-						messages.add("shop fail " + sub.slug + ": " + e.getMessage());
-					}
+					for (ApprovedSubmission sub : summary.writtenSubmissions) {
+						boolean shopSucceeded = false;
+						try {
+							ShopSubmissionWriter.write(sub, log);
+							shopOk++;
+							shopSucceeded = true;
+						} catch (Exception e) {
+							shopFail++;
+							log.warning("[shop] fail " + sub.id + ": " + e.getMessage());
+							messages.add("shop fail " + sub.slug + ": " + e.getMessage());
+						}
 
-					boolean lpSucceeded = false;
-					if (sub.staff) {
-						// Staff curated skins use scroll consume — no submission LP.
-						lpSucceeded = true;
-					} else {
-						UUID uuid = parseUuid(sub.playerUuid);
-						if (uuid == null) {
-							lpFail++;
-							log.warning("[lp] invalid uuid for " + sub.id + ": " + sub.playerUuid);
-							messages.add("lp fail " + sub.slug + ": invalid uuid");
-						} else if (LuckPermsGrant.grantSubmission(uuid, sub.slug, log)) {
-							lpOk++;
+						boolean lpSucceeded = false;
+						if (sub.staff) {
+							// Staff curated skins use scroll consume — no submission LP.
 							lpSucceeded = true;
 						} else {
-							lpFail++;
-							messages.add("lp fail " + sub.slug);
+							UUID uuid = parseUuid(sub.playerUuid);
+							if (uuid == null) {
+								lpFail++;
+								log.warning("[lp] invalid uuid for " + sub.id + ": " + sub.playerUuid);
+								messages.add("lp fail " + sub.slug + ": invalid uuid");
+							} else if (LuckPermsGrant.grantSubmission(uuid, sub.slug, log)) {
+								lpOk++;
+								lpSucceeded = true;
+							} else {
+								lpFail++;
+								messages.add("lp fail " + sub.slug);
+							}
+						}
+
+						if (shopSucceeded && lpSucceeded && sub.id != null && !sub.id.isBlank()) {
+							readyForReload.add(sub.id.trim());
 						}
 					}
 
-					if (shopSucceeded && lpSucceeded && sub.id != null && !sub.id.isBlank()) {
-						readyForReload.add(sub.id.trim());
+					final int fShopOk = shopOk;
+					final int fShopFail = shopFail;
+					final int fLpOk = lpOk;
+					final int fLpFail = lpFail;
+					final boolean hadWrites = !summary.writtenSubmissions.isEmpty();
+
+					Bukkit.getScheduler().runTask(plugin, () -> {
+						try {
+							if (hadWrites) {
+								plugin.reload();
+								log.info("[pack] ArmourShop reloaded after shop write");
+							}
+
+							DeferredIaReloadService reloadService = plugin.getDeferredIaReloadService();
+							if (reloadService != null) {
+								if (!readyForReload.isEmpty()) {
+									reloadService.queue().enqueue(readyForReload);
+								}
+								if (!reloadService.queue().isEmpty()) {
+									reloadService.requestFlush(forceReload);
+								}
+							}
+
+							PullResult result = new PullResult(
+								false,
+								summary.written,
+								summary.skipped,
+								summary.failed,
+								fShopOk,
+								fShopFail,
+								fLpOk,
+								fLpFail,
+								readyForReload.size(),
+								messages
+							);
+							if (onDone != null) {
+								onDone.accept(result);
+							}
+						} finally {
+							RUNNING.set(false);
+						}
+					});
+				} catch (Exception e) {
+					log.severe("[pack] pull failed: " + e.getMessage());
+					try {
+						Bukkit.getScheduler().runTask(plugin, () -> {
+							try {
+								if (onDone != null) {
+									onDone.accept(PullResult.failed(e.getMessage()));
+								}
+							} finally {
+								RUNNING.set(false);
+							}
+						});
+					} catch (RuntimeException | Error schedulingFailure) {
+						RUNNING.set(false);
+						throw schedulingFailure;
 					}
+				} catch (Error fatal) {
+					RUNNING.set(false);
+					throw fatal;
 				}
-
-				final int fShopOk = shopOk;
-				final int fShopFail = shopFail;
-				final int fLpOk = lpOk;
-				final int fLpFail = lpFail;
-				final boolean hadWrites = !summary.writtenSubmissions.isEmpty();
-
-				Bukkit.getScheduler().runTask(plugin, () -> {
-					try {
-						if (hadWrites) {
-							plugin.reload();
-							log.info("[pack] ArmourShop reloaded after shop write");
-						}
-
-						DeferredIaReloadService reloadService = plugin.getDeferredIaReloadService();
-						if (reloadService != null) {
-							if (!readyForReload.isEmpty()) {
-								reloadService.queue().enqueue(readyForReload);
-							}
-							if (!reloadService.queue().isEmpty()) {
-								reloadService.requestFlush(forceReload);
-							}
-						}
-
-						PullResult result = new PullResult(
-							false,
-							summary.written,
-							summary.skipped,
-							summary.failed,
-							fShopOk,
-							fShopFail,
-							fLpOk,
-							fLpFail,
-							readyForReload.size(),
-							messages
-						);
-						if (onDone != null) {
-							onDone.accept(result);
-						}
-					} finally {
-						RUNNING.set(false);
-					}
-				});
-			} catch (Exception e) {
-				log.severe("[pack] pull failed: " + e.getMessage());
-				Bukkit.getScheduler().runTask(plugin, () -> {
-					try {
-						if (onDone != null) {
-							onDone.accept(PullResult.failed(e.getMessage()));
-						}
-					} finally {
-						RUNNING.set(false);
-					}
-				});
-			}
-		});
+			});
+		} catch (RuntimeException | Error schedulingFailure) {
+			RUNNING.set(false);
+			throw schedulingFailure;
+		}
 		return true;
 	}
 

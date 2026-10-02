@@ -1,6 +1,5 @@
 package net.tfminecraft.armourshop.pack.writer.model3d;
 
-
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
@@ -40,7 +39,6 @@ public final class Item3dWriter {
 			contentsRoot,
 			submission,
 			"PAPER",
-			null,
 			false,
 			namespace
 		);
@@ -69,7 +67,6 @@ public final class Item3dWriter {
 			contentsRoot,
 			submission,
 			"CARVED_PUMPKIN",
-			null,
 			true,
 			namespace
 		);
@@ -93,7 +90,6 @@ public final class Item3dWriter {
 			contentsRoot,
 			submission,
 			"CARVED_PUMPKIN",
-			null,
 			true,
 			namespace
 		);
@@ -103,26 +99,13 @@ public final class Item3dWriter {
 	 * Shared pack write for standalone 3D items (item_3d / helmet_3d).
 	 *
 	 * @param material IA material name
-	 * @param armorSlot if non-null, adds armor slot specific_properties (e.g. {@code head})
 	 * @param hat when true, appends {@code behaviours.hat} so a carved pumpkin cannot be placed
 	 */
-	static List<Path> writeModelItem(
-		Path contentsRoot,
-		PackSubmission submission,
-		String material,
-		String armorSlot,
-		boolean hat
-	) throws IOException {
-		return writeModelItem(
-			contentsRoot, submission, material, armorSlot, hat, PackPaths.playerNamespace()
-		);
-	}
 
 	static List<Path> writeModelItem(
 		Path contentsRoot,
 		PackSubmission submission,
 		String material,
-		String armorSlot,
 		boolean hat,
 		String namespace
 	) throws IOException {
@@ -150,7 +133,7 @@ public final class Item3dWriter {
 		Path yamlPath = configsDir.resolve(slug + ".yml");
 		Files.writeString(
 			yamlPath,
-			buildYaml(submission, material, armorSlot, hat, ns),
+			buildYaml(submission, material, hat, ns),
 			StandardCharsets.UTF_8
 		);
 		written.add(yamlPath);
@@ -160,16 +143,6 @@ public final class Item3dWriter {
 	static String buildYaml(
 		PackSubmission submission,
 		String material,
-		String armorSlot,
-		boolean hat
-	) {
-		return buildYaml(submission, material, armorSlot, hat, PackPaths.playerNamespace());
-	}
-
-	static String buildYaml(
-		PackSubmission submission,
-		String material,
-		String armorSlot,
 		boolean hat,
 		String namespace
 	) {
@@ -186,11 +159,6 @@ public final class Item3dWriter {
 		sb.append("      material: ").append(material).append('\n');
 		sb.append("      generate: false\n");
 		sb.append("      model_path: item/").append(slug).append('\n');
-		if (armorSlot != null && !armorSlot.isBlank()) {
-			sb.append("    specific_properties:\n");
-			sb.append("      armor:\n");
-			sb.append("        slot: ").append(armorSlot.trim()).append('\n');
-		}
 		if (hat) {
 			sb.append("    behaviours:\n");
 			sb.append("      hat: true\n");

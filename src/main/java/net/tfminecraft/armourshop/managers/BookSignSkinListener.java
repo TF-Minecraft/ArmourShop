@@ -3,6 +3,7 @@ package net.tfminecraft.armourshop.managers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -53,8 +54,7 @@ public final class BookSignSkinListener implements Listener {
 			return;
 		}
 
-		boolean signing = event.isSigning();
-		String targetId = signing ? id + "_signed" : id;
+		String targetId = id + "_signed";
 		CustomStack target = CustomStack.getInstance(namespace + ":" + targetId);
 		if (target == null) {
 			return;
@@ -68,41 +68,43 @@ public final class BookSignSkinListener implements Listener {
 		List<String> lore = prevMeta != null && prevMeta.hasLore() && prevMeta.getLore() != null
 			? new ArrayList<>(prevMeta.getLore())
 			: null;
-		BookMeta content = event.getNewBookMeta();
-		int amount = Math.max(1, current.getAmount());
-
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (!player.isOnline()) {
 					return;
 				}
+				// Later book handlers may format the content. Only replace the saved result
+				// of this event, never another item moved into its slot before the next tick.
+				BookMeta content = event.getNewBookMeta();
+				ItemStack saved = player.getInventory().getItem(slot);
+				if (saved == null || saved.getType() != Material.WRITTEN_BOOK
+					|| !(saved.getItemMeta() instanceof BookMeta savedMeta)
+					|| content == null
+					|| !savedMeta.equals(content)) {
+					return;
+				}
 				ItemStack restored = target.getItemStack();
-				if (restored == null || restored.getType().isAir()) {
+				if (restored == null || restored.getType() != Material.WRITTEN_BOOK) {
 					return;
 				}
 				restored = restored.clone();
-				restored.setAmount(amount);
+				restored.setAmount(saved.getAmount());
 
 				ItemMeta meta = restored.getItemMeta();
 				if (!(meta instanceof BookMeta bookMeta)) {
-					player.getInventory().setItem(slot, restored);
 					return;
 				}
 
-				if (content != null) {
-					bookMeta.setPages(content.getPages());
-					if (signing) {
-						if (content.hasTitle()) {
-							bookMeta.setTitle(content.getTitle());
-						}
-						if (content.hasAuthor()) {
-							bookMeta.setAuthor(content.getAuthor());
-						}
-						if (content.hasGeneration()) {
-							bookMeta.setGeneration(content.getGeneration());
-						}
-					}
+				bookMeta.pages(content.pages());
+				if (content.hasTitle()) {
+					bookMeta.setTitle(content.getTitle());
+				}
+				if (content.hasAuthor()) {
+					bookMeta.setAuthor(content.getAuthor());
+				}
+				if (content.hasGeneration()) {
+					bookMeta.setGeneration(content.getGeneration());
 				}
 				if (displayName != null) {
 					bookMeta.setDisplayName(displayName);
@@ -116,9 +118,8 @@ public final class BookSignSkinListener implements Listener {
 
 				restored.setItemMeta(bookMeta);
 				player.getInventory().setItem(slot, restored);
-				String action = signing ? "book-sign" : "book-edit";
 				ArmourShop.plugin.getLogger().info(
-					"[" + action + "] " + player.getName() + " "
+					"[book-sign] " + player.getName() + " "
 						+ namespace + ":" + id + " -> " + targetId
 				);
 			}

@@ -87,8 +87,9 @@ public final class BookCommandSkinListener implements Listener {
                 ? (id.endsWith("_signed") ? id : id + "_signed")
                 : (id.endsWith("_signed") ? id.substring(0, id.length() - 7) : id);
             CustomStack target = CustomStack.getInstance(custom.getNamespace() + ":" + targetId);
-            if (target != null && target.getItemStack().getType() == converted.getType()) {
-                ItemMeta appearance = target.getItemStack().getItemMeta();
+            ItemStack targetStack = target != null ? target.getItemStack() : null;
+            if (targetStack != null && targetStack.getType() == converted.getType()
+                    && targetStack.getItemMeta() instanceof BookMeta appearance) {
                 ItemMeta meta = restored.getItemMeta();
                 meta.setCustomModelDataComponent(appearance.getCustomModelDataComponent());
                 meta.setItemModel(appearance.getItemModel());

@@ -265,9 +265,6 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 
 	private static String pieceList(SkinSet set) {
 		List<String> pieces = new ArrayList<>();
-		if (set.hasItem()) {
-			pieces.add("item");
-		}
 		if (set.hasHelmet()) {
 			pieces.add("helmet");
 		}
@@ -678,9 +675,9 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 	}
 
 	private List<String> filter(List<String> list, String input) {
-		String prefix = input == null ? "" : input.toLowerCase();
+		String prefix = input == null ? "" : input.toLowerCase(java.util.Locale.ROOT);
 		return list.stream()
-			.filter(s -> s.toLowerCase().startsWith(prefix))
+			.filter(s -> s.toLowerCase(java.util.Locale.ROOT).startsWith(prefix))
 			.collect(Collectors.toList());
 	}
 }

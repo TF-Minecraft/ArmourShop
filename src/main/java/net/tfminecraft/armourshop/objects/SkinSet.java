@@ -86,7 +86,7 @@ public class SkinSet {
 	public String getFormattedPieceName(ArmorType type) {
 		String plain = plainName;
 		if (type != null && !type.equals(ArmorType.ITEM)) {
-			plain = plain + " " + WordUtils.capitalize(type.toString().toLowerCase());
+			plain = plain + " " + WordUtils.capitalize(type.toString().toLowerCase(java.util.Locale.ROOT));
 		}
 		return StringFormatter.formatDisplayName(plain, colours, styles);
 	}

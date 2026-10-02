@@ -1,6 +1,5 @@
 package net.tfminecraft.armourshop.pack.writer.armor;
 
-
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
@@ -105,10 +104,6 @@ public final class ArmorSetWriter {
 		);
 		written.add(yamlPath);
 		return written;
-	}
-
-	static String buildYaml(PackSubmission submission, boolean helmet3d) {
-		return buildYaml(submission, helmet3d, PackPaths.playerNamespace());
 	}
 
 	static String buildYaml(PackSubmission submission, boolean helmet3d, String namespace) {

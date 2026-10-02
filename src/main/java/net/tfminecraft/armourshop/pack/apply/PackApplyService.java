@@ -1,5 +1,7 @@
 package net.tfminecraft.armourshop.pack.apply;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import net.tfminecraft.armourshop.pack.model.BowFrames;
 import net.tfminecraft.armourshop.pack.model.PackKind;
@@ -16,6 +18,7 @@ import net.tfminecraft.armourshop.pack.writer.large.LargeHandheldWriter;
 import net.tfminecraft.armourshop.pack.writer.mask.MasksYml;
 import net.tfminecraft.armourshop.pack.writer.model3d.Item3dWriter;
 import net.tfminecraft.armourshop.pack.writer.model3d.ShieldWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -231,36 +234,39 @@ public final class PackApplyService {
 		return out;
 	}
 
-	/** Writes one tier's armor set as its own pack slug ({@code id_tier}). */
+	/** Writes one tier's armor set as its own pack slug ({@code slug_tier}). */
 	private static void writeArmorTier(
 		Path contentsRoot,
 		ApprovedSubmission sub,
 		String tier,
 		Map<String, byte[]> files
 	) throws Exception {
-		if (files == null) {
-			throw new IllegalStateException("missing files for tier " + tier);
-		}
-		boolean h3d = files.containsKey(Model3dUtil.HELMET_MODEL_STEM);
-		if (h3d) {
-			if (!files.containsKey(Model3dUtil.HELMET_TEXTURE_STEM)) {
-				throw new IllegalStateException(
-					"missing helmet_texture for tier " + tier
-				);
-			}
-		} else if (!files.containsKey("helmet")) {
-			throw new IllegalStateException("missing helmet for tier " + tier);
-		}
-		for (String stem : ARMOR_BODY_STEMS) {
-			if (!files.containsKey(stem)) {
-				throw new IllegalStateException(
-					"missing armor stem: " + stem + " for tier " + tier
-				);
-			}
-		}
+		// downloadArmorFiles validates every required stem before any tier is written.
 		String ns = sub.resolveNamespace();
 		Map<String, byte[]> packFiles = rewriteModelFiles(files, ns);
-		String packSlug = sub.id + "_" + tier;
+		String packSlug = sub.slug + "_" + tier;
+		// Legacy web models name this texture after the submission ID, while shop entries use the slug.
+		if (!sub.slug.equals(sub.id) && packFiles.containsKey(Model3dUtil.HELMET_MODEL_STEM)) {
+			JsonObject model = Model3dUtil.parseObject(packFiles.get(Model3dUtil.HELMET_MODEL_STEM));
+			JsonElement textures = model.get("textures");
+			if (textures != null && textures.isJsonObject()) {
+				String oldTexture = ns + ":item/" + sub.id + "_" + tier + "_helmet";
+				String newTexture = ns + ":item/" + packSlug + "_helmet";
+				boolean changed = false;
+				for (Map.Entry<String, JsonElement> entry : textures.getAsJsonObject().entrySet()) {
+					JsonElement value = entry.getValue();
+					if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()
+						&& oldTexture.equals(value.getAsString())) {
+						textures.getAsJsonObject().addProperty(entry.getKey(), newTexture);
+						changed = true;
+					}
+				}
+				if (changed) {
+					packFiles = new LinkedHashMap<>(packFiles);
+					packFiles.put(Model3dUtil.HELMET_MODEL_STEM, (model.toString() + "\n").getBytes(StandardCharsets.UTF_8));
+				}
+			}
+		}
 		String display = sub.displayNameForTier(tier);
 		ArmorSetWriter.write(
 			contentsRoot,
@@ -517,7 +523,7 @@ public final class PackApplyService {
 		}
 	}
 
-	/** Rewrite player-ns prefixes in model JSON when writing a staff namespace. */
+	/** Rewrite the shared web-model namespace for staff and realm-specific packs. */
 	static Map<String, byte[]> rewriteModelFiles(
 		Map<String, byte[]> files,
 		String namespace
@@ -527,7 +533,7 @@ public final class PackApplyService {
 		}
 		if (namespace == null
 			|| namespace.isBlank()
-			|| PackPaths.playerNamespace().equals(namespace.trim())) {
+			|| PackPaths.NAMESPACE.equals(namespace.trim())) {
 			return files;
 		}
 		Map<String, byte[]> out = new LinkedHashMap<>();

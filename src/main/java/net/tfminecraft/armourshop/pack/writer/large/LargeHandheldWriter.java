@@ -65,10 +65,6 @@ public final class LargeHandheldWriter {
 		return written;
 	}
 
-	static String buildYaml(PackSubmission submission) {
-		return buildYaml(submission, PackPaths.playerNamespace());
-	}
-
 	static String buildYaml(PackSubmission submission, String namespace) {
 		String slug = submission.slug();
 		String name = YamlUtil.escapeDoubleQuoted(submission.displayName());

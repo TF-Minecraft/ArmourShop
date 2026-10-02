@@ -61,7 +61,7 @@ public class SkinCategory {
 		this.id = another.getId();
 		this.name = another.getName();
 		this.item = another.getItem();
-		this.permission = Optional.of(another.getPermission());
+		this.permission = another.permission;
 		this.isItem = another.isItem();
 	}
 }

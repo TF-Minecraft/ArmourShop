@@ -3,6 +3,7 @@ package net.tfminecraft.armourshop.pack.reload;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -11,7 +12,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import dev.lone.itemsadder.api.Events.ItemsAdderPackCompressedEvent;
 import net.tfminecraft.armourshop.Cache;
@@ -38,7 +38,9 @@ public final class DeferredIaReloadService implements Listener {
 	private volatile boolean inFlight;
 	/** True only after this flush has dispatched {@code iazip}. */
 	private volatile boolean awaitingZipEvent;
-	private BukkitTask delayedZipTask;
+	/** Only ids present when iareload began belong to this compressed pack. */
+	private Map<String, Long> flushingVersions = Map.of();
+	private final Object flightLock = new Object();
 
 	public DeferredIaReloadService(JavaPlugin plugin, PendingReloadQueue queue) {
 		this.plugin = plugin;
@@ -86,6 +88,8 @@ public final class DeferredIaReloadService implements Listener {
 	 * thread (HTTP). Thread-safe for the queue.
 	 */
 	public SyncResult pruneQueueToApproved(Logger log) {
+		Map<String, Long> versions = queue.snapshotVersions();
+		int before = versions.size();
 		ListResult list = ProvinceSystemClient.listApproved();
 		if (!list.ok) {
 			String err = list.error != null ? list.error : "unknown error";
@@ -95,14 +99,15 @@ public final class DeferredIaReloadService implements Listener {
 			}
 			return SyncResult.failed(err);
 		}
-		int before = queue.size();
 		List<String> stillApproved = new ArrayList<>();
 		for (ApprovedSubmission sub : list.submissions) {
 			if (sub != null && sub.id != null && !sub.id.isBlank()) {
 				stillApproved.add(sub.id.trim());
 			}
 		}
-		queue.retainAll(stillApproved);
+		List<String> dropped = new ArrayList<>(versions.keySet());
+		dropped.removeAll(stillApproved);
+		queue.clearIfUnchanged(dropped, versions);
 		if (log != null) {
 			log.info("[ia-reload] pending queue kept written ids still approved: "
 				+ before + " → " + queue.size());
@@ -128,56 +133,76 @@ public final class DeferredIaReloadService implements Listener {
 			return;
 		}
 
-		inFlight = true;
-		awaitingZipEvent = false;
+		synchronized (flightLock) {
+			inFlight = true;
+			awaitingZipEvent = false;
+			flushingVersions = queue.snapshotVersions();
+		}
 		Logger log = plugin.getLogger();
 		int delaySec = Math.max(0, Cache.iaReloadDelaySeconds);
 		log.info("[ia-reload] running iareload then iazip in " + delaySec
 			+ "s for " + queue.size() + " pending submission(s) (force=" + force
 			+ ", refreshEvenIfEmpty=" + refreshEvenIfEmpty + ")");
 
-		boolean reloadOk = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iareload");
-		if (!reloadOk) {
-			log.warning("[ia-reload] failed to dispatch iareload — continuing to iazip anyway");
-		}
-
-		if (delayedZipTask != null) {
-			delayedZipTask.cancel();
-			delayedZipTask = null;
-		}
-
-		long delayTicks = delaySec * 20L;
-		delayedZipTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			delayedZipTask = null;
-			awaitingZipEvent = true;
-			boolean ok = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iazip");
-			if (!ok) {
-				awaitingZipEvent = false;
-				inFlight = false;
-				log.severe("[ia-reload] failed to dispatch iazip — will retry later");
+		try {
+			boolean reloadOk = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iareload");
+			if (!reloadOk) {
+				log.warning("[ia-reload] failed to dispatch iareload — continuing to iazip anyway");
 			}
-		}, delayTicks);
+
+			long delayTicks = delaySec * 20L;
+			Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				try {
+					synchronized (flightLock) {
+						awaitingZipEvent = true;
+					}
+					boolean ok = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iazip");
+					if (!ok) {
+						resetFlight();
+						log.severe("[ia-reload] failed to dispatch iazip — will retry later");
+					}
+				} catch (RuntimeException | Error failure) {
+					resetFlight();
+					log.warning("[ia-reload] iazip failed — pending ids retained: " + failure.getMessage());
+					throw failure;
+				}
+			}, delayTicks);
+		} catch (RuntimeException | Error failure) {
+			resetFlight();
+			log.warning("[ia-reload] refresh could not start — pending ids retained: " + failure.getMessage());
+			throw failure;
+		}
+	}
+
+	private void resetFlight() {
+		synchronized (flightLock) {
+			awaitingZipEvent = false;
+			flushingVersions = Map.of();
+			inFlight = false;
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPackCompressed(ItemsAdderPackCompressedEvent event) {
-		if (!inFlight || !awaitingZipEvent) {
-			return;
+		Map<String, Long> versions;
+		synchronized (flightLock) {
+			if (!inFlight || !awaitingZipEvent) {
+				return;
+			}
+			versions = flushingVersions;
+			resetFlight();
 		}
-		awaitingZipEvent = false;
-		inFlight = false;
-		List<String> ids = queue.snapshot();
-		if (ids.isEmpty()) {
+		if (versions.isEmpty()) {
 			return;
 		}
 
 		Logger log = plugin.getLogger();
-		log.info("[ia-reload] pack compressed — checking " + ids.size()
+		log.info("[ia-reload] pack compressed — checking " + versions.size()
 			+ " written submission(s) before ack");
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> ackWritten(log, ids));
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> ackWritten(log, versions));
 	}
 
-	private void ackWritten(Logger log, List<String> ids) {
+	private void ackWritten(Logger log, Map<String, Long> versions) {
 		String contents = Cache.iaContentsPath;
 		if (contents == null || contents.isBlank()) {
 			log.severe("[ia-reload] pack-apply.ia-contents-path is unset — not acking; "
@@ -191,13 +216,13 @@ public final class DeferredIaReloadService implements Listener {
 				+ ") — not acking; ids remain queued");
 			return;
 		}
-		Plan plan = ApplyAckPlanner.plan(ids, list.submissions, Path.of(contents.trim()));
+		Plan plan = ApplyAckPlanner.plan(queue.matchingIds(versions), list.submissions, Path.of(contents.trim()));
 		AppliedResult result = plan.ack().isEmpty()
 			? AppliedResult.success(List.of())
 			: ProvinceSystemClient.markApplied(plan.ack());
 		Bukkit.getScheduler().runTask(plugin, () -> {
-			queue.clear(plan.notApproved());
-			queue.clear(plan.missingFiles());
+			queue.clearIfUnchanged(plan.notApproved(), versions);
+			queue.clearIfUnchanged(plan.missingFiles(), versions);
 			if (!plan.notApproved().isEmpty()) {
 				log.info("[ia-reload] dropped " + plan.notApproved().size()
 					+ " queued id(s) that are no longer approved");
@@ -211,7 +236,7 @@ public final class DeferredIaReloadService implements Listener {
 					+ " — written ids remain queued");
 				return;
 			}
-			queue.clear(result.applied);
+			queue.clearIfUnchanged(result.applied, versions);
 			log.info("[ia-reload] applied ack ok: " + result.applied.size()
 				+ " id(s); remaining queued=" + queue.size());
 			if (result.applied.size() < plan.ack().size()) {

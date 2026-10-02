@@ -29,7 +29,11 @@ public final class YamlUtil {
 					sb.append("\\t");
 					break;
 				default:
-					sb.append(c);
+                    if (c < 0x20 || (c >= 0x7f && c <= 0x9f) || c == 0x2028 || c == 0x2029) {
+                        sb.append(String.format(java.util.Locale.ROOT, "\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
 			}
 		}
 		return sb.toString();

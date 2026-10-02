@@ -26,7 +26,7 @@ public final class GripY {
 			throw new IllegalArgumentException("grip_preset is required");
 		}
 		String text = raw.trim();
-		String lower = text.toLowerCase();
+		String lower = text.toLowerCase(java.util.Locale.ROOT);
 		if ("bottom".equals(lower)) {
 			return 2.5;
 		}
