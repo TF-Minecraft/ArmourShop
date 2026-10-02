@@ -1,6 +1,5 @@
 package net.tfminecraft.armourshop.pack.delete;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,7 +22,9 @@ public final class DeletableSubmissionCache {
 	private static final AtomicReference<List<String>> IDS =
 		new AtomicReference<>(Collections.emptyList());
 	private static final AtomicLong FETCHED_AT = new AtomicLong(0L);
+	private static final Object REFRESH_LOCK = new Object();
 	private static volatile boolean refreshInFlight;
+	private static long generation;
 
 	private DeletableSubmissionCache() {}
 
@@ -34,31 +35,52 @@ public final class DeletableSubmissionCache {
 
 	/** Call after a successful delete so tab-complete drops the id soon. */
 	public static void invalidate() {
-		FETCHED_AT.set(0L);
 		maybeRefreshAsync(true);
 	}
 
 	private static void maybeRefreshAsync(boolean force) {
-		long now = System.currentTimeMillis();
-		if (!force && now - FETCHED_AT.get() < TTL_MS) {
-			return;
+		final long fetchGeneration;
+		synchronized (REFRESH_LOCK) {
+			if (force) {
+				generation++;
+				FETCHED_AT.set(0L);
+			}
+			if (!force && System.currentTimeMillis() - FETCHED_AT.get() < TTL_MS) {
+				return;
+			}
+			if (refreshInFlight) {
+				return;
+			}
+			refreshInFlight = true;
+			fetchGeneration = generation;
 		}
-		if (refreshInFlight) {
-			return;
-		}
-		refreshInFlight = true;
-		JavaPlugin plugin = JavaPlugin.getPlugin(ArmourShop.class);
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			try {
-				DeletableListResult result =
-					ProvinceSystemClient.listDeletableSubmissionIds();
-				if (result.ok) {
-					IDS.set(new ArrayList<>(result.ids));
-					FETCHED_AT.set(System.currentTimeMillis());
+		try {
+			JavaPlugin plugin = JavaPlugin.getPlugin(ArmourShop.class);
+			Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+				try {
+					DeletableListResult result = ProvinceSystemClient.listDeletableSubmissionIds();
+					synchronized (REFRESH_LOCK) {
+						if (result.ok && fetchGeneration == generation) {
+							IDS.set(List.copyOf(result.ids));
+							FETCHED_AT.set(System.currentTimeMillis());
+						}
+					}
+				} finally {
+					boolean followup;
+					synchronized (REFRESH_LOCK) {
+						refreshInFlight = false;
+						followup = fetchGeneration != generation;
+					}
+					if (followup) {
+						maybeRefreshAsync(false);
+					}
 				}
-			} finally {
+			});
+		} catch (RuntimeException e) {
+			synchronized (REFRESH_LOCK) {
 				refreshInFlight = false;
 			}
-		});
+			throw e;
+		}
 	}
 }

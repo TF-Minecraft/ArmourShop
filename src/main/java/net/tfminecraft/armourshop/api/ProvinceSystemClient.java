@@ -1,5 +1,10 @@
 package net.tfminecraft.armourshop.api;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -714,10 +719,6 @@ public class ProvinceSystemClient {
 		return requestSimple("POST", path, jsonBody);
 	}
 
-	private static SimpleResult putSimple(String path, String jsonBody) {
-		return requestSimple("PUT", path, jsonBody);
-	}
-
 	private static SimpleResult requestSimple(String method, String path, String jsonBody) {
 		GatewayClient.Result raw = GatewayClient.request(method, path, jsonBody);
 		if (raw.ok) {
@@ -887,39 +888,14 @@ public class ProvinceSystemClient {
 
 	static List<String> jsonStringArray(String json, String key) {
 		List<String> out = new ArrayList<>();
-		String body = jsonArrayBody(json, key);
-		if (body == null) {
+		JsonElement value = jsonField(json, key);
+		if (value == null || !value.isJsonArray()) {
 			return out;
 		}
-		boolean inString = false;
-		boolean escape = false;
-		StringBuilder cur = null;
-		for (int i = 0; i < body.length(); i++) {
-			char ch = body.charAt(i);
-			if (!inString) {
-				if (ch == '"') {
-					inString = true;
-					escape = false;
-					cur = new StringBuilder();
-				}
-				continue;
+		for (JsonElement item : value.getAsJsonArray()) {
+			if (item.isJsonPrimitive() && item.getAsJsonPrimitive().isString()) {
+				out.add(item.getAsString());
 			}
-			if (escape) {
-				cur.append(ch);
-				escape = false;
-				continue;
-			}
-			if (ch == '\\') {
-				escape = true;
-				continue;
-			}
-			if (ch == '"') {
-				inString = false;
-				out.add(cur.toString());
-				cur = null;
-				continue;
-			}
-			cur.append(ch);
 		}
 		return out;
 	}
@@ -978,101 +954,36 @@ public class ProvinceSystemClient {
 	/** Parse a JSON object of string→string values (e.g. tier_aliases). */
 	static Map<String, String> jsonStringMap(String json, String key) {
 		Map<String, String> out = new LinkedHashMap<>();
-		String body = jsonObjectBody(json, key);
-		if (body == null || body.isBlank()) {
+		JsonElement value = jsonField(json, key);
+		if (value == null || !value.isJsonObject()) {
 			return out;
 		}
-		boolean inString = false;
-		boolean escape = false;
-		StringBuilder cur = null;
-		List<String> tokens = new ArrayList<>();
-		for (int i = 0; i < body.length(); i++) {
-			char ch = body.charAt(i);
-			if (!inString) {
-				if (ch == '"') {
-					inString = true;
-					escape = false;
-					cur = new StringBuilder();
-				}
-				continue;
-			}
-			if (escape) {
-				cur.append(ch);
-				escape = false;
-				continue;
-			}
-			if (ch == '\\') {
-				escape = true;
-				continue;
-			}
-			if (ch == '"') {
-				inString = false;
-				tokens.add(cur.toString());
-				cur = null;
-				continue;
-			}
-			cur.append(ch);
-		}
-		for (int i = 0; i + 1 < tokens.size(); i += 2) {
-			String k = tokens.get(i);
-			String v = tokens.get(i + 1);
-			if (k != null && !k.isBlank() && v != null) {
-				out.put(k.trim().toLowerCase(Locale.ROOT), v.trim());
+		for (Map.Entry<String, JsonElement> entry : value.getAsJsonObject().entrySet()) {
+			String name = entry.getKey().trim().toLowerCase(Locale.ROOT);
+			JsonElement item = entry.getValue();
+			if (!name.isEmpty() && item.isJsonPrimitive() && item.getAsJsonPrimitive().isString()) {
+				out.put(name, item.getAsString().trim());
 			}
 		}
 		return out;
 	}
 
-	/** Extract a JSON string field value (simple, no nested objects). */
+	/** Extract a top-level JSON string, boolean, or number as text. */
 	static String jsonString(String json, String key) {
+		JsonElement value = jsonField(json, key);
+		return value != null && value.isJsonPrimitive() ? value.getAsString() : null;
+	}
+
+	private static JsonElement jsonField(String json, String key) {
 		if (json == null || key == null) {
 			return null;
 		}
-		String needle = "\"" + key + "\"";
-		int keyIdx = json.indexOf(needle);
-		if (keyIdx < 0) {
+		try {
+			JsonElement root = JsonParser.parseString(json);
+			return root.isJsonObject() ? root.getAsJsonObject().get(key) : null;
+		} catch (JsonParseException e) {
 			return null;
 		}
-		int colon = json.indexOf(':', keyIdx + needle.length());
-		if (colon < 0) {
-			return null;
-		}
-		int i = colon + 1;
-		while (i < json.length() && Character.isWhitespace(json.charAt(i))) {
-			i++;
-		}
-		if (i >= json.length()) {
-			return null;
-		}
-		char c = json.charAt(i);
-		if (c == '"') {
-			StringBuilder out = new StringBuilder();
-			i++;
-			while (i < json.length()) {
-				char ch = json.charAt(i++);
-				if (ch == '\\' && i < json.length()) {
-					out.append(json.charAt(i++));
-					continue;
-				}
-				if (ch == '"') {
-					break;
-				}
-				out.append(ch);
-			}
-			return out.toString();
-		}
-		if (c == 'n' && json.startsWith("null", i)) {
-			return null;
-		}
-		int start = i;
-		while (i < json.length()) {
-			char ch = json.charAt(i);
-			if (ch == ',' || ch == '}' || ch == ']') {
-				break;
-			}
-			i++;
-		}
-		return json.substring(start, i).trim();
 	}
 
 	/** True for JSON boolean true or string "true". */
@@ -1098,27 +1009,7 @@ public class ProvinceSystemClient {
 		if (raw == null) {
 			return "";
 		}
-		StringBuilder sb = new StringBuilder(raw.length() + 8);
-		for (int i = 0; i < raw.length(); i++) {
-			char ch = raw.charAt(i);
-			switch (ch) {
-				case '\\':
-				case '"':
-					sb.append('\\').append(ch);
-					break;
-				case '\n':
-					sb.append("\\n");
-					break;
-				case '\r':
-					sb.append("\\r");
-					break;
-				case '\t':
-					sb.append("\\t");
-					break;
-				default:
-					sb.append(ch);
-			}
-		}
-		return sb.toString();
+		String quoted = new JsonPrimitive(raw).toString();
+		return quoted.substring(1, quoted.length() - 1);
 	}
 }

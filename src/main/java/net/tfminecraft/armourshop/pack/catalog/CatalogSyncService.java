@@ -1,6 +1,7 @@
 package net.tfminecraft.armourshop.pack.catalog;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -183,16 +184,13 @@ public final class CatalogSyncService {
 					sb.append(',');
 				}
 				first = false;
-				sb.append('"').append(escape(value.trim().toLowerCase())).append('"');
+				sb.append('"').append(escape(value.trim().toLowerCase(Locale.ROOT))).append('"');
 			}
 		}
 		sb.append(']');
 	}
 
 	private static String escape(String raw) {
-		if (raw == null) {
-			return "";
-		}
 		StringBuilder out = new StringBuilder(raw.length() + 8);
 		for (int i = 0; i < raw.length(); i++) {
 			char c = raw.charAt(i);

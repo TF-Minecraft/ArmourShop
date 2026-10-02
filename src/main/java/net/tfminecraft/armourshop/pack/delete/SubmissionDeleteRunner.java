@@ -49,6 +49,7 @@ public final class SubmissionDeleteRunner {
 			try {
 				PackSubmissionRemover.remove(
 					Path.of(contents.trim()),
+                    sub.resolveNamespace(),
 					sub.kind,
 					sub.slug,
 					tiers,

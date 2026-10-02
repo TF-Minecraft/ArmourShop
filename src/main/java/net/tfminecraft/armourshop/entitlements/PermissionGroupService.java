@@ -111,6 +111,8 @@ public final class PermissionGroupService {
 		int fallback = Cache.permissionGroupDefaults.getOrDefault(perkKey, 0);
 		if (perkKey.equals(PermissionGroupDefinition.KEY_SKIN_TOKEN_COOLDOWN_DAYS)) {
 			fallback = getDefaultSkinTokenCooldownDays();
+        } else if (perkKey.equals(PermissionGroupDefinition.KEY_MAX_3D_PAIR_BYTES)) {
+            fallback = getDefaultMax3dPairBytes();
 		}
 		if (group == null) {
 			return fallback;
@@ -188,7 +190,7 @@ public final class PermissionGroupService {
 	}
 
 	private static int resolvePerkMax(Player player, String perkKey) {
-		int value = Cache.permissionGroupDefaults.getOrDefault(perkKey, 0);
+		int value = groupPerkOrDefault(null, perkKey);
 		if (player == null) {
 			return value;
 		}

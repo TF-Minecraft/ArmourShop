@@ -16,7 +16,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import net.tfminecraft.armourshop.Cache;
 import net.tfminecraft.armourshop.api.ProvinceSystemClient.ApprovedSubmission;
-import net.tfminecraft.armourshop.pack.model.PackPaths;
 
 /**
  * Upserts SkinSets after pack write — player {@code ps_*} lane or staff category lane.
@@ -42,7 +41,7 @@ public final class ShopSubmissionWriter {
 			throw new IllegalStateException("pack-apply.categories-path is not set in config.yml");
 		}
 
-		Path categoriesPath = Path.of(categoriesDir.trim());
+		Path categoriesPath = Path.of(categoriesDir.trim()).toAbsolutePath();
 		Files.createDirectories(categoriesPath);
 
 		File categoriesYml = categoriesPath.getParent().resolve("categories.yml").toFile();
@@ -62,7 +61,7 @@ public final class ShopSubmissionWriter {
 		List<String> colours = sub.nameColours == null ? List.of() : sub.nameColours;
 		List<String> styles = sub.nameStyles == null ? List.of() : sub.nameStyles;
 		boolean addName = sub.addName;
-		String ns = PackPaths.playerNamespace();
+		String ns = sub.resolveNamespace();
 
 		if ("armor_set".equals(kind)) {
 			List<String> tiers = sub.tiers != null && !sub.tiers.isEmpty()
@@ -153,9 +152,7 @@ public final class ShopSubmissionWriter {
 					"missing tiers (and base_set fallback) for armor submission"
 				);
 			}
-			Map<String, String> tierScrolls = sub.tierScrolls == null
-				? Map.of()
-				: sub.tierScrolls;
+			Map<String, String> tierScrolls = sub.tierScrolls;
 			for (String tier : tiers) {
 				String rootKey = slug + "_" + tier;
 				String tierDisplay = sub.displayNameForTier(tier);
@@ -382,9 +379,7 @@ public final class ShopSubmissionWriter {
 	) throws IOException {
 		FileConfiguration config = loadOrEmpty(file);
 		String root = rootKey;
-		String ns = namespace == null || namespace.isBlank()
-			? PackPaths.playerNamespace()
-			: namespace.trim();
+		String ns = namespace.trim();
 		config.set(root + ".name", display);
 		writeColour(config, root, colours);
 		writeStyles(config, root, styles);
@@ -415,9 +410,7 @@ public final class ShopSubmissionWriter {
 	) throws IOException {
 		FileConfiguration config = loadOrEmpty(file);
 		String root = slug;
-		String ns = namespace == null || namespace.isBlank()
-			? PackPaths.playerNamespace()
-			: namespace.trim();
+		String ns = namespace.trim();
 		config.set(root + ".name", display);
 		writeColour(config, root, colours);
 		writeStyles(config, root, styles);

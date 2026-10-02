@@ -1,6 +1,7 @@
 package net.tfminecraft.armourshop.managers;
 
 import java.util.Optional;
+import java.util.Locale;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -39,10 +40,11 @@ public class SkinManager implements Listener{
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void invenClick(InventoryClickEvent e) {
-		if(e.getClickedInventory() == null) return;
+		if(!(e.getView().getTopInventory().getHolder() instanceof ASInventoryHolder)) return;
+		e.setCancelled(true);
+		if(e.getClickedInventory() != e.getView().getTopInventory()) return;
 		if(e.getCurrentItem() == null) return;
 		Player p = (Player) e.getWhoClicked();
-		if(!(e.getView().getTopInventory().getHolder() instanceof ASInventoryHolder)) return;
 		ASInventoryHolder holder = (ASInventoryHolder) e.getView().getTopInventory().getHolder();
 		if(e.getView().getTitle().equalsIgnoreCase("\u00A77Armourshop Categories")) {
 			e.setCancelled(true);
@@ -52,7 +54,6 @@ public class SkinManager implements Listener{
 				return;
 			}
 			ItemStack item = e.getCurrentItem();
-			if(item == null) return;
 			SkinCategory c = CategoryLoader.getByName(item.getItemMeta().getDisplayName());
 			if(c == null) return;
 			
@@ -61,7 +62,6 @@ public class SkinManager implements Listener{
 		} else if(e.getView().getTitle().equalsIgnoreCase("\u00A77Armourshop Type")) {
 			e.setCancelled(true);
 			ItemStack item = e.getCurrentItem();
-			if(item == null) return;
 			boolean isItem = false;
 			if(e.getSlot() == 1) isItem = true;
 			inv.categoryView(p, isItem);
@@ -70,17 +70,18 @@ public class SkinManager implements Listener{
 			SkinCategory c = CategoryLoader.getByName(e.getView().getTitle());
 			e.setCancelled(true);
 			ItemStack item = e.getCurrentItem();
-			if(item == null) return;
 			ItemMeta m = item.getItemMeta();
 			if(item.getType().equals(Material.GRAY_STAINED_GLASS_PANE)) return;
 			if(e.getSlot() == 3) {			
 				NamespacedKey key = new NamespacedKey(ArmourShop.plugin, "page");
-				int page = m.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+				Integer page = m.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+				if(page == null) return;
 				inv.skinView(p, c, page-1, holder.isItem());
 				p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 1f, 1f);
 			} else if(e.getSlot() == 5) {
 				NamespacedKey key = new NamespacedKey(ArmourShop.plugin, "page");
-				int page = m.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+				Integer page = m.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+				if(page == null) return;
 				inv.skinView(p, c, page+1, holder.isItem());
 				p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 1f, 1f);
 			} else if(e.getSlot() == 4) {
@@ -101,8 +102,17 @@ public class SkinManager implements Listener{
 			return;
 		}
 		String info = m.getPersistentDataContainer().get(key, PersistentDataType.STRING);
-		SkinSet set = CategoryLoader.getByContainsSet(info.split("\\.")[0]);
+		String[] parts = info.split("\\.", -1);
+		if(parts.length != 2) return;
+		SkinSet set = CategoryLoader.getByContainsSet(parts[0]);
 		if(set == null) return;
+		if(set.hasPermission() && !p.hasPermission(set.getPermission())) return;
+		ArmorType type;
+		try {
+			type = ArmorType.valueOf(parts[1].toUpperCase(Locale.ROOT));
+		} catch(IllegalArgumentException invalidType) {
+			return;
+		}
 		ItemStack scroll = null;
 		if(set.hasScroll()) {
 			scroll = findScroll(p, set.getScroll());
@@ -112,8 +122,6 @@ public class SkinManager implements Listener{
 				return;
 			}
 		}
-		if(ArmorType.valueOf(info.split("\\.")[1].toUpperCase()) == null) return;
-		ArmorType type = ArmorType.valueOf(info.split("\\.")[1].toUpperCase());
 		for(int y = 0; y<p.getInventory().getContents().length;y++) {
 			ItemStack item = p.getInventory().getContents()[y];
 			if(set.getSet().contains(item, type)) {
@@ -134,7 +142,15 @@ public class SkinManager implements Listener{
 					name = Optional.of(i.getItemMeta().getDisplayName());
 				}
 				ArmorMerger merger = TLibs.getItemAPI().getArmorMerger();
-				p.getInventory().setItem(y, merger.merge(item, name, s));
+				ItemStack merged;
+				try {
+					merged = merger.merge(item.clone(), name, s);
+				} catch(Exception ex) {
+					ArmourShop.plugin.getLogger().warning("[shop] could not apply skin '" + set.getId() + "': " + ex.getMessage());
+					return;
+				}
+				if(merged == null || merged.getType().isAir()) return;
+				p.getInventory().setItem(y, merged);
 				if(set.hasScroll()) scroll.setAmount(scroll.getAmount()-1);
 				p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 				return;

@@ -16,7 +16,6 @@ class Item3dWriterMaskTest {
 		String yaml = Item3dWriter.buildYaml(
 			new PackSubmission("oni_mask", "Oni", PackKind.MASK, Map.of()),
 			"CARVED_PUMPKIN",
-			null,
 			true,
 			"tfmc_submissions"
 		);

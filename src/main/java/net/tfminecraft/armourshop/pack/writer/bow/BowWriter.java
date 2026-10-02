@@ -1,6 +1,5 @@
 package net.tfminecraft.armourshop.pack.writer.bow;
 
-
 import net.tfminecraft.armourshop.pack.model.BowFrames;
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
@@ -77,17 +76,6 @@ public final class BowWriter {
 		Path contentsRoot,
 		PackSubmission submission,
 		String material,
-		String[] stems
-	) throws IOException {
-		return writeGenerateTrue(
-			contentsRoot, submission, material, stems, PackPaths.playerNamespace()
-		);
-	}
-
-	static List<Path> writeGenerateTrue(
-		Path contentsRoot,
-		PackSubmission submission,
-		String material,
 		String[] stems,
 		String namespace
 	) throws IOException {
@@ -122,10 +110,6 @@ public final class BowWriter {
 		);
 		written.add(yamlPath);
 		return written;
-	}
-
-	static String buildYaml(PackSubmission submission, String material) {
-		return buildYaml(submission, material, PackPaths.playerNamespace());
 	}
 
 	static String buildYaml(PackSubmission submission, String material, String namespace) {

@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,7 +23,8 @@ public final class PendingReloadQueue {
 	private static final String KEY = "submission-ids";
 
 	private final JavaPlugin plugin;
-	private final LinkedHashSet<String> ids = new LinkedHashSet<>();
+	private final LinkedHashMap<String, Long> ids = new LinkedHashMap<>();
+	private long generation;
 	private final Object lock = new Object();
 
 	public PendingReloadQueue(JavaPlugin plugin) {
@@ -39,7 +42,7 @@ public final class PendingReloadQueue {
 			List<String> list = config.getStringList(KEY);
 			for (String id : list) {
 				if (id != null && !id.isBlank()) {
-					ids.add(id.trim());
+					ids.put(id.trim(), ++generation);
 				}
 			}
 		}
@@ -55,7 +58,7 @@ public final class PendingReloadQueue {
 				if (id == null || id.isBlank()) {
 					continue;
 				}
-				if (ids.add(id.trim())) {
+				if (ids.put(id.trim(), ++generation) == null) {
 					changed = true;
 				}
 			}
@@ -67,7 +70,53 @@ public final class PendingReloadQueue {
 
 	public List<String> snapshot() {
 		synchronized (lock) {
-			return new ArrayList<>(ids);
+			return new ArrayList<>(ids.keySet());
+		}
+	}
+
+	/** Captures queue generations without changing the persisted ID-only format. */
+	Map<String, Long> snapshotVersions() {
+		synchronized (lock) {
+			return new LinkedHashMap<>(ids);
+		}
+	}
+
+	/** Returns unchanged captured entries in their original snapshot order. */
+	List<String> matchingIds(Map<String, Long> versions) {
+		if (versions == null || versions.isEmpty()) {
+			return List.of();
+		}
+		synchronized (lock) {
+			List<String> matching = new ArrayList<>();
+			for (Map.Entry<String, Long> entry : versions.entrySet()) {
+				if (entry.getValue() != null && entry.getValue().equals(ids.get(entry.getKey()))) {
+					matching.add(entry.getKey());
+				}
+			}
+			return matching;
+		}
+	}
+
+	/** Removes acknowledged entries only if no newer enqueue replaced them. */
+	void clearIfUnchanged(Collection<String> acked, Map<String, Long> versions) {
+		if (acked == null || acked.isEmpty() || versions == null || versions.isEmpty()) {
+			return;
+		}
+		synchronized (lock) {
+			boolean changed = false;
+			for (String id : acked) {
+				if (id == null) {
+					continue;
+				}
+				String key = id.trim();
+				Long version = versions.get(key);
+				if (version != null && ids.remove(key, version)) {
+					changed = true;
+				}
+			}
+			if (changed) {
+				saveUnlocked();
+			}
 		}
 	}
 
@@ -90,7 +139,7 @@ public final class PendingReloadQueue {
 		synchronized (lock) {
 			boolean changed = false;
 			for (String id : acked) {
-				if (id != null && ids.remove(id.trim())) {
+				if (id != null && ids.remove(id.trim()) != null) {
 					changed = true;
 				}
 			}
@@ -115,7 +164,7 @@ public final class PendingReloadQueue {
 					}
 				}
 			}
-			if (ids.retainAll(keep)) {
+			if (ids.keySet().retainAll(keep)) {
 				saveUnlocked();
 			}
 			return before;
@@ -128,7 +177,7 @@ public final class PendingReloadQueue {
 
 	private void saveUnlocked() {
 		FileConfiguration config = new YamlConfiguration();
-		config.set(KEY, new ArrayList<>(ids));
+		config.set(KEY, new ArrayList<>(ids.keySet()));
 		try {
 			config.save(file());
 		} catch (IOException e) {

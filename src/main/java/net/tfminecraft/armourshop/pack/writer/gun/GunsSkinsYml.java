@@ -1,6 +1,5 @@
 package net.tfminecraft.armourshop.pack.writer.gun;
 
-
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -67,9 +66,6 @@ public final class GunsSkinsYml {
 			out = block.toString();
 		} else {
 			out = body + "\n\n" + block;
-		}
-		if (!out.endsWith("\n")) {
-			out = out + "\n";
 		}
 		Files.writeString(skinsYml, out, StandardCharsets.UTF_8);
 	}

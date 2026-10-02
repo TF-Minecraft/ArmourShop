@@ -95,7 +95,7 @@ public final class ApplyAckPlanner {
 
 	/**
 	 * True when the ItemsAdder config this submission's writer would emit is
-	 * present. Armor needs one config per tier ({@code {id}_{tier}.yml}).
+	 * present. Armor needs one config per tier ({@code {slug}_{tier}.yml}).
 	 * Every other kind needs {@code {slug}.yml}.
 	 */
 	static boolean hasPackConfig(Path contentsRoot, ApprovedSubmission sub) {
@@ -103,20 +103,17 @@ public final class ApplyAckPlanner {
 			return false;
 		}
 		String namespace = sub.resolveNamespace();
-		if (namespace == null || namespace.isBlank()) {
-			return false;
-		}
 		Path configs = PackPaths.configsDir(contentsRoot, namespace);
 		String kind = sub.kind == null ? "" : sub.kind.trim().toLowerCase(Locale.ROOT);
 		if ("armor_set".equals(kind)) {
-			if (sub.tiers == null || sub.tiers.isEmpty() || sub.id == null || sub.id.isBlank()) {
+			if (sub.tiers == null || sub.tiers.isEmpty() || sub.slug == null || sub.slug.isBlank()) {
 				return false;
 			}
 			for (String tier : sub.tiers) {
 				if (tier == null || tier.isBlank()) {
 					return false;
 				}
-				String name = sub.id.trim() + "_" + tier.trim() + ".yml";
+				String name = sub.slug.trim() + "_" + tier.trim() + ".yml";
 				if (!Files.isRegularFile(configs.resolve(name))) {
 					return false;
 				}

@@ -67,6 +67,15 @@ public final class PackSubmissionRemover {
 			throw new IllegalArgumentException("slug is blank");
 		}
 
+        net.tfminecraft.armourshop.pack.util.YamlUtil.validateSlug(s);
+        PackPaths.namespaceRoot(contentsRoot, ns);
+        if ("armor_set".equals(k) && tiers != null) {
+            for (String tier : tiers) {
+                if (tier != null && !tier.isBlank()) {
+                    net.tfminecraft.armourshop.pack.util.YamlUtil.validateSlug(tier.trim());
+                }
+            }
+        }
 		List<Path> removed = new ArrayList<>();
 
 		if ("armor_set".equals(k)) {

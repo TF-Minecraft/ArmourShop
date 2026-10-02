@@ -1,6 +1,5 @@
 package net.tfminecraft.armourshop.pack.writer.bow;
 
-
 import net.tfminecraft.armourshop.pack.model.BowFrames;
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
@@ -87,10 +86,6 @@ public final class LargeBowWriter {
 			return MODEL_STEM_PREFIX + "_2";
 		}
 		throw new IllegalArgumentException("unknown bow stem: " + bowStem);
-	}
-
-	static String buildYaml(PackSubmission submission) {
-		return buildYaml(submission, PackPaths.playerNamespace());
 	}
 
 	static String buildYaml(PackSubmission submission, String namespace) {

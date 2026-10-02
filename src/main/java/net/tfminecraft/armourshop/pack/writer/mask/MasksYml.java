@@ -65,10 +65,6 @@ public final class MasksYml {
 				current = null;
 				continue;
 			}
-			if (trimmed.endsWith(":") && !trimmed.contains(" ") && !trimmed.contains("\t")) {
-				current = trimmed.substring(0, trimmed.length() - 1);
-				continue;
-			}
 			if (current != null && trimmed.startsWith("item:")) {
 				String item = trimmed.substring("item:".length()).trim();
 				if (item.isEmpty()) {
@@ -76,6 +72,10 @@ public final class MasksYml {
 				}
 				entries.put(current, item);
 				current = null;
+				continue;
+			}
+			if (trimmed.endsWith(":") && !trimmed.contains(" ") && !trimmed.contains("\t")) {
+				current = trimmed.substring(0, trimmed.length() - 1);
 				continue;
 			}
 			throw new IOException("unrecognized custom-masks.yml line: " + trimmed);

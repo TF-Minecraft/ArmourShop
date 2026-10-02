@@ -32,7 +32,7 @@ public final class PackPaths {
 			if (realm == null) {
 				return "main";
 			}
-			String text = String.valueOf(realm).trim().toLowerCase();
+			String text = String.valueOf(realm).trim().toLowerCase(java.util.Locale.ROOT);
 			return text.isEmpty() ? "main" : text;
 		} catch (Throwable ignored) {
 			return "main";
@@ -112,6 +112,10 @@ public final class PackPaths {
 		if (namespace == null || namespace.isBlank()) {
 			throw new IllegalArgumentException("namespace is required");
 		}
-		return namespace.trim();
+        String ns = namespace.trim();
+        if (!ns.matches("[a-z0-9_-]+")) {
+            throw new IllegalArgumentException("invalid namespace: " + namespace);
+        }
+        return ns;
 	}
 }
