@@ -9,10 +9,10 @@
     <version>main-SNAPSHOT</version>
 
     <properties>
-        <argLine></argLine>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.proc>full</maven.compiler.proc>
+        <argLine></argLine>
         <gunsandgadgets.version>2.0.0</gunsandgadgets.version>
         <tlibs.version>2.0.0</tlibs.version>
     </properties>
