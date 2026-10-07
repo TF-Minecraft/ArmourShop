@@ -3,32 +3,39 @@ package net.tfminecraft.armourshop.objects;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
-import io.lumine.mythic.lib.api.item.NBTItem;
+import net.tfminecraft.tlibs.TLibs;
 import net.tfminecraft.armourshop.enums.ArmorType;
 
+/**
+ * One base-set entry. {@code type.id} matches that MMOItems item; a bare {@code type}
+ * matches every item of that MMOItems type, so templates other plugins craft from
+ * (AdvancedCrafting, Magic) count without being listed one by one.
+ */
 public class ArmorPiece {
-	private NBTItem item;
+	private String path;
 	private ArmorType type;
-	
-	public ArmorPiece(String key, ItemStack item, ArmorType type){
-		NBTItem nbt = NBTItem.get(item);
-		if(!nbt.hasType()) Bukkit.getLogger().info("Item is not an MMOItem for id "+key+" and type "+type.toString());
-		this.item = nbt;
+
+	public ArmorPiece(String key, String entry, ArmorType type){
+		this.path = "m." + entry.trim();
 		this.type = type;
+		if(!isTypeOnly() && TLibs.getItemAPI().getCreator().getItemFromPath(path) == null) {
+			Bukkit.getLogger().warning("[ArmourShop] Base set " + key + " lists " + entry + " (" + type + "), which is not an MMOItem");
+		}
 	}
 
-	public NBTItem getItem() {
-		return item;
+	public String getPath() {
+		return path;
 	}
 
 	public ArmorType getType() {
 		return type;
 	}
-	
+
+	public boolean isTypeOnly() {
+		return path.split("\\.").length < 3;
+	}
+
 	public boolean is(ItemStack target) {
-		NBTItem nbt = NBTItem.get(target);
-		if(!nbt.hasType()) return false;
-		if(nbt.getType().equalsIgnoreCase(this.item.getType()) && nbt.getString("MMOITEMS_ITEM_ID").equalsIgnoreCase(this.item.getString("MMOITEMS_ITEM_ID"))) return true;
-		return false;
+		return TLibs.getItemAPI().getChecker().checkItemWithPath(target, path);
 	}
 }

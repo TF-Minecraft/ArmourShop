@@ -128,6 +128,174 @@ mythril:
     - armors.medium_custom_boots
     - armors.heavy_custom_boots
 
+light steel:
+  helmet:
+    - helmets.light_steel_helmet
+    - helmets.light_custom_helmet
+  chestplate:
+    - armors.light_steel_chestplate
+    - armors.light_custom_chestplate
+  leggings:
+    - armors.light_steel_leggings
+    - armors.light_custom_leggings
+  boots:
+    - armors.light_steel_boots
+    - armors.light_custom_boots
+
+light abyssalite:
+  helmet:
+    - helmets.light_abyssalite_helmet
+    - helmets.light_custom_helmet
+  chestplate:
+    - armors.light_abyssalite_chestplate
+    - armors.light_custom_chestplate
+  leggings:
+    - armors.light_abyssalite_leggings
+    - armors.light_custom_leggings
+  boots:
+    - armors.light_abyssalite_boots
+    - armors.light_custom_boots
+
+light mythril:
+  helmet:
+    - helmets.light_mythril_helmet
+    - helmets.light_custom_helmet
+  chestplate:
+    - armors.light_mythril_chestplate
+    - armors.light_custom_chestplate
+  leggings:
+    - armors.light_mythril_leggings
+    - armors.light_custom_leggings
+  boots:
+    - armors.light_mythril_boots
+    - armors.light_custom_boots
+
+medium steel:
+  helmet:
+    - helmets.medium_steel_helmet
+    - helmets.medium_custom_helmet
+  chestplate:
+    - armors.medium_steel_chestplate
+    - armors.medium_custom_chestplate
+  leggings:
+    - armors.medium_steel_leggings
+    - armors.medium_custom_leggings
+  boots:
+    - armors.medium_steel_boots
+    - armors.medium_custom_boots
+
+medium abyssalite:
+  helmet:
+    - helmets.medium_abyssalite_helmet
+    - helmets.medium_custom_helmet
+  chestplate:
+    - armors.medium_abyssalite_chestplate
+    - armors.medium_custom_chestplate
+  leggings:
+    - armors.medium_abyssalite_leggings
+    - armors.medium_custom_leggings
+  boots:
+    - armors.medium_abyssalite_boots
+    - armors.medium_custom_boots
+
+medium mythril:
+  helmet:
+    - helmets.medium_mythril_helmet
+    - helmets.medium_custom_helmet
+  chestplate:
+    - armors.medium_mythril_chestplate
+    - armors.medium_custom_chestplate
+  leggings:
+    - armors.medium_mythril_leggings
+    - armors.medium_custom_leggings
+  boots:
+    - armors.medium_mythril_boots
+    - armors.medium_custom_boots
+
+heavy steel:
+  helmet:
+    - helmets.heavy_steel_helmet
+    - helmets.heavy_custom_helmet
+  chestplate:
+    - armors.heavy_steel_chestplate
+    - armors.heavy_custom_chestplate
+  leggings:
+    - armors.heavy_steel_leggings
+    - armors.heavy_custom_leggings
+  boots:
+    - armors.heavy_steel_boots
+    - armors.heavy_custom_boots
+
+heavy abyssalite:
+  helmet:
+    - helmets.heavy_abyssalite_helmet
+    - helmets.heavy_custom_helmet
+  chestplate:
+    - armors.heavy_abyssalite_chestplate
+    - armors.heavy_custom_chestplate
+  leggings:
+    - armors.heavy_abyssalite_leggings
+    - armors.heavy_custom_leggings
+  boots:
+    - armors.heavy_abyssalite_boots
+    - armors.heavy_custom_boots
+
+heavy mythril:
+  helmet:
+    - helmets.heavy_mythril_helmet
+    - helmets.heavy_custom_helmet
+  chestplate:
+    - armors.heavy_mythril_chestplate
+    - armors.heavy_custom_chestplate
+  leggings:
+    - armors.heavy_mythril_leggings
+    - armors.heavy_custom_leggings
+  boots:
+    - armors.heavy_mythril_boots
+    - armors.heavy_custom_boots
+
+infantry steel:
+  helmet:
+    - helmets.infantry_steel_helmet
+    - helmets.infantry_custom_helmet
+  chestplate:
+    - armors.infantry_steel_chestplate
+    - armors.infantry_custom_chestplate
+  leggings:
+    - armors.infantry_steel_leggings
+    - armors.infantry_custom_leggings
+  boots:
+    - armors.infantry_steel_boots
+    - armors.infantry_custom_boots
+
+infantry abyssalite:
+  helmet:
+    - helmets.infantry_abyssalite_helmet
+    - helmets.infantry_custom_helmet
+  chestplate:
+    - armors.infantry_abyssalite_chestplate
+    - armors.infantry_custom_chestplate
+  leggings:
+    - armors.infantry_abyssalite_leggings
+    - armors.infantry_custom_leggings
+  boots:
+    - armors.infantry_abyssalite_boots
+    - armors.infantry_custom_boots
+
+infantry mythril:
+  helmet:
+    - helmets.infantry_mythril_helmet
+    - helmets.infantry_custom_helmet
+  chestplate:
+    - armors.infantry_mythril_chestplate
+    - armors.infantry_custom_chestplate
+  leggings:
+    - armors.infantry_mythril_leggings
+    - armors.infantry_custom_leggings
+  boots:
+    - armors.infantry_mythril_boots
+    - armors.infantry_custom_boots
+
 any:
   helmet:
     - helmets.light_chainmail_helmet
@@ -200,21 +368,25 @@ mage:
     - mage_armors.mage_steel_helmet
     - mage_armors.mage_abyssalite_helmet
     - mage_armors.mage_mythril_helmet
+    - mage_armors.mage_custom_helmet
   chestplate:
     - mage_armors.mage_iron_chestplate
     - mage_armors.mage_steel_chestplate
     - mage_armors.mage_abyssalite_chestplate
     - mage_armors.mage_mythril_chestplate
+    - mage_armors.mage_custom_chestplate
   leggings:
     - mage_armors.mage_iron_leggings
     - mage_armors.mage_steel_leggings
     - mage_armors.mage_abyssalite_leggings
     - mage_armors.mage_mythril_leggings
+    - mage_armors.mage_custom_leggings
   boots:
     - mage_armors.mage_iron_boots
     - mage_armors.mage_steel_boots
     - mage_armors.mage_abyssalite_boots
     - mage_armors.mage_mythril_boots
+    - mage_armors.mage_custom_boots
 
 illusion:
   helmet:
@@ -387,158 +559,96 @@ exploration:
     - armors.cold_mythril_boots
 
 ##Items
+# An entry with no item id (e.g. "shortswords") matches every MMOItems item of that
+# type, so templates other plugins craft from (AdvancedCrafting, Magic) are covered.
 
 swords:
   item:
-    - sword.iron_sword
-    - sword.steel_sword
-    - sword.abyssalite_sword
-    - sword.mythril_sword
-    - sword.custom_sword
+    - sword
 
 battleaxes:
   item:
-    - battleaxes.iron_battleaxe
-    - battleaxes.steel_battleaxe
-    - battleaxes.abyssalite_battleaxe
-    - battleaxes.mythril_battleaxe
-    - battleaxes.custom_battleaxe
+    - battleaxes
 
 daggers:
   item:
-    - daggers.iron_dagger
-    - daggers.steel_dagger
-    - daggers.abyssalite_dagger
-    - daggers.mythril_dagger
-    - daggers.custom_dagger
+    - daggers
 
 warhammers:
   item:
-    - warhammers.iron_warhammer
-    - warhammers.steel_warhammer
-    - warhammers.abyssalite_warhammer
-    - warhammers.mythril_warhammer
-    - warhammers.custom_warhammer
+    - warhammers
 
 spears:
   item:
-    - spears.iron_spear
-    - spears.steel_spear
-    - spears.abyssalite_spear
-    - spears.mythril_spear
-    - spears.custom_spear
+    - spears
 
 polearms:
   item:
-    - polearms.iron_polearm
-    - polearms.steel_polearm
-    - polearms.abyssalite_polearm
-    - polearms.mythril_polearm
-    - polearms.custom_polearm
+    - polearms
 
 greathammers:
   item:
-    - greathammers.iron_greathammer
-    - greathammers.steel_greathammer
-    - greathammers.abyssalite_greathammer
-    - greathammers.mythril_greathammer
-    - greathammers.custom_greathammer
+    - greathammers
 
 longswords:
   item:
-    - longswords.iron_longsword
-    - longswords.steel_longsword
-    - longswords.abyssalite_longsword
-    - longswords.mythril_longsword
-    - longswords.custom_longsword
+    - longswords
 
 greataxes:
   item:
-    - greataxes.iron_greataxe
-    - greataxes.steel_greataxe
-    - greataxes.abyssalite_greataxe
-    - greataxes.mythril_greataxe
-    - greataxes.custom_greataxe
+    - greataxes
 
 shortbows:
   item:
-    - shortbows.barkwood_shortbow
-    - shortbows.maplewood_shortbow
-    - shortbows.elderwood_shortbow
-    - shortbows.demonwood_shortbow
-    - shortbows.custom_shortbow
+    - shortbows
 
 longbows:
   item:
-    - longbows.barkwood_longbow
-    - longbows.maplewood_longbow
-    - longbows.elderwood_longbow
-    - longbows.demonwood_longbow
-    - longbows.custom_longbow
+    - longbows
 
 crossbows:
   item:
-    - crossbows.barkwood_crossbow
-    - crossbows.maplewood_crossbow
-    - crossbows.elderwood_crossbow
-    - crossbows.demonwood_crossbow
-    - crossbows.custom_crossbow
+    - crossbows
 
 staffs:
   item:
-    - mage_staffs.mage_iron_staff
-    - mage_staffs.mage_steel_staff
-    - mage_staffs.mage_abyssalite_staff
-    - mage_staffs.mage_mythril_staff
+    - mage_staffs
+
+wands:
+  item:
+    - mage_wands
 
 shortswords:
   item:
-    - shortswords.iron_shortsword
-    - shortswords.steel_shortsword
-    - shortswords.abyssalite_shortsword
-    - shortswords.mythril_shortsword
+    - shortswords
 #    - shortswords.custom_shortsword
+
+lutes:
+  item:
+    - lutes
 
 shields:
   item:
-    - shields.iron_shield
-    - shields.steel_shield
-    - shields.abyssalite_shield
-    - shields.mythril_shield
+    - shields
 
 battle standards:
   item:
-    - banners.barkwood_banner
-    - banners.maplewood_banner
-    - banners.elderwood_banner
-    - banners.demonwood_banner
+    - banners
 
 helmets:
   item:
-    - helmets.light_chainmail_helmet
-    - helmets.medium_chainmail_helmet
-    - helmets.heavy_chainmail_helmet
-    - helmets.light_steel_helmet
-    - helmets.medium_steel_helmet
-    - helmets.heavy_steel_helmet
-    - helmets.light_abyssalite_helmet
-    - helmets.medium_abyssalite_helmet
-    - helmets.heavy_abyssalite_helmet
-    - helmets.light_mythril_helmet
-    - helmets.medium_mythril_helmet
-    - helmets.heavy_mythril_helmet
-    - helmets.light_custom_helmet
-    - helmets.medium_custom_helmet
-    - helmets.heavy_custom_helmet
+    - helmets
     - mage_armors.mage_iron_helmet
     - mage_armors.mage_steel_helmet
     - mage_armors.mage_abyssalite_helmet
     - mage_armors.mage_mythril_helmet
-    - helmets.infantry_iron_helmet
-    - helmets.infantry_steel_helmet
-    - helmets.infantry_abyssalite_helmet
-    - helmets.infantry_mythril_helmet
-    - helmets.infantry_custom_helmet
+    - mage_armors.mage_custom_helmet
+    - mage_armors.illusion_mage_helmet
+    - mage_armors.spiritual_mage_helmet
+    - mage_armors.bloodmagic_mage_helmet
+    - mage_armors.necromancy_mage_helmet
+    - mage_armors.arcanum_mage_helmet
+    - mage_armors.shadowmancy_mage_helmet
 
 masks:
   item:
@@ -571,10 +681,7 @@ launchers:
 
 mage blades:
   item:
-    - mage_swords.mage_iron_sword
-    - mage_swords.mage_steel_sword
-    - mage_swords.mage_abyssalite_sword
-    - mage_swords.mage_mythril_sword
+    - mage_swords
 
 hatchets:
   item:
@@ -596,7 +703,7 @@ knives:
 
 books:
   item:
-    - books.LETTER
+    - books.writable_book
 
 minor health:
   item:
