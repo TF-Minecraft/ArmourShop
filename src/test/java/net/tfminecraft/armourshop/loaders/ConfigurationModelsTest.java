@@ -17,6 +17,7 @@ import net.tfminecraft.armourshop.objects.*;
 import net.tfminecraft.armourshop.utils.NameDisplay;
 import net.tfminecraft.tlibs.TLibs;
 import net.tfminecraft.tlibs.objects.api.ItemAPI;
+import net.tfminecraft.tlibs.objects.api.subapi.ItemChecker;
 import net.tfminecraft.tlibs.objects.api.subapi.ItemCreator;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -43,7 +44,15 @@ class ConfigurationModelsTest {
         MockBukkit.mock();
         var api = mock(ItemAPI.class); var creator = mock(ItemCreator.class);
         when(api.getCreator()).thenReturn(creator);
-        when(creator.getItemFromPath(anyString())).thenAnswer(call -> items.computeIfAbsent(call.getArgument(0), key -> tagged("ARMOR", key)));
+        when(creator.getItemFromPath(anyString())).thenAnswer(call -> ((String) call.getArgument(0)).contains("missing") ? null
+                : items.computeIfAbsent(call.getArgument(0), key -> tagged("ARMOR", key)));
+        // Mirrors TLibs' m.TYPE[.ID] matching on the mocked MMOItems tags.
+        var checker = mock(ItemChecker.class); when(api.getChecker()).thenReturn(checker);
+        when(checker.checkItemWithPath(any(), anyString())).thenAnswer(call -> {
+            NBTItem tag = itemData.get(call.getArgument(0)); String[] parts = ((String) call.getArgument(1)).split("\\.");
+            if (tag == null || !tag.hasType() || !tag.getType().equalsIgnoreCase(parts[1])) return false;
+            return parts.length == 2 || tag.getString("MMOITEMS_ITEM_ID").equalsIgnoreCase(String.join(".", Arrays.copyOfRange(parts, 2, parts.length)));
+        });
         tlibs = mockStatic(TLibs.class); tlibs.when(TLibs::getItemAPI).thenReturn(api);
         nbt = mockStatic(NBTItem.class); nbt.when(() -> NBTItem.get(any(ItemStack.class))).thenAnswer(call -> itemData.get(call.getArgument(0)));
     }
@@ -154,18 +163,33 @@ class ConfigurationModelsTest {
         assertEquals("iron", base.getId()); assertNull(BaseSetLoader.getByString("absent"));
         List<List<ArmorPiece>> armor = List.of(base.getHelmets(), base.getChestplates(), base.getLeggings(), base.getBoots());
         for (List<ArmorPiece> slot : armor) {
-            ArmorPiece piece = slot.getFirst(); assertTrue(base.contains(piece.getItem().getItem(), piece.getType()));
+            ArmorPiece piece = slot.getFirst(); String[] path = piece.getPath().split("\\."); assertTrue(base.contains(tagged(path[1].toUpperCase(), path[2].toUpperCase()), piece.getType()));
             assertFalse(base.contains(tagged("OTHER", "other"), piece.getType()));
             assertTrue(BaseSetLoader.getByString("empty").getHelmets().isEmpty());
         }
-        assertTrue(base.contains(items.get("m.tools.pick"), ArmorType.ITEM));
+        assertTrue(base.contains(tagged("TOOLS", "PICK"), ArmorType.ITEM));
         for (ArmorType type : ArmorType.values()) assertFalse(base.contains(tagged("ARMOR", "unlisted"), type));
         ArmorPiece helmet = base.getHelmets().getFirst();
-        assertTrue(helmet.is(tagged("armor", "M.HELMETS.IRON")));
-        assertFalse(helmet.is(tagged(null, "ordinary")));
-        ArmorPiece ordinary = new ArmorPiece("ordinary", tagged(null, "ordinary"), ArmorType.ITEM);
-        assertEquals(ArmorType.ITEM, ordinary.getType()); assertNotNull(ordinary.getItem());
+        assertEquals("m.helmets.iron", helmet.getPath()); assertFalse(helmet.isTypeOnly());
+        assertTrue(helmet.is(tagged("helmets", "IRON")));
+        assertFalse(helmet.is(tagged(null, "iron"))); assertFalse(helmet.is(tagged("HELMETS", "other")));
         BaseSetLoader.clear(); assertTrue(BaseSetLoader.get().isEmpty());
+    }
+
+    @Test void typeOnlyBaseSetEntriesMatchEveryItemOfThatMmoType() throws Exception {
+        new BaseSetLoader().load(yaml("bases.yml", """
+            shortswords:
+              item: [' shortswords ', shortswords.missing_shortsword]
+            """));
+        BaseSet base = BaseSetLoader.getByString("shortswords");
+        assertTrue(base.contains(tagged("SHORTSWORDS", "CUSTOM_SHORTSWORD"), ArmorType.ITEM));
+        assertFalse(base.contains(tagged("SHORTSWORDS", "CUSTOM_SHORTSWORD"), ArmorType.HELMET));
+        ArmorPiece any = new ArmorPiece("shortswords", "shortswords", ArmorType.ITEM);
+        assertTrue(any.isTypeOnly()); assertEquals("m.shortswords", any.getPath());
+        assertTrue(any.is(tagged("SHORTSWORDS", "IRON_SHORTSWORD"))); assertTrue(any.is(tagged("shortswords", "anything_new")));
+        assertFalse(any.is(tagged("SWORD", "CUSTOM_SWORD"))); assertFalse(any.is(tagged(null, "CUSTOM_SHORTSWORD")));
+        verify(TLibs.getItemAPI().getCreator(), never()).getItemFromPath("m.shortswords");
+        verify(TLibs.getItemAPI().getCreator()).getItemFromPath("m.shortswords.missing_shortsword");
     }
 
     @Test void categoriesAndSkinFilesLoadAllFieldsAndLookUpSets() throws Exception {

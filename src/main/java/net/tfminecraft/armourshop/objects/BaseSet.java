@@ -6,9 +6,6 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
-import net.tfminecraft.tlibs.TLibs;
-import net.tfminecraft.tlibs.objects.api.ItemAPI;
-import net.tfminecraft.tlibs.objects.api.subapi.ItemCreator;
 import net.tfminecraft.armourshop.enums.ArmorType;
 
 public class BaseSet {
@@ -21,31 +18,29 @@ public class BaseSet {
 	
 	public BaseSet(String key, ConfigurationSection config) {
 		this.id = key;
-		ItemAPI api = TLibs.getItemAPI();
-		ItemCreator c = api.getCreator();
 		if(config.contains("helmet")) {
 			for(String s : config.getStringList("helmet")) {
-				this.helmets.add(new ArmorPiece(key, c.getItemFromPath("m."+s), ArmorType.HELMET));
+				this.helmets.add(new ArmorPiece(key, s, ArmorType.HELMET));
 			}
 		}
 		if(config.contains("chestplate")) {
 			for(String s : config.getStringList("chestplate")) {
-				this.chestplates.add(new ArmorPiece(key, c.getItemFromPath("m."+s), ArmorType.CHESTPLATE));
+				this.chestplates.add(new ArmorPiece(key, s, ArmorType.CHESTPLATE));
 			}
 		}
 		if(config.contains("leggings")) {
 			for(String s : config.getStringList("leggings")) {
-				this.leggings.add(new ArmorPiece(key, c.getItemFromPath("m."+s), ArmorType.LEGGINGS));
+				this.leggings.add(new ArmorPiece(key, s, ArmorType.LEGGINGS));
 			}
 		}
 		if(config.contains("boots")) {
 			for(String s : config.getStringList("boots")) {
-				this.boots.add(new ArmorPiece(key, c.getItemFromPath("m."+s), ArmorType.BOOTS));
+				this.boots.add(new ArmorPiece(key, s, ArmorType.BOOTS));
 			}
 		}
 		if(config.contains("item")) {
 			for(String s : config.getStringList("item")) {
-				this.items.add(new ArmorPiece(key, c.getItemFromPath("m."+s), ArmorType.ITEM));
+				this.items.add(new ArmorPiece(key, s, ArmorType.ITEM));
 			}
 		}
 	}
