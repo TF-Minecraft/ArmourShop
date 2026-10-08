@@ -20,8 +20,10 @@ import net.tfminecraft.tlibs.objects.api.ItemAPI;
 import net.tfminecraft.tlibs.objects.api.subapi.ItemChecker;
 import net.tfminecraft.tlibs.objects.api.subapi.ItemCreator;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockbukkit.mockbukkit.MockBukkit;
@@ -190,6 +192,40 @@ class ConfigurationModelsTest {
         assertFalse(any.is(tagged("SWORD", "CUSTOM_SWORD"))); assertFalse(any.is(tagged(null, "CUSTOM_SHORTSWORD")));
         verify(TLibs.getItemAPI().getCreator(), never()).getItemFromPath("m.shortswords");
         verify(TLibs.getItemAPI().getCreator()).getItemFromPath("m.shortswords.missing_shortsword");
+    }
+
+    ItemStack crafted(String metal) {
+        ItemStack stack = tagged("ARMORS", "LIGHT_CUSTOM_CHESTPLATE"); var meta = stack.getItemMeta();
+        meta.setDisplayName("Crafted");
+        if (metal != null) meta.getPersistentDataContainer().set(NamespacedKey.fromString("advancedcrafting:ac_craft_model_scheme"), PersistentDataType.STRING, metal);
+        stack.setItemMeta(meta); return stack;
+    }
+
+    @Test void metalBaseSetsOnlyTakeCraftedPiecesOfTheirMetal() throws Exception {
+        new BaseSetLoader().load(yaml("bases.yml", """
+            light mythril:
+              metal: Mythril
+              chestplate: [armors.light_custom_chestplate]
+            light alloys:
+              metal: [' iron ', steel]
+              chestplate: [armors.light_custom_chestplate]
+            light any:
+              chestplate: [armors.light_custom_chestplate]
+            odd:
+              metal: 12
+            """));
+        BaseSet mythril = BaseSetLoader.getByString("light mythril"), alloys = BaseSetLoader.getByString("light alloys");
+        BaseSet any = BaseSetLoader.getByString("light any");
+        assertEquals(List.of("mythril"), mythril.getMetals()); assertEquals(List.of("iron", "steel"), alloys.getMetals());
+        assertTrue(any.getMetals().isEmpty()); assertTrue(BaseSetLoader.getByString("odd").getMetals().isEmpty());
+        ItemStack steel = crafted("steel"), mythrilPiece = crafted("MYTHRIL");
+        assertTrue(mythril.contains(mythrilPiece, ArmorType.CHESTPLATE)); assertFalse(mythril.contains(steel, ArmorType.CHESTPLATE));
+        assertTrue(alloys.contains(steel, ArmorType.CHESTPLATE)); assertFalse(alloys.contains(mythrilPiece, ArmorType.CHESTPLATE));
+        assertTrue(any.contains(steel, ArmorType.CHESTPLATE)); assertTrue(any.contains(mythrilPiece, ArmorType.CHESTPLATE));
+        // Pieces without the AdvancedCrafting tag (premade items, older crafts) keep matching every metal.
+        assertTrue(mythril.contains(crafted(null), ArmorType.CHESTPLATE));
+        assertTrue(mythril.contains(tagged("ARMORS", "LIGHT_CUSTOM_CHESTPLATE"), ArmorType.CHESTPLATE));
+        assertFalse(mythril.contains(tagged("ARMORS", "OTHER"), ArmorType.CHESTPLATE));
     }
 
     @Test void categoriesAndSkinFilesLoadAllFieldsAndLookUpSets() throws Exception {
