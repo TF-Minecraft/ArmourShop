@@ -23,12 +23,16 @@ Technical documentation is maintained in [TF-Minecraft/Docs](https://github.com/
 
 ## Tests and coverage
 
-Run `mvn clean verify` with Java 21. The build runs the unit tests and enforces
-100% executable runtime **line coverage** with JaCoCo, without production-class
-exclusions. Instruction and branch coverage are reported separately.
+With Java 21 and the [build dependencies](https://github.com/TF-Minecraft/Docs/blob/main/projects/ArmourShop/README.md#build-and-dependencies)
+prepared, run `mvn clean verify`. JUnit 5, Mockito and MockBukkit cover menus,
+permissions, pack processing and web-service boundaries. JaCoCo enforces 100%
+production **line coverage**, without production-class exclusions. Instruction
+and branch coverage are reported separately.
 
 The HTML report is `target/site/jacoco/index.html`; the machine-readable report is
-`target/site/jacoco/jacoco.xml`. CI uploads these reports alongside test results.
+`target/site/jacoco/jacoco.xml`. Surefire results are in `target/surefire-reports/`;
+the Build workflow uploads both report directories. These tests do not replace
+live Paper, ItemsAdder resource-pack or deployed website integration checks.
 
 ## License
 
