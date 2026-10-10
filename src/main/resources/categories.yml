@@ -172,6 +172,12 @@ i_swords:
   item: m.sword.steel_sword
   is-item: true
 
+i_lutes:
+  name: "Lutes"
+  colour: "#7f7d80"
+  item: m.lutes.steel_lute
+  is-item: true
+
 i_battleaxes:
   name: "Battleaxes"
   colour: "#7f7d80"
