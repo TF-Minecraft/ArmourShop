@@ -232,6 +232,21 @@ class CommandManagerTest {
         run(player, "model", "apply", "cat", "skin"); message(); assertEquals(Material.PAPER, player.getInventory().getItemInMainHand().getType());
     }
 
+    @Test void originalBooksNeverTakeTheTemplatesTatteredGeneration() {
+        var set = set("skin"); when(set.hasItem()).thenReturn(true); when(set.getItem()).thenReturn("item"); category("cat", set);
+        var original = new ItemStack(Material.WRITTEN_BOOK); var old = (BookMeta) original.getItemMeta();
+        old.setPages("Original page"); old.setTitle("Title"); old.setAuthor("Author"); original.setItemMeta(old);
+        player.getInventory().setItemInMainHand(original);
+        var template = new ItemStack(Material.WRITTEN_BOOK); var tattered = (BookMeta) template.getItemMeta();
+        tattered.setGeneration(BookMeta.Generation.TATTERED); template.setItemMeta(tattered);
+        when(merger.merge(any(), any(), anyString())).thenReturn(template);
+        run(player, "model", "apply", "cat", "skin"); assertTrue(message().contains("Applied"));
+        assertNotEquals(BookMeta.Generation.TATTERED, ((BookMeta) player.getInventory().getItemInMainHand().getItemMeta()).getGeneration());
+        player.getInventory().setItemInMainHand(new ItemStack(Material.WRITABLE_BOOK)); when(merger.merge(any(), any(), anyString())).thenReturn(new ItemStack(Material.WRITABLE_BOOK));
+        run(player, "model", "apply", "cat", "skin"); assertTrue(message().contains("Applied"));
+        assertEquals(Material.WRITABLE_BOOK, player.getInventory().getItemInMainHand().getType());
+    }
+
     @Test void bookModelsStillRestoreWritingWhenLegacyPdcCopyIsUnsupported() {
         var set = set("skin"); when(set.hasItem()).thenReturn(true); when(set.getItem()).thenReturn("item"); category("cat", set);
         for (Throwable failure : List.of(new UnsupportedOperationException("old server"), new NoSuchMethodError("copyTo"))) {

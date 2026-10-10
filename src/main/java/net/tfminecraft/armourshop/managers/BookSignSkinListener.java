@@ -103,9 +103,9 @@ public final class BookSignSkinListener implements Listener {
 				if (content.hasAuthor()) {
 					bookMeta.setAuthor(content.getAuthor());
 				}
-				if (content.hasGeneration()) {
-					bookMeta.setGeneration(content.getGeneration());
-				}
+				// Paper reports Original as "no generation", which would keep the
+				// ItemsAdder template's default of Tattered.
+				bookMeta.setGeneration(content.getGeneration());
 				if (displayName != null) {
 					bookMeta.setDisplayName(displayName);
 				}

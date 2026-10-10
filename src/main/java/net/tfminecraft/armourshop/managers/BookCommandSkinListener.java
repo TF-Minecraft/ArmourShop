@@ -19,6 +19,8 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import dev.lone.itemsadder.api.CustomStack;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.tfminecraft.tlibs.objects.api.subapi.ItemSkinPreserver;
 
 /** Let Essentials authorize /book, then retain the custom item during its conversion. */
@@ -64,8 +66,32 @@ public final class BookCommandSkinListener implements Listener {
             event.getPlayer().sendMessage("An error occurred while editing your book. Please contact staff.");
         }
         ItemStack converted = event.getPlayer().getInventory().getItemInMainHand();
-        if (!isBook(converted) || converted.getType() == original.getType()) return;
-        event.getPlayer().getInventory().setItemInMainHand(restore.apply(original, converted));
+        if (!isBook(converted)) return;
+        if (converted.getType() != original.getType()) {
+            event.getPlayer().getInventory().setItemInMainHand(restore.apply(original, converted));
+            return;
+        }
+        if (words.length < 2 || !words[1].equalsIgnoreCase("title")) return;
+        ItemStack named = nameAfterTitle(original, converted);
+        if (named != null) event.getPlayer().getInventory().setItemInMainHand(named);
+    }
+
+    /**
+     * Skinned and MMOItems books carry a custom name, which the client shows instead of the
+     * title. After Essentials changes the title, show it as the name too. Null when the title
+     * did not change, e.g. because Essentials denied the edit.
+     */
+    static ItemStack nameAfterTitle(ItemStack original, ItemStack edited) {
+        if (edited.getType() != Material.WRITTEN_BOOK
+                || !(original.getItemMeta() instanceof BookMeta before)
+                || !(edited.getItemMeta() instanceof BookMeta after)
+                || !after.hasTitle() || after.getTitle().equals(before.getTitle())) return null;
+        // Book titles are not italic, unlike plain custom names.
+        after.displayName(LegacyComponentSerializer.legacySection().deserialize(after.getTitle())
+            .decoration(TextDecoration.ITALIC, false));
+        ItemStack named = edited.clone();
+        named.setItemMeta(after);
+        return named;
     }
 
     private static boolean isBook(ItemStack item) {
@@ -109,7 +135,8 @@ public final class BookCommandSkinListener implements Listener {
         if (converted.getType() == Material.WRITTEN_BOOK) {
             meta.setTitle(content.hasTitle() ? content.getTitle() : "Book");
             meta.setAuthor(content.getAuthor());
-            if (content.hasGeneration()) meta.setGeneration(content.getGeneration());
+            // Paper reports Original as "no generation"; set it so no template default remains.
+            meta.setGeneration(content.getGeneration());
         }
         restored.setItemMeta(meta);
         restored.setAmount(converted.getAmount());

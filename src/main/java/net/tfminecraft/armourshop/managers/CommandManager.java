@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -300,7 +301,8 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 		if (previous.hasAuthor()) {
 			bookMeta.setAuthor(previous.getAuthor());
 		}
-		if (previous.hasGeneration()) {
+		// The merged ItemsAdder template defaults to Tattered; Original reports no generation.
+		if (merged.getType() == Material.WRITTEN_BOOK) {
 			bookMeta.setGeneration(previous.getGeneration());
 		}
 		if (!replaceName && previous.hasDisplayName()) {
