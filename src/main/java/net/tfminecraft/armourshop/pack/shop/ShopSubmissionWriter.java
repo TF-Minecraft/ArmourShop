@@ -81,7 +81,7 @@ public final class ShopSubmissionWriter {
 					psArmor,
 					rootKey,
 					tierDisplay,
-					tier,
+					sub.baseSetForTier(tier),
 					permission,
 					null,
 					colours,
@@ -169,7 +169,7 @@ public final class ShopSubmissionWriter {
 					categoryFile,
 					rootKey,
 					tierDisplay,
-					tier,
+					sub.baseSetForTier(tier),
 					permission,
 					scroll,
 					colours,
@@ -363,13 +363,14 @@ public final class ShopSubmissionWriter {
 
 	/**
 	 * Upserts one tier's armor SkinSet. {@code rootKey} is {@code {slug}_{tier}} and is
-	 * also the pack slug used for the IA piece ids (matches the per-tier pack write).
+	 * also the pack slug used for the IA piece ids (matches the per-tier pack write);
+	 * {@code baseSet} is the tier's shop set ({@code light iron}).
 	 */
 	private static void upsertArmor(
 		File file,
 		String rootKey,
 		String display,
-		String tier,
+		String baseSet,
 		String permission,
 		String scroll,
 		List<String> colours,
@@ -384,7 +385,7 @@ public final class ShopSubmissionWriter {
 		writeColour(config, root, colours);
 		writeStyles(config, root, styles);
 		config.set(root + ".add-name", addName);
-		config.set(root + ".set", tier);
+		config.set(root + ".set", baseSet);
 		config.set(root + ".permission", permission);
 		config.set(root + ".scroll", scroll);
 		config.set(root + ".helmet", "ia." + ns + ":" + rootKey + "_helmet");
