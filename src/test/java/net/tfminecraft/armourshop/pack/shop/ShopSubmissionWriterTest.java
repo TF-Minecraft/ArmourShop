@@ -33,10 +33,10 @@ class ShopSubmissionWriterTest {
         String slug = "skin", kind = "handheld", display = " Skin ", base = "iron", category = "hats", scroll = "scroll", namespace;
         boolean staff, addName = true;
         List<String> tiers = List.of(), colours = List.of("red"), styles = List.of("bold");
-        Map<String, String> aliases = Map.of(), scrolls = Map.of();
+        Map<String, String> aliases = Map.of(), scrolls = Map.of(), sets = Map.of();
         ApprovedSubmission build() {
             return new ApprovedSubmission("id", "uuid", slug, kind, display, "grip", base, tiers,
-                null, aliases, addName, colours, styles, null, staff, category, scroll, scrolls, namespace);
+                null, aliases, addName, colours, styles, null, staff, category, scroll, scrolls, namespace, sets);
         }
     }
     private YamlConfiguration category(String name) throws Exception {
@@ -91,6 +91,25 @@ class ShopSubmissionWriterTest {
         assertEquals("Custom Armor", YamlConfiguration.loadConfiguration(temp.resolve("categories.yml").toFile()).getString("ps_armor.name"));
         sub.kind = " ARMOR_SET "; sub.tiers = List.of(); sub.base = "mythril"; ShopSubmissionWriter.write(sub.build(), null);
         assertTrue(category("ps_armor").contains("skin_mythril"));
+    }
+
+    @Test void armorWritesEachTiersBaseSet() throws Exception {
+        var sub = new Submission(); sub.kind = "armor_set"; sub.tiers = List.of("light_steel", "mage_steel");
+        sub.sets = Map.of("light_steel", "light steel", "mage_steel", "mage steel"); write(sub);
+        var yaml = category("ps_armor");
+        assertEquals("light steel", yaml.getString("skin_light_steel.set"));
+        assertEquals("mage steel", yaml.getString("skin_mage_steel.set"));
+        assertEquals("Skin Light Steel", yaml.getString("skin_light_steel.name"));
+        assertEquals("ia.players_dev:skin_light_steel_helmet", yaml.getString("skin_light_steel.helmet"));
+
+        // Older bare tiers keep their keys and ids but take the set the web stores for them.
+        sub.tiers = List.of("iron", "mage"); sub.sets = Map.of("iron", "light iron"); write(sub);
+        yaml = category("ps_armor");
+        assertEquals("light iron", yaml.getString("skin_iron.set")); assertEquals("mage", yaml.getString("skin_mage.set"));
+        assertEquals("ia.players_dev:skin_iron_helmet", yaml.getString("skin_iron.helmet"));
+
+        sub.staff = true; sub.tiers = List.of("heavy_iron"); sub.sets = Map.of("heavy_iron", "heavy iron"); write(sub);
+        assertEquals("heavy iron", category("hats").getString("skin_heavy_iron.set"));
     }
 
     @Test void staffArmorAndItemsUseCategoryScrollsAndNamespace() throws Exception {

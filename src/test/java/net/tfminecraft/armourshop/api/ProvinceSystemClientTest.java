@@ -82,6 +82,7 @@ class ProvinceSystemClientTest {
             var empty = new ApprovedSubmission(null, null, null, "handheld", null, null, null,
                 List.of(), null, null, false, null, null, null);
             assertEquals("Iron", empty.displayNameForTier("iron")); assertEquals("", empty.displayNameForTier(""));
+            assertEquals("Light Iron", empty.displayNameForTier("light_iron")); assertEquals("Iron", empty.displayNameForTier("_iron"));
             var staff = new ApprovedSubmission(null, null, "slug", "armor_set", null, null, " ",
                 null, null, null, false, null, null, null, true, " ", " ", null, " ");
             assertTrue(staff.tiers.isEmpty()); assertNull(staff.category); assertNull(staff.scroll);
@@ -126,7 +127,8 @@ class ProvinceSystemClientTest {
              "helmet_3d_tiers":["iron"],"tier_aliases":{"iron":"Scout"},"add_name":true,
              "name_colours":["#123456"],"name_styles":["bold"],"files":["iron.png"],
              "staff":" true ","category":"armor","scroll":"common",
-             "tier_scrolls":{"iron":"rare"},"ia_namespace":"curated"}
+             "tier_scrolls":{"iron":"rare"},"ia_namespace":"curated",
+             "tier_sets":{" IRON ":" light iron ","mage":" "}}
             """;
         try (var parser = mockStatic(JsonParser.class, CALLS_REAL_METHODS)) {
             var parsed = parseApprovedSubmissions("{\"submissions\":[{}," + submission + "]}");
@@ -137,6 +139,8 @@ class ProvinceSystemClientTest {
             assertEquals(List.of("#123456"), sub.nameColours); assertEquals(List.of("bold"), sub.nameStyles);
             assertEquals(List.of("iron.png"), sub.files); assertEquals("armor", sub.category); assertEquals("common", sub.scroll);
             assertEquals(Map.of("iron", "rare"), sub.tierScrolls); assertEquals("curated", sub.resolveNamespace());
+            assertEquals(Map.of("iron", "light iron"), sub.tierSets);
+            assertEquals("light iron", sub.baseSetForTier(" Iron ")); assertEquals("mage", sub.baseSetForTier("mage"));
             parser.verify(() -> JsonParser.parseString(anyString()), times(2));
             parser.clearInvocations();
             var codes = parseActiveCodes("{\"codes\":[{}, {\"code\":\"abc\",\"player_uuid\":\"owner\",\"minecraft_name\":\"Name\",\"created_at\":\"start\",\"expires_at\":\"end\"}]}");

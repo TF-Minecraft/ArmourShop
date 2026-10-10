@@ -95,8 +95,16 @@ public class ProvinceSystemClient {
 		public final String displayName;
 		public final String gripPreset;
 		public final String baseSet;
-		/** Armor tier list (1-6): iron|steel|abyssalite|mythril|mage|infantry. Empty for non-armor kinds. */
+		/**
+		 * Armor tier list: {@code {type}_{metal}} ({@code light_iron}) for metal lines,
+		 * or an older bare tier ({@code iron}, {@code mage}). Empty for non-armor kinds.
+		 */
 		public final List<String> tiers;
+		/**
+		 * ArmourShop base set per tier ({@code light_iron → light iron}). A tier with no
+		 * entry is its own base set (submissions from before metal lines).
+		 */
+		public final Map<String, String> tierSets;
 		/**
 		 * Armor tiers that use a 3D helmet model instead of a 16×16 icon.
 		 * Empty for non-armor or all-flat armor.
@@ -216,6 +224,52 @@ public class ProvinceSystemClient {
 			Map<String, String> tierScrolls,
 			String iaNamespace
 		) {
+			this(
+				id,
+				playerUuid,
+				slug,
+				kind,
+				displayName,
+				gripPreset,
+				baseSet,
+				tiers,
+				helmet3dTiers,
+				tierAliases,
+				addName,
+				nameColours,
+				nameStyles,
+				files,
+				staff,
+				category,
+				scroll,
+				tierScrolls,
+				iaNamespace,
+				null
+			);
+		}
+
+		public ApprovedSubmission(
+			String id,
+			String playerUuid,
+			String slug,
+			String kind,
+			String displayName,
+			String gripPreset,
+			String baseSet,
+			List<String> tiers,
+			List<String> helmet3dTiers,
+			Map<String, String> tierAliases,
+			boolean addName,
+			List<String> nameColours,
+			List<String> nameStyles,
+			List<String> files,
+			boolean staff,
+			String category,
+			String scroll,
+			Map<String, String> tierScrolls,
+			String iaNamespace,
+			Map<String, String> tierSets
+		) {
 			this.id = id;
 			this.playerUuid = playerUuid;
 			this.slug = slug;
@@ -243,20 +297,7 @@ public class ProvinceSystemClient {
 				}
 			}
 			this.helmet3dTiers = Collections.unmodifiableList(h3d);
-			Map<String, String> aliasMap = new LinkedHashMap<>();
-			if (tierAliases != null) {
-				for (Map.Entry<String, String> e : tierAliases.entrySet()) {
-					if (e.getKey() == null || e.getValue() == null) {
-						continue;
-					}
-					String k = e.getKey().trim().toLowerCase(Locale.ROOT);
-					String v = e.getValue().trim();
-					if (!k.isEmpty() && !v.isEmpty()) {
-						aliasMap.put(k, v);
-					}
-				}
-			}
-			this.tierAliases = Collections.unmodifiableMap(aliasMap);
+			this.tierAliases = tierKeyedMap(tierAliases);
 			this.addName = addName;
 			this.nameColours = nameColours == null
 				? Collections.emptyList()
@@ -270,23 +311,29 @@ public class ProvinceSystemClient {
 			this.staff = staff;
 			this.category = category == null || category.isBlank() ? null : category.trim();
 			this.scroll = scroll == null || scroll.isBlank() ? null : scroll.trim();
-			Map<String, String> scrolls = new LinkedHashMap<>();
-			if (tierScrolls != null) {
-				for (Map.Entry<String, String> e : tierScrolls.entrySet()) {
+			this.tierScrolls = tierKeyedMap(tierScrolls);
+			this.tierSets = tierKeyedMap(tierSets);
+			this.iaNamespace = iaNamespace == null || iaNamespace.isBlank()
+				? null
+				: iaNamespace.trim();
+		}
+
+		/** Lower-cased tier keys to trimmed values; blank or null entries are dropped. */
+		private static Map<String, String> tierKeyedMap(Map<String, String> raw) {
+			Map<String, String> out = new LinkedHashMap<>();
+			if (raw != null) {
+				for (Map.Entry<String, String> e : raw.entrySet()) {
 					if (e.getKey() == null || e.getValue() == null) {
 						continue;
 					}
 					String k = e.getKey().trim().toLowerCase(Locale.ROOT);
 					String v = e.getValue().trim();
 					if (!k.isEmpty() && !v.isEmpty()) {
-						scrolls.put(k, v);
+						out.put(k, v);
 					}
 				}
 			}
-			this.tierScrolls = Collections.unmodifiableMap(scrolls);
-			this.iaNamespace = iaNamespace == null || iaNamespace.isBlank()
-				? null
-				: iaNamespace.trim();
+			return Collections.unmodifiableMap(out);
 		}
 
 		/** IA pack namespace for this submission. */
@@ -304,6 +351,13 @@ public class ProvinceSystemClient {
 				return false;
 			}
 			return helmet3dTiers.contains(tier.trim().toLowerCase(Locale.ROOT));
+		}
+
+		/** ArmourShop base set ({@code set:}) for one armor tier; the tier itself if none is given. */
+		public String baseSetForTier(String tier) {
+			String t = tier == null ? "" : tier.trim();
+			String set = tierSets.get(t.toLowerCase(Locale.ROOT));
+			return set == null ? t : set;
 		}
 
 		/**
@@ -328,11 +382,22 @@ public class ProvinceSystemClient {
 			return base + " " + alias;
 		}
 
+		/** {@code light_iron → Light Iron}, {@code iron → Iron}. */
 		private static String capitalizeTier(String tier) {
 			if (tier == null || tier.isEmpty()) {
 				return "";
 			}
-			return Character.toUpperCase(tier.charAt(0)) + tier.substring(1);
+			StringBuilder out = new StringBuilder();
+			for (String part : tier.split("_")) {
+				if (part.isEmpty()) {
+					continue;
+				}
+				if (out.length() > 0) {
+					out.append(' ');
+				}
+				out.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
+			}
+			return out.toString();
 		}
 	}
 
@@ -768,7 +833,8 @@ public class ProvinceSystemClient {
 				jsonString(obj, "category"),
 				jsonString(obj, "scroll"),
 				jsonStringMap(obj, "tier_scrolls"),
-				jsonString(obj, "ia_namespace")
+				jsonString(obj, "ia_namespace"),
+				jsonStringMap(obj, "tier_sets")
 			));
 		}
 		return out;
