@@ -2,14 +2,21 @@ package net.tfminecraft.armourshop.objects;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import net.tfminecraft.armourshop.enums.ArmorType;
 
 public class BaseSet {
+	/** The model scheme AdvancedCrafting stamps on crafted pieces: their metal (alloys carry their base's). */
+	private static final NamespacedKey CRAFT_METAL = NamespacedKey.fromString("advancedcrafting:ac_craft_model_scheme");
+
 	private String id;
+	private final List<String> metals = new ArrayList<>();
 	private List<ArmorPiece> helmets = new ArrayList<>();
 	private List<ArmorPiece> chestplates = new ArrayList<>();
 	private List<ArmorPiece> leggings = new ArrayList<>();
@@ -18,6 +25,11 @@ public class BaseSet {
 	
 	public BaseSet(String key, ConfigurationSection config) {
 		this.id = key;
+		List<String> metalList = config.isList("metal") ? config.getStringList("metal")
+				: config.isString("metal") ? List.of(config.getString("metal")) : List.of();
+		for(String s : metalList) {
+			this.metals.add(s.trim().toLowerCase(Locale.ROOT));
+		}
 		if(config.contains("helmet")) {
 			for(String s : config.getStringList("helmet")) {
 				this.helmets.add(new ArmorPiece(key, s, ArmorType.HELMET));
@@ -64,29 +76,43 @@ public class BaseSet {
 	public List<ArmorPiece> getBoots() {
 		return boots;
 	}
+
+	public List<String> getMetals() {
+		return metals;
+	}
 	
 	public boolean contains(ItemStack i, ArmorType type) {
 		if(type.equals(ArmorType.HELMET)) {
 			for(ArmorPiece p : helmets) {
-				if(p.is(i)) return true;
+				if(p.is(i)) return metalAllows(i);
 			}
 		} else if(type.equals(ArmorType.CHESTPLATE)) {
 			for(ArmorPiece p : chestplates) {
-				if(p.is(i)) return true;
+				if(p.is(i)) return metalAllows(i);
 			}
 		} else if(type.equals(ArmorType.LEGGINGS)) {
 			for(ArmorPiece p : leggings) {
-				if(p.is(i)) return true;
+				if(p.is(i)) return metalAllows(i);
 			}
 		} else if(type.equals(ArmorType.BOOTS)) {
 			for(ArmorPiece p : boots) {
-				if(p.is(i)) return true;
+				if(p.is(i)) return metalAllows(i);
 			}
 		} else if(type.equals(ArmorType.ITEM)) {
 			for(ArmorPiece p : items) {
-				if(p.is(i)) return true;
+				if(p.is(i)) return metalAllows(i);
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * With {@code metal:} set, a crafted piece only matches when it was made of one of those metals, so a
+	 * mythril skin line never lands on steel. Pieces without the tag (premade items, older crafts) still match.
+	 */
+	private boolean metalAllows(ItemStack i) {
+		if(metals.isEmpty() || !i.hasItemMeta()) return true;
+		String metal = i.getItemMeta().getPersistentDataContainer().get(CRAFT_METAL, PersistentDataType.STRING);
+		return metal == null || metals.contains(metal.toLowerCase(Locale.ROOT));
 	}
 }
