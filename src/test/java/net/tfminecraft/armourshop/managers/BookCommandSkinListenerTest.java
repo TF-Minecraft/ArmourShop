@@ -77,6 +77,42 @@ class BookCommandSkinListenerTest {
         verify(inventory, never()).setItemInMainHand(any());
     }
 
+    @Test void titleEditsShowTheNewTitleAsTheBooksName() {
+        var before = mock(BookMeta.class); var after = mock(BookMeta.class); var named = mock(ItemStack.class);
+        when(original.getItemMeta()).thenReturn(before); when(before.getTitle()).thenReturn("Roslyn's Journal");
+        when(converted.getType()).thenReturn(Material.WRITTEN_BOOK); when(converted.getItemMeta()).thenReturn(after); when(converted.clone()).thenReturn(named);
+        when(after.hasTitle()).thenReturn(true); when(after.getTitle()).thenReturn("§6Recipes");
+        new BookCommandSkinListener(label -> command, item -> true, (a, b) -> restored)
+            .onBookCommand(new PlayerCommandPreprocessEvent(player, "/book title &6Recipes"));
+        var name = org.mockito.ArgumentCaptor.forClass(net.kyori.adventure.text.Component.class);
+        verify(after).displayName(name.capture()); verify(named).setItemMeta(after); verify(inventory).setItemInMainHand(named);
+        assertEquals("Recipes", net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(name.getValue()));
+        assertEquals(net.kyori.adventure.text.format.TextDecoration.State.FALSE,
+            name.getValue().decoration(net.kyori.adventure.text.format.TextDecoration.ITALIC));
+    }
+
+    @Test void deniedUnchangedOrNonTitleEditsKeepTheBooksName() {
+        var before = mock(BookMeta.class); var after = mock(BookMeta.class);
+        when(before.getTitle()).thenReturn("Same"); when(after.hasTitle()).thenReturn(true); when(after.getTitle()).thenReturn("Same");
+        when(original.getItemMeta()).thenReturn(before); when(converted.getItemMeta()).thenReturn(after); when(converted.getType()).thenReturn(Material.WRITTEN_BOOK);
+        assertNull(BookCommandSkinListener.nameAfterTitle(original, converted));
+        when(after.hasTitle()).thenReturn(false);
+        assertNull(BookCommandSkinListener.nameAfterTitle(original, converted));
+        when(converted.getItemMeta()).thenReturn(mock(ItemMeta.class));
+        assertNull(BookCommandSkinListener.nameAfterTitle(original, converted));
+        when(original.getItemMeta()).thenReturn(mock(ItemMeta.class));
+        assertNull(BookCommandSkinListener.nameAfterTitle(original, converted));
+        when(converted.getType()).thenReturn(Material.WRITABLE_BOOK);
+        assertNull(BookCommandSkinListener.nameAfterTitle(original, converted));
+        when(converted.getType()).thenReturn(Material.WRITTEN_BOOK); when(inventory.getItemInMainHand()).thenReturn(held, converted);
+        new BookCommandSkinListener(label -> command, item -> true, (a, b) -> restored)
+            .onBookCommand(new PlayerCommandPreprocessEvent(player, "/book author Roslyn Rose"));
+        when(inventory.getItemInMainHand()).thenReturn(held, converted);
+        new BookCommandSkinListener(label -> command, item -> true, (a, b) -> restored)
+            .onBookCommand(new PlayerCommandPreprocessEvent(player, "/book"));
+        verify(after, never()).displayName(any()); verify(inventory, never()).setItemInMainHand(any());
+    }
+
     @Test void vanillaBooksAndOtherPluginsAreNotIntercepted() {
         var event = new PlayerCommandPreprocessEvent(player, "/book");
         new BookCommandSkinListener(label -> command, item -> false, (a, b) -> restored)
@@ -182,7 +218,8 @@ class BookCommandSkinListenerTest {
         var fixture = conversion(Material.WRITTEN_BOOK); when(fixture.content.getAuthor()).thenReturn("Writer");
         try (var stacks = mockStatic(CustomStack.class)) {
             assertSame(restored, BookCommandSkinListener.restoreConversion(original, converted));
-            verify(fixture.output).setTitle("Book"); verify(fixture.output).setAuthor("Writer"); verify(fixture.output, never()).setGeneration(any());
+            // Always written: an Original book reports no generation, and the template default is Tattered.
+            verify(fixture.output).setTitle("Book"); verify(fixture.output).setAuthor("Writer"); verify(fixture.output).setGeneration(fixture.content.getGeneration());
             verify(fixture.outputPages).setPages(fixture.pages); verify(restored).setType(Material.WRITTEN_BOOK); verify(restored).setAmount(2);
         }
     }

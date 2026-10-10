@@ -124,6 +124,14 @@ class BookSignSkinListenerTest {
             assertFalse(((BookMeta) template.getItemMeta()).hasTitle()); assertTrue(((BookMeta) template.getItemMeta()).getPages().isEmpty());
             verify(plugin.getLogger()).info(contains("skins:book -> book_signed"));
         }
+        @Test void signingAnOriginalNeverKeepsTheTemplatesTatteredGeneration() {
+            // ItemsAdder written-book templates default to Tattered; Paper reports Original as no generation.
+            var template = target.getItemStack(); var appearance = (BookMeta) template.getItemMeta();
+            appearance.setGeneration(BookMeta.Generation.TATTERED); template.setItemMeta(appearance);
+            var event = signing(); var content = event.getNewBookMeta(); content.setGeneration(null); event.setNewBookMeta(content);
+            listener.onSignBook(event); save(event, 1); tasks.remove().run();
+            assertNotEquals(BookMeta.Generation.TATTERED, ((BookMeta) player.getInventory().getItem(2).getItemMeta()).getGeneration());
+        }
         @Test void emptyVanillaAlreadySignedAndMissingIaDefinitionsDoNotScheduleReplacement() {
             var event = signing(); player.getInventory().setItem(2, null); listener.onSignBook(event);
             player.getInventory().setItem(2, new ItemStack(Material.AIR)); listener.onSignBook(event);
