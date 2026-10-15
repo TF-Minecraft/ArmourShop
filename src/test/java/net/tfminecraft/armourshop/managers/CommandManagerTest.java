@@ -121,12 +121,15 @@ class CommandManagerTest {
     }
 
     @Test void tokenDeletionNormalizesQuotedCodeAndReportsApiOutcomes() {
-        for (String code : Arrays.asList(null, " ", "\" \"")) { assertTrue(run(player, "token", "delete", code)); assertTrue(message().contains("Usage:")); }
-        client.when(() -> ProvinceSystemClient.revokeCode("code")).thenReturn(SimpleResult.success(), SimpleResult.fail(null), SimpleResult.fail("rejected"));
-        assertTrue(run(player, "token", "delete", " \" code \" ")); drain(); assertTrue(message().contains("Deleted token"));
-        run(player, "token", "delete", "code"); drain(); assertTrue(message().contains("Could not delete token"));
-        run(player, "token", "delete", "code"); drain(); assertTrue(message().contains("rejected"));
-        client.verify(() -> ProvinceSystemClient.revokeCode("code"), times(3));
+        try (var cache = mockStatic(ActiveTokenCodeCache.class)) {
+            for (String code : Arrays.asList(null, " ", "\" \"")) { assertTrue(run(player, "token", "delete", code)); assertTrue(message().contains("Usage:")); }
+            client.when(() -> ProvinceSystemClient.revokeCode("code")).thenReturn(SimpleResult.success(), SimpleResult.fail(null), SimpleResult.fail("rejected"));
+            assertTrue(run(player, "token", "delete", " \" code \" ")); drain(); assertTrue(message().contains("Deleted token"));
+            run(player, "token", "delete", "code"); drain(); assertTrue(message().contains("Could not delete token"));
+            run(player, "token", "delete", "code"); drain(); assertTrue(message().contains("rejected"));
+            client.verify(() -> ProvinceSystemClient.revokeCode("code"), times(3));
+            cache.verify(ActiveTokenCodeCache::invalidate, times(1));
+        }
     }
 
     @Test void tokenListsUseNamesOfflineLookupAndUuidFallbacks() {
@@ -281,6 +284,21 @@ class CommandManagerTest {
         assertTrue(manager.onTabComplete(denied, command, "as", new String[]{"token", ""}).isEmpty());
         assertTrue(manager.onTabComplete(console, command, "as", new String[0]).isEmpty());
         when(command.getName()).thenReturn("other"); assertTrue(manager.onTabComplete(console, command, "as", new String[]{""}).isEmpty());
+    }
+
+    @Test void tokenDeletionCompletesOnlyCachedCodesForAdminsOnTheExactPath() {
+        try (var cache = mockStatic(ActiveTokenCodeCache.class)) {
+            cache.when(ActiveTokenCodeCache::snapshot).thenReturn(List.of("Alpha123", "Beta456"));
+            assertEquals(List.of("Alpha123", "Beta456"), manager.onTabComplete(console, command, "as", new String[]{"token", "delete", ""}));
+            assertEquals(List.of("Alpha123"), manager.onTabComplete(console, command, "as", new String[]{"TOKEN", "DELETE", "aLp"}));
+            assertEquals(List.of(), manager.onTabComplete(console, command, "as", new String[]{"token", "delete", "unknown"}));
+            cache.clearInvocations();
+            for (String[] args : List.of(new String[]{"token", "create", ""}, new String[]{"wrong", "delete", ""}, new String[]{"token", "delete", "Alpha123", ""}))
+                assertEquals(List.of(), manager.onTabComplete(console, command, "as", args));
+            assertEquals(List.of(), manager.onTabComplete(mock(CommandSender.class), command, "as", new String[]{"token", "delete", ""}));
+            cache.verifyNoInteractions();
+            client.verifyNoInteractions();
+        }
     }
 
     @Test void tabCompletionUsesLocaleIndependentIdentifiers() {

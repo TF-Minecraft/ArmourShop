@@ -29,6 +29,7 @@ import net.tfminecraft.armourshop.loaders.CategoryLoader;
 import net.tfminecraft.armourshop.objects.SkinCategory;
 import net.tfminecraft.armourshop.objects.SkinSet;
 import net.tfminecraft.armourshop.pack.apply.PackPullRunner;
+import net.tfminecraft.armourshop.pack.delete.ActiveTokenCodeCache;
 import net.tfminecraft.armourshop.pack.catalog.CatalogSyncService;
 import net.tfminecraft.armourshop.pack.reload.DeferredIaReloadService;
 import net.tfminecraft.armourshop.utils.ChatMessages;
@@ -537,6 +538,7 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 						+ (result.error != null ? result.error : "Could not delete token."));
 					return;
 				}
+				ActiveTokenCodeCache.invalidate();
 				sender.sendMessage(ChatColor.GREEN + "[ArmourShop] "
 					+ ChatColor.YELLOW + "Deleted token "
 					+ ChatColor.AQUA + toRevoke);
@@ -588,6 +590,11 @@ public class CommandManager implements Listener, CommandExecutor, TabCompleter {
 				completions.add("model");
 			}
 			return filter(completions, args[0]);
+		}
+
+		if (args.length == 3 && args[0].equalsIgnoreCase("token")
+			&& args[1].equalsIgnoreCase("delete") && Permissions.isAdmin(sender)) {
+			return filter(ActiveTokenCodeCache.snapshot(), args[2]);
 		}
 
 		if (args.length == 2 && args[0].equalsIgnoreCase("token")) {

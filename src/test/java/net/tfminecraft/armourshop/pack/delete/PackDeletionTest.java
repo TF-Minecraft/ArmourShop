@@ -51,7 +51,7 @@ class PackDeletionTest {
         when(scheduler.runTaskAsynchronously(eq(plugin), any(Runnable.class))).thenAnswer(i -> {workers.add(i.getArgument(1)); return mock(BukkitTask.class);});
         when(scheduler.runTask(eq(plugin), any(Runnable.class))).thenAnswer(i -> {main.add(i.getArgument(1)); return mock(BukkitTask.class);});
         client = mockStatic(ProvinceSystemClient.class); client.when(() -> ProvinceSystemClient.revokeSubmission(anyString())).thenReturn(SimpleResult.success());
-        for (Class<?> type : List.of(DeletableSubmissionCache.class, DeletableStaffSkinCache.class)) {
+        for (Class<?> type : List.of(DeletableSubmissionCache.class, DeletableStaffSkinCache.class, ActiveTokenCodeCache.class)) {
             Object cache = field(type, "CACHE").get(null);
             for (String name : List.of("IDS", "FETCHED_AT", "refreshInFlight", "generation")) {
                 Field field = field(GenerationalIdCache.class, name);
@@ -169,6 +169,27 @@ class PackDeletionTest {
             doAnswer(i -> {workers.add(i.getArgument(1)); return mock(BukkitTask.class);}).when(scheduler).runTaskAsynchronously(eq(plugin), any(Runnable.class));
             invalidate.run(); assertEquals(1, workers.size(), "refresh must retry after scheduler rejected it"); workers.clear();
         }
+    }
+
+    @Test void activeTokenCodesRefreshOnlyOnWorkersAndDropRevokedCodesAfterInvalidation() {
+        var alpha = new ActiveCode("Alpha123", null, null, null, null);
+        var beta = new ActiveCode("Beta456", null, null, null, null);
+        client.when(ProvinceSystemClient::listActiveCodes).thenReturn(ActiveCodesResult.success(List.of(alpha, beta, alpha)));
+        assertTrue(ActiveTokenCodeCache.snapshot().isEmpty());
+        assertTrue(ActiveTokenCodeCache.snapshot().isEmpty());
+        assertEquals(1, workers.size()); client.verifyNoInteractions();
+        workers.remove().run();
+        assertEquals(List.of("Alpha123", "Beta456"), ActiveTokenCodeCache.snapshot());
+        assertTrue(workers.isEmpty());
+        client.when(ProvinceSystemClient::listActiveCodes).thenReturn(ActiveCodesResult.success(List.of(beta)));
+        ActiveTokenCodeCache.invalidate(); workers.remove().run();
+        assertEquals(List.of("Beta456"), ActiveTokenCodeCache.snapshot());
+        client.when(ProvinceSystemClient::listActiveCodes).thenReturn(ActiveCodesResult.fail("offline"));
+        ActiveTokenCodeCache.invalidate(); workers.remove().run();
+        assertEquals(List.of("Beta456"), ActiveTokenCodeCache.snapshot());
+        client.when(ProvinceSystemClient::listActiveCodes).thenReturn(ActiveCodesResult.success(List.of()));
+        workers.remove().run();
+        assertTrue(ActiveTokenCodeCache.snapshot().isEmpty());
     }
 
     @Test void cacheSnapshotsCannotBeMutatedByTabCompleters() {
