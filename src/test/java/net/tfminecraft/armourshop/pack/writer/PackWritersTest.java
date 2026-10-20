@@ -50,6 +50,8 @@ class PackWritersTest {
             new Spec(PackKind.BOW, 5, s -> BowWriter.write(temp,s), (s,n) -> BowWriter.write(temp,s,n)),
             new Spec(PackKind.LARGE_BOW, 9, s -> LargeBowWriter.write(temp,s), (s,n) -> LargeBowWriter.write(temp,s,n)),
             new Spec(PackKind.CROSSBOW, 7, s -> BowWriter.writeCrossbow(temp,s), (s,n) -> BowWriter.writeCrossbow(temp,s,n)),
+            new Spec(PackKind.BOW_3D, 6, s -> Bow3dWriter.write(temp,s,PackPaths.playerNamespace()), (s,n) -> Bow3dWriter.write(temp,s,n)),
+            new Spec(PackKind.CROSSBOW_3D, 8, s -> Bow3dWriter.write(temp,s,PackPaths.playerNamespace()), (s,n) -> Bow3dWriter.write(temp,s,n)),
             new Spec(PackKind.ITEM_3D, 3, s -> Item3dWriter.write(temp,s), (s,n) -> Item3dWriter.write(temp,s,n)),
             new Spec(PackKind.HELMET_3D, 3, s -> Item3dWriter.writeHelmet3d(temp,s), (s,n) -> Item3dWriter.writeHelmet3d(temp,s,n)),
             new Spec(PackKind.MASK, 3, s -> Item3dWriter.writeMask(temp,s,PackPaths.playerNamespace()), (s,n) -> Item3dWriter.writeMask(temp,s,n)),
@@ -60,7 +62,7 @@ class PackWritersTest {
     private Map<String,byte[]> files() {
         Map<String,byte[]> files = new LinkedHashMap<>();
         for (String key : List.of("helmet","chestplate","leggings","boots","layer_1","layer_2","texture","pull_0","pull_1","pull_2","charged","unsigned","signed","helmet_texture")) files.put(key,png);
-        for (String key : List.of("model","model_0","model_1","model_2","model_blocking","carry","reload","aim","aim_charged")) files.put(key,MODEL);
+        for (String key : List.of("model","model_0","model_1","model_2","model_charged","model_blocking","carry","reload","aim","aim_charged")) files.put(key,MODEL);
         return files;
     }
     private PackSubmission submission(PackKind kind) {return new PackSubmission(kind.name().toLowerCase(Locale.ROOT), "Skin \"quoted\"", kind, files());}
@@ -83,9 +85,39 @@ class PackWritersTest {
         assertEquals("item/handheld",yaml(PackPaths.configsDir(temp).resolve("handheld.yml")).getString("items.handheld.resource.parent"));
         assertTrue(yaml(PackPaths.configsDir(temp).resolve("helmet_3d.yml")).getBoolean("items.helmet_3d.behaviours.hat"));
         assertEquals("WRITTEN_BOOK",yaml(PackPaths.configsDir(temp).resolve("book.yml")).getString("items.book_signed.resource.material"));
+        var bow3d=yaml(PackPaths.configsDir(temp).resolve("bow_3d.yml"));
+        assertEquals("BOW",bow3d.getString("items.bow_3d.resource.material")); assertFalse(bow3d.getBoolean("items.bow_3d.resource.generate"));
+        assertEquals("item/bow_3d",bow3d.getString("items.bow_3d.resource.model_path"));
+        var crossbow3d=yaml(PackPaths.configsDir(temp).resolve("crossbow_3d.yml"));
+        assertEquals("CROSSBOW",crossbow3d.getString("items.crossbow_3d.resource.material"));
+        for (String suffix : List.of("", "_0", "_1", "_2", "_charged", "_firework")) assertTrue(Files.isRegularFile(PackPaths.itemModelsDir(temp).resolve("crossbow_3d" + suffix + ".json")), suffix);
+        assertFalse(Files.exists(PackPaths.itemModelsDir(temp).resolve("bow_3d_charged.json")));
         Map<String,byte[]> armor=files(); armor.put("helmet_model",MODEL);
         var written=ArmorSetWriter.write(temp,new PackSubmission("three_d","3D",PackKind.ARMOR_SET,armor)); assertEquals(8,written.size());
         assertTrue(yaml(PackPaths.configsDir(temp).resolve("three_d.yml")).getBoolean("items.three_d_helmet.behaviours.hat"));
+    }
+
+    @Test void animatedTexturesGetTheirMcmetaBesideEveryPngExceptArmourLayers() throws Exception {
+        byte[] meta = "{\"animation\":{\"frametime\":2}}".getBytes(StandardCharsets.UTF_8);
+        Map<String,byte[]> files = files();
+        for (String stem : List.of("texture","pull_0","charged","unsigned","helmet","chestplate","layer_1")) files.put(stem + ".mcmeta", meta);
+        Path itemTex = PackPaths.itemTexturesDir(temp);
+        var crossbow = BowWriter.writeCrossbow(temp, new PackSubmission("xb", "XB", PackKind.CROSSBOW, files));
+        for (String name : List.of("xb.png.mcmeta","xb_0.png.mcmeta","xb_charged.png.mcmeta","xb_arrow.png.mcmeta")) {
+            assertTrue(crossbow.contains(itemTex.resolve(name)), name); assertArrayEquals(meta, Files.readAllBytes(itemTex.resolve(name)));
+        }
+        assertFalse(Files.exists(itemTex.resolve("xb_1.png.mcmeta")));
+        Bow3dWriter.write(temp, new PackSubmission("b3", "B3", PackKind.BOW_3D, files), PackPaths.playerNamespace());
+        assertArrayEquals(meta, Files.readAllBytes(itemTex.resolve("b3.png.mcmeta")));
+        BookWriter.write(temp, new PackSubmission("bk", "BK", PackKind.BOOK, files));
+        assertTrue(Files.exists(itemTex.resolve("bk_unsigned.png.mcmeta"))); assertFalse(Files.exists(itemTex.resolve("bk_signed.png.mcmeta")));
+        ArmorSetWriter.write(temp, new PackSubmission("ar", "AR", PackKind.ARMOR_SET, files));
+        assertTrue(Files.exists(PackPaths.armorIconsDir(temp).resolve("ar_helmet.png.mcmeta")));
+        assertTrue(Files.exists(PackPaths.armorIconsDir(temp).resolve("ar_chestplate.png.mcmeta")));
+        assertFalse(Files.exists(PackPaths.armorLayersDir(temp).resolve("ar_layer_1.png.mcmeta")));
+        // Re-applying without an animation removes the old one.
+        FlatItemWriter.write(temp, new PackSubmission("xb", "XB", PackKind.HANDHELD, files()));
+        assertFalse(Files.exists(itemTex.resolve("xb.png.mcmeta")));
     }
 
     @Test void writersRejectWrongKindNamespaceAndMissingRequiredAssets() throws Exception {

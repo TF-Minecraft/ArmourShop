@@ -3,6 +3,7 @@ package net.tfminecraft.armourshop.pack.writer.flat;
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
+import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.util.YamlUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -50,8 +51,7 @@ public final class FlatItemWriter {
 		List<Path> written = new ArrayList<>();
 
 		Path pngPath = itemTexDir.resolve(slug + ".png");
-		Files.write(pngPath, submission.requireFile(TEXTURE_STEM));
-		written.add(pngPath);
+		TextureFiles.writePng(submission, TEXTURE_STEM, pngPath, written);
 
 		Path yamlPath = configsDir.resolve(slug + ".yml");
 		Files.writeString(yamlPath, buildYaml(submission, ns), StandardCharsets.UTF_8);

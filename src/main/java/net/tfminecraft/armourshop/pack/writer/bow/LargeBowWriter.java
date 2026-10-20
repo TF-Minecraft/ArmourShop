@@ -4,6 +4,7 @@ import net.tfminecraft.armourshop.pack.model.BowFrames;
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
+import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.util.YamlUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -52,10 +53,8 @@ public final class LargeBowWriter {
 
 		List<Path> written = new ArrayList<>();
 		for (String stem : BowFrames.BOW_STEMS) {
-			byte[] png = submission.requireFile(stem);
 			Path pngPath = itemTexDir.resolve(BowFrames.textureFileName(slug, stem));
-			Files.write(pngPath, png);
-			written.add(pngPath);
+			TextureFiles.writePng(submission, stem, pngPath, written);
 
 			String modelStem = modelStemFor(stem);
 			byte[] modelJson = submission.requireFile(modelStem);

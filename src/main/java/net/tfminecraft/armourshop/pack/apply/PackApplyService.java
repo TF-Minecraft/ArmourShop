@@ -8,7 +8,9 @@ import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
 import net.tfminecraft.armourshop.pack.util.Model3dUtil;
+import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.writer.armor.ArmorSetWriter;
+import net.tfminecraft.armourshop.pack.writer.bow.Bow3dWriter;
 import net.tfminecraft.armourshop.pack.writer.bow.BowWriter;
 import net.tfminecraft.armourshop.pack.writer.bow.LargeBowWriter;
 import net.tfminecraft.armourshop.pack.writer.flat.BookWriter;
@@ -205,6 +207,7 @@ public final class PackApplyService {
 				}
 				tierFiles.put(Model3dUtil.HELMET_MODEL_STEM, modelDl.data);
 				tierFiles.put(Model3dUtil.HELMET_TEXTURE_STEM, texDl.data);
+				putOptionalMcmeta(sub, available, texName, Model3dUtil.HELMET_TEXTURE_STEM, tierFiles);
 			} else {
 				String filename = tier + "_helmet.png";
 				if (!available.contains(filename)) {
@@ -217,6 +220,7 @@ public final class PackApplyService {
 					throw new IllegalStateException("download " + filename + ": " + dl.error);
 				}
 				tierFiles.put("helmet", dl.data);
+				putOptionalMcmeta(sub, available, filename, "helmet", tierFiles);
 			}
 			for (String stem : ARMOR_BODY_STEMS) {
 				String filename = tier + "_" + stem + ".png";
@@ -228,10 +232,32 @@ public final class PackApplyService {
 					throw new IllegalStateException("download " + filename + ": " + dl.error);
 				}
 				tierFiles.put(stem, dl.data);
+				if (!stem.startsWith("layer_")) {
+					putOptionalMcmeta(sub, available, filename, stem, tierFiles);
+				}
 			}
 			out.put(tier, tierFiles);
 		}
 		return out;
+	}
+
+	/** Downloads {@code pngFilename.mcmeta} into {@code stem.mcmeta} when the website lists one. */
+	private static void putOptionalMcmeta(
+		ApprovedSubmission sub,
+		Set<String> available,
+		String pngFilename,
+		String stem,
+		Map<String, byte[]> tierFiles
+	) {
+		String metaName = pngFilename + TextureFiles.MCMETA_SUFFIX;
+		if (!available.contains(metaName)) {
+			return;
+		}
+		DownloadResult dl = ProvinceSystemClient.downloadSubmissionFile(sub.id, metaName);
+		if (!dl.ok) {
+			throw new IllegalStateException("download " + metaName + ": " + dl.error);
+		}
+		tierFiles.put(TextureFiles.mcmetaStem(stem), dl.data);
 	}
 
 	/** Writes one tier's armor set as its own pack slug ({@code slug_tier}). */
@@ -313,6 +339,30 @@ public final class PackApplyService {
 			return null;
 		}
 		String name = filename.trim();
+		// {png}.mcmeta animates that PNG: stem is the PNG's stem + ".mcmeta"
+		if (name.endsWith(".png" + TextureFiles.MCMETA_SUFFIX)) {
+			String pngStem = stemFromFilename(
+				kind, slug, name.substring(0, name.length() - TextureFiles.MCMETA_SUFFIX.length())
+			);
+			return pngStem == null ? null : TextureFiles.mcmetaStem(pngStem);
+		}
+		if ("bow_3d".equals(kind) || "crossbow_3d".equals(kind)) {
+			if (name.equals(slug + ".png")) {
+				return Model3dUtil.TEXTURE_STEM;
+			}
+			if (name.equals(slug + ".json")) {
+				return Model3dUtil.MODEL_STEM;
+			}
+			String prefix = slug + "_";
+			if (name.startsWith(prefix) && name.endsWith(".json")) {
+				String suffix = name.substring(prefix.length(), name.length() - 5);
+				if ("0".equals(suffix) || "1".equals(suffix) || "2".equals(suffix)
+					|| ("crossbow_3d".equals(kind) && "charged".equals(suffix))) {
+					return Model3dUtil.MODEL_STEM + "_" + suffix;
+				}
+			}
+			return null;
+		}
 		if ("book".equals(kind)) {
 			String prefix = slug + "_";
 			if (name.startsWith(prefix) && name.endsWith(".png")) {
@@ -459,6 +509,20 @@ public final class PackApplyService {
 					ns
 				);
 				return;
+			case "bow_3d":
+			case "crossbow_3d": {
+				PackKind packKind = "bow_3d".equals(kind) ? PackKind.BOW_3D : PackKind.CROSSBOW_3D;
+				if (!packFiles.containsKey(Model3dUtil.TEXTURE_STEM)) {
+					throw new IllegalStateException("missing texture");
+				}
+				requireStems(packFiles, Bow3dWriter.requiredModelStems(packKind));
+				Bow3dWriter.write(
+					contentsRoot,
+					new PackSubmission(slug, display, packKind, packFiles),
+					ns
+				);
+				return;
+			}
 			case "item_3d":
 				requireModel3d(packFiles);
 				Item3dWriter.write(
@@ -554,6 +618,9 @@ public final class PackApplyService {
 			return false;
 		}
 		String s = stem.trim().toLowerCase(Locale.ROOT);
+		if (TextureFiles.isMcmetaStem(s)) {
+			return false;
+		}
 		return Model3dUtil.MODEL_STEM.equals(s)
 			|| Model3dUtil.HELMET_MODEL_STEM.equals(s)
 			|| ShieldWriter.MODEL_BLOCKING_STEM.equals(s)

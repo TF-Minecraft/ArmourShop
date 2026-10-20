@@ -3,6 +3,7 @@ package net.tfminecraft.armourshop.pack.delete;
 
 import net.tfminecraft.armourshop.pack.model.BowFrames;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
+import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.writer.flat.BookWriter;
 import net.tfminecraft.armourshop.pack.writer.gun.GunWriter;
 import net.tfminecraft.armourshop.pack.writer.mask.MasksYml;
@@ -91,7 +92,7 @@ public final class PackSubmissionRemover {
 		} else if ("gun".equals(k)) {
 			removed.addAll(GunWriter.remove(contentsRoot, ns, s, gunsSkinsYmlOrNull()));
 		} else if ("mask".equals(k)) {
-			removeNonArmorPack(contentsRoot, ns, s, removed);
+			removeNonArmorPack(contentsRoot, ns, s, k, removed);
 			try {
 				MasksYml.remove(masksYmlOrNull(), s);
 			} catch (RuntimeException e) {
@@ -102,7 +103,7 @@ public final class PackSubmissionRemover {
 		} else if ("book".equals(k)) {
 			removed.addAll(BookWriter.remove(contentsRoot, ns, s));
 		} else {
-			removeNonArmorPack(contentsRoot, ns, s, removed);
+			removeNonArmorPack(contentsRoot, ns, s, k, removed);
 		}
 
 		if (log != null) {
@@ -125,13 +126,13 @@ public final class PackSubmissionRemover {
 
 		deleteQuiet(configs.resolve(packSlug + ".yml"), removed);
 		for (String stem : ARMOR_ICON_STEMS) {
-			deleteQuiet(icons.resolve(packSlug + "_" + stem + ".png"), removed);
+			TextureFiles.deleteWithMcmeta(icons.resolve(packSlug + "_" + stem + ".png"), removed);
 		}
 		deleteQuiet(layers.resolve(packSlug + "_layer_1.png"), removed);
 		deleteQuiet(layers.resolve(packSlug + "_layer_2.png"), removed);
 		// 3D helmet assets (when present)
 		String helmetId = packSlug + "_helmet";
-		deleteQuiet(
+		TextureFiles.deleteWithMcmeta(
 			PackPaths.itemTexturesDir(contentsRoot, namespace).resolve(helmetId + ".png"),
 			removed
 		);
@@ -145,6 +146,7 @@ public final class PackSubmissionRemover {
 		Path contentsRoot,
 		String namespace,
 		String s,
+		String kind,
 		List<Path> removed
 	) throws IOException {
 		Path configs = PackPaths.configsDir(contentsRoot, namespace);
@@ -152,21 +154,25 @@ public final class PackSubmissionRemover {
 		Path models = PackPaths.itemModelsDir(contentsRoot, namespace);
 
 		deleteQuiet(configs.resolve(s + ".yml"), removed);
-		deleteQuiet(itemTex.resolve(s + ".png"), removed);
+		TextureFiles.deleteWithMcmeta(itemTex.resolve(s + ".png"), removed);
 		deleteQuiet(models.resolve(s + ".json"), removed);
 		deleteQuiet(models.resolve(s + "_blocking.json"), removed);
 		for (String stem : BowFrames.CROSSBOW_STEMS) {
-			deleteQuiet(
+			TextureFiles.deleteWithMcmeta(
 				itemTex.resolve(BowFrames.textureFileName(s, stem)),
 				removed
 			);
-			// large_bow frame models (and any stray pull models)
+			// large_bow / bow_3d / crossbow_3d frame models (and any stray pull models)
 			deleteQuiet(
 				models.resolve(s + BowFrames.fileSuffix(stem) + ".json"),
 				removed
 			);
 		}
-		deleteQuiet(itemTex.resolve(s + "_arrow.png"), removed);
+		// crossbow_3d firework model is a copy of the charged one
+		if ("crossbow_3d".equals(kind)) {
+			deleteQuiet(models.resolve(s + "_firework.json"), removed);
+		}
+		TextureFiles.deleteWithMcmeta(itemTex.resolve(s + "_arrow.png"), removed);
 	}
 
 	private static void deleteQuiet(Path path, List<Path> removed) throws IOException {

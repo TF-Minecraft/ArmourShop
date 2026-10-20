@@ -3,6 +3,7 @@ package net.tfminecraft.armourshop.pack.writer.flat;
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
+import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.util.YamlUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -51,12 +52,10 @@ public final class BookWriter {
 		List<Path> written = new ArrayList<>();
 
 		Path unsignedPng = itemTexDir.resolve(slug + "_unsigned.png");
-		Files.write(unsignedPng, submission.requireFile(UNSIGNED_STEM));
-		written.add(unsignedPng);
+		TextureFiles.writePng(submission, UNSIGNED_STEM, unsignedPng, written);
 
 		Path signedPng = itemTexDir.resolve(slug + "_signed.png");
-		Files.write(signedPng, submission.requireFile(SIGNED_STEM));
-		written.add(signedPng);
+		TextureFiles.writePng(submission, SIGNED_STEM, signedPng, written);
 
 		Path yamlPath = configsDir.resolve(slug + ".yml");
 		Files.writeString(yamlPath, buildYaml(submission, ns), StandardCharsets.UTF_8);
@@ -80,8 +79,8 @@ public final class BookWriter {
 		List<Path> removed = new ArrayList<>();
 		deleteQuiet(PackPaths.configsDir(contentsRoot, ns).resolve(s + ".yml"), removed);
 		Path itemTex = PackPaths.itemTexturesDir(contentsRoot, ns);
-		deleteQuiet(itemTex.resolve(s + "_unsigned.png"), removed);
-		deleteQuiet(itemTex.resolve(s + "_signed.png"), removed);
+		TextureFiles.deleteWithMcmeta(itemTex.resolve(s + "_unsigned.png"), removed);
+		TextureFiles.deleteWithMcmeta(itemTex.resolve(s + "_signed.png"), removed);
 		return removed;
 	}
 

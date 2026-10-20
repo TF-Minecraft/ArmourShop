@@ -4,6 +4,7 @@ import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
 import net.tfminecraft.armourshop.pack.util.Model3dUtil;
+import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.util.YamlUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -72,8 +73,7 @@ public final class GunWriter {
 		List<Path> written = new ArrayList<>();
 
 		Path pngPath = itemTexDir.resolve(slug + ".png");
-		Files.write(pngPath, submission.requireFile(TEXTURE_STEM));
-		written.add(pngPath);
+		TextureFiles.writePng(submission, TEXTURE_STEM, pngPath, written);
 
 		for (String stem : MODEL_STEMS) {
 			Path modelPath = modelsDir.resolve(slug + "_" + stem + ".json");
@@ -125,7 +125,7 @@ public final class GunWriter {
 			PackPaths.configsDir(contentsRoot, ns).resolve(s + ".yml"),
 			removed
 		);
-		deleteQuiet(
+		TextureFiles.deleteWithMcmeta(
 			PackPaths.itemTexturesDir(contentsRoot, ns).resolve(s + ".png"),
 			removed
 		);

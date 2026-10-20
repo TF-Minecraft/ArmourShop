@@ -4,6 +4,7 @@ import net.tfminecraft.armourshop.pack.model.BowFrames;
 import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
+import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.util.YamlUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -90,15 +91,12 @@ public final class BowWriter {
 
 		List<Path> written = new ArrayList<>();
 		for (String stem : stems) {
-			byte[] png = submission.requireFile(stem);
 			Path pngPath = itemTexDir.resolve(BowFrames.textureFileName(slug, stem));
-			Files.write(pngPath, png);
-			written.add(pngPath);
+			TextureFiles.writePng(submission, stem, pngPath, written);
 			// IA CROSSBOW charged often keyed as *_arrow
 			if (BowFrames.CHARGED.equals(stem)) {
 				Path arrow = itemTexDir.resolve(slug + "_arrow.png");
-				Files.write(arrow, png);
-				written.add(arrow);
+				TextureFiles.writePng(submission, stem, arrow, written);
 			}
 		}
 

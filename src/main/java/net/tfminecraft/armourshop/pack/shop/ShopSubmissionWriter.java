@@ -215,6 +215,8 @@ public final class ShopSubmissionWriter {
 			|| "bow".equals(kind)
 			|| "large_bow".equals(kind)
 			|| "crossbow".equals(kind)
+			|| "bow_3d".equals(kind)
+			|| "crossbow_3d".equals(kind)
 			|| "item_3d".equals(kind)
 			|| "shield".equals(kind)
 			|| "helmet_3d".equals(kind)

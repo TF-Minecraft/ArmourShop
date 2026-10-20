@@ -260,7 +260,10 @@ class PackDeletionTest {
         List<Path> expected = new ArrayList<>();
         for (String slug : List.of("skin_iron", "skin")) {
             expected.add(put(PackPaths.configsDir(temp, "custom").resolve(slug + ".yml")));
-            for (String stem : List.of("helmet", "chestplate", "leggings", "boots")) expected.add(put(PackPaths.armorIconsDir(temp, "custom").resolve(slug + "_" + stem + ".png")));
+            for (String stem : List.of("helmet", "chestplate", "leggings", "boots")) {
+                expected.add(put(PackPaths.armorIconsDir(temp, "custom").resolve(slug + "_" + stem + ".png")));
+                expected.add(put(PackPaths.armorIconsDir(temp, "custom").resolve(slug + "_" + stem + ".png.mcmeta")));
+            }
             for (int layer : List.of(1, 2)) expected.add(put(PackPaths.armorLayersDir(temp, "custom").resolve(slug + "_layer_" + layer + ".png")));
             expected.add(put(PackPaths.itemTexturesDir(temp, "custom").resolve(slug + "_helmet.png"))); expected.add(put(PackPaths.itemModelsDir(temp, "custom").resolve(slug + "_helmet.json")));
         }
@@ -270,15 +273,24 @@ class PackDeletionTest {
     }
 
     @Test void removerDeletesNonArmorVariantsRegistriesAndToleratesMissingFiles() throws Exception {
-        for (String kind : Arrays.asList("bow", "book", "gun", "mask", null)) {
+        for (String kind : Arrays.asList("bow", "crossbow_3d", "book", "gun", "mask", null)) {
             String ns = PackPaths.playerNamespace(); List<Path> expected = new ArrayList<>(); expected.add(put(PackPaths.configsDir(temp).resolve("skin.yml")));
-            if ("book".equals(kind)) for (String suffix : List.of("_unsigned", "_signed")) expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin" + suffix + ".png")));
+            if ("book".equals(kind)) for (String suffix : List.of("_unsigned", "_signed")) {
+                expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin" + suffix + ".png")));
+                expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin" + suffix + ".png.mcmeta")));
+            }
             else {
                 expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin.png")));
+                expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin.png.mcmeta")));
                 if ("gun".equals(kind)) for (String suffix : List.of("_carry", "_reload", "_aim", "_aim_charged")) expected.add(put(PackPaths.itemModelsDir(temp).resolve("skin" + suffix + ".json")));
                 else {
                     for (String suffix : List.of("", "_0", "_1", "_2", "_charged", "_blocking")) expected.add(put(PackPaths.itemModelsDir(temp).resolve("skin" + suffix + ".json")));
-                    for (String suffix : List.of("_0", "_1", "_2", "_charged", "_arrow")) expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin" + suffix + ".png")));
+                    Path firework = put(PackPaths.itemModelsDir(temp).resolve("skin_firework.json"));
+                    if ("crossbow_3d".equals(kind)) expected.add(firework);
+                    for (String suffix : List.of("_0", "_1", "_2", "_charged", "_arrow")) {
+                        expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin" + suffix + ".png")));
+                        expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin" + suffix + ".png.mcmeta")));
+                    }
                 }
             }
             Cache.gunsSkinsYmlPath = temp.resolve("skins.yml").toString(); Files.writeString(Path.of(Cache.gunsSkinsYmlPath), "skin:\n  types:\n  - rifle\n");
