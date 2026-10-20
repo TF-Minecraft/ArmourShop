@@ -284,7 +284,9 @@ class PackDeletionTest {
                 expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin.png.mcmeta")));
                 if ("gun".equals(kind)) for (String suffix : List.of("_carry", "_reload", "_aim", "_aim_charged")) expected.add(put(PackPaths.itemModelsDir(temp).resolve("skin" + suffix + ".json")));
                 else {
-                    for (String suffix : List.of("", "_0", "_1", "_2", "_charged", "_firework", "_blocking")) expected.add(put(PackPaths.itemModelsDir(temp).resolve("skin" + suffix + ".json")));
+                    for (String suffix : List.of("", "_0", "_1", "_2", "_charged", "_blocking")) expected.add(put(PackPaths.itemModelsDir(temp).resolve("skin" + suffix + ".json")));
+                    Path firework = put(PackPaths.itemModelsDir(temp).resolve("skin_firework.json"));
+                    if ("crossbow_3d".equals(kind)) expected.add(firework);
                     for (String suffix : List.of("_0", "_1", "_2", "_charged", "_arrow")) {
                         expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin" + suffix + ".png")));
                         expected.add(put(PackPaths.itemTexturesDir(temp).resolve("skin" + suffix + ".png.mcmeta")));

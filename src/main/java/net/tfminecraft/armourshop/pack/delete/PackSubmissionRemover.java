@@ -92,7 +92,7 @@ public final class PackSubmissionRemover {
 		} else if ("gun".equals(k)) {
 			removed.addAll(GunWriter.remove(contentsRoot, ns, s, gunsSkinsYmlOrNull()));
 		} else if ("mask".equals(k)) {
-			removeNonArmorPack(contentsRoot, ns, s, removed);
+			removeNonArmorPack(contentsRoot, ns, s, k, removed);
 			try {
 				MasksYml.remove(masksYmlOrNull(), s);
 			} catch (RuntimeException e) {
@@ -103,7 +103,7 @@ public final class PackSubmissionRemover {
 		} else if ("book".equals(k)) {
 			removed.addAll(BookWriter.remove(contentsRoot, ns, s));
 		} else {
-			removeNonArmorPack(contentsRoot, ns, s, removed);
+			removeNonArmorPack(contentsRoot, ns, s, k, removed);
 		}
 
 		if (log != null) {
@@ -146,6 +146,7 @@ public final class PackSubmissionRemover {
 		Path contentsRoot,
 		String namespace,
 		String s,
+		String kind,
 		List<Path> removed
 	) throws IOException {
 		Path configs = PackPaths.configsDir(contentsRoot, namespace);
@@ -168,7 +169,9 @@ public final class PackSubmissionRemover {
 			);
 		}
 		// crossbow_3d firework model is a copy of the charged one
-		deleteQuiet(models.resolve(s + "_firework.json"), removed);
+		if ("crossbow_3d".equals(kind)) {
+			deleteQuiet(models.resolve(s + "_firework.json"), removed);
+		}
 		TextureFiles.deleteWithMcmeta(itemTex.resolve(s + "_arrow.png"), removed);
 	}
 
