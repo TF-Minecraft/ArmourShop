@@ -4,6 +4,7 @@ import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
 import net.tfminecraft.armourshop.pack.util.Model3dUtil;
+import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.util.YamlUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -74,24 +75,22 @@ public final class ArmorSetWriter {
 			Files.createDirectories(itemTexDir);
 			String helmetId = slug + "_helmet";
 			Path tex = itemTexDir.resolve(helmetId + ".png");
-			Files.write(tex, submission.requireFile(Model3dUtil.HELMET_TEXTURE_STEM));
-			written.add(tex);
+			TextureFiles.writePng(submission, Model3dUtil.HELMET_TEXTURE_STEM, tex, written);
 			Path modelPath = modelsDir.resolve(helmetId + ".json");
 			Files.write(modelPath, submission.requireFile(Model3dUtil.HELMET_MODEL_STEM));
 			written.add(modelPath);
 		} else {
 			Path out = iconsDir.resolve(slug + "_helmet.png");
-			Files.write(out, submission.requireFile("helmet"));
-			written.add(out);
+			TextureFiles.writePng(submission, "helmet", out, written);
 		}
 
 		for (String stem : BODY_ICON_STEMS) {
 			Path out = iconsDir.resolve(slug + "_" + stem + ".png");
-			Files.write(out, submission.requireFile(stem));
-			written.add(out);
+			TextureFiles.writePng(submission, stem, out, written);
 		}
 		for (String stem : LAYER_STEMS) {
 			Path out = layersDir.resolve(slug + "_" + stem + ".png");
+			// Armour layers are not animated.
 			Files.write(out, submission.requireFile(stem));
 			written.add(out);
 		}

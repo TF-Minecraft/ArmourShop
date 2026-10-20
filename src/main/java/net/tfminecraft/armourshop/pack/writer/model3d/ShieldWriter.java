@@ -4,6 +4,7 @@ import net.tfminecraft.armourshop.pack.model.PackKind;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
 import net.tfminecraft.armourshop.pack.model.PackSubmission;
 import net.tfminecraft.armourshop.pack.util.Model3dUtil;
+import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.util.YamlUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -52,8 +53,7 @@ public final class ShieldWriter {
 		List<Path> written = new ArrayList<>();
 
 		Path pngPath = itemTexDir.resolve(slug + ".png");
-		Files.write(pngPath, submission.requireFile(Model3dUtil.TEXTURE_STEM));
-		written.add(pngPath);
+		TextureFiles.writePng(submission, Model3dUtil.TEXTURE_STEM, pngPath, written);
 
 		Path idlePath = modelsDir.resolve(slug + ".json");
 		Files.write(idlePath, submission.requireFile(Model3dUtil.MODEL_STEM));

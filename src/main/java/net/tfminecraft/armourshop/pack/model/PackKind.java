@@ -11,6 +11,8 @@ public enum PackKind {
 	BOW,
 	LARGE_BOW,
 	CROSSBOW,
+	BOW_3D,
+	CROSSBOW_3D,
 	ITEM_3D,
 	SHIELD,
 	HELMET_3D,

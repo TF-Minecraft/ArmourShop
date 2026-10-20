@@ -67,6 +67,8 @@ class PackApplyServiceTest {
             case "bow" -> List.of("skin.png", "skin_0.png", "skin_1.png", "skin_2.png");
             case "large_bow" -> List.of("skin.png", "skin_0.png", "skin_1.png", "skin_2.png", "skin.json", "skin_0.json", "skin_1.json", "skin_2.json");
             case "crossbow" -> List.of("skin.png", "skin_0.png", "skin_1.png", "skin_2.png", "skin_charged.png");
+            case "bow_3d" -> List.of("skin.png", "skin.png.mcmeta", "skin.json", "skin_0.json", "skin_1.json", "skin_2.json");
+            case "crossbow_3d" -> List.of("skin.png", "skin.json", "skin_0.json", "skin_1.json", "skin_2.json", "skin_charged.json");
             case "gun" -> List.of("skin.png", "skin_carry.json", "skin_reload.json", "skin_aim.json", "skin_aim_charged.json");
             case "book" -> List.of("skin_unsigned.png", "skin_signed.png");
             default -> List.of("skin.png");
@@ -99,7 +101,7 @@ class PackApplyServiceTest {
     }
 
     @Test void everyNonArmorKindWritesRealPackFilesAndRegistries() throws Exception {
-        for (String kind : List.of("handheld", "large_handheld", "bow", "large_bow", "crossbow", "item_3d", "shield", "helmet_3d", "mask", "gun", "book")) {
+        for (String kind : List.of("handheld", "large_handheld", "bow", "large_bow", "crossbow", "bow_3d", "crossbow_3d", "item_3d", "shield", "helmet_3d", "mask", "gun", "book")) {
             var sub = new Submission(); sub.kind = kind; sub.files = filesFor(kind); sub.namespace = "curated";
             if (kind.equals("gun")) sub.base = "rifles";
             if (kind.equals("handheld")) sub.display = null;
@@ -108,6 +110,14 @@ class PackApplyServiceTest {
             assertEquals(1, result.writtenSubmissions.size()); assertEquals(sub.kind, result.writtenSubmissions.getFirst().kind);
             Path config = Path.of(Cache.iaContentsPath).resolve("curated/configs/skin.yml");
             assertTrue(Files.isRegularFile(config), kind); assertTrue(Files.readString(config).contains("namespace: curated"));
+            if (kind.equals("crossbow_3d")) {
+                String firework = Files.readString(Path.of(Cache.iaContentsPath).resolve("curated/resourcepack/assets/curated/models/item/skin_firework.json"));
+                assertTrue(firework.contains("curated:item/skin")); assertTrue(Files.readString(config).contains("material: CROSSBOW"));
+            }
+            if (kind.equals("bow_3d")) {
+                // the animation is copied untouched, not namespace-rewritten like a model
+                assertArrayEquals(PNG, Files.readAllBytes(Path.of(Cache.iaContentsPath).resolve("curated/resourcepack/assets/curated/textures/item/skin.png.mcmeta")));
+            }
             if (kind.equals("large_handheld")) {
                 String model = Files.readString(Path.of(Cache.iaContentsPath).resolve("curated/resourcepack/assets/curated/models/item/skin.json"));
                 assertTrue(model.contains("curated:item/skin")); assertFalse(model.contains("tfmc_submissions:"));
@@ -129,9 +139,15 @@ class PackApplyServiceTest {
 
     @Test void flatAndThreeDimensionalArmorWriteEveryTier() throws Exception {
         var sub = new Submission(); sub.kind = "armor_set"; sub.tiers = List.of("iron", "steel"); sub.helmet3d = List.of("steel"); sub.namespace = "curated";
-        var files = armorFiles("iron", false); files.addAll(armorFiles("steel", true)); sub.files = files;
+        var files = armorFiles("iron", false); files.addAll(armorFiles("steel", true));
+        files.addAll(List.of("iron_helmet.png.mcmeta", "iron_boots.png.mcmeta", "iron_layer_1.png.mcmeta", "steel_helmet_texture.png.mcmeta")); sub.files = files;
         var summary = apply(sub); assertEquals(1, summary.written, summary.messages.toString());
         Path root = Path.of(Cache.iaContentsPath).resolve("curated");
+        assertTrue(Files.exists(root.resolve("resourcepack/assets/curated/textures/armor_icons/skin_iron_helmet.png.mcmeta")));
+        assertTrue(Files.exists(root.resolve("resourcepack/assets/curated/textures/armor_icons/skin_iron_boots.png.mcmeta")));
+        assertFalse(Files.exists(root.resolve("resourcepack/assets/curated/textures/armor_icons/skin_iron_chestplate.png.mcmeta")));
+        assertTrue(Files.exists(root.resolve("resourcepack/assets/curated/textures/item/skin_steel_helmet.png.mcmeta")));
+        client.verify(() -> ProvinceSystemClient.downloadSubmissionFile("skin", "iron_layer_1.png.mcmeta"), never());
         assertTrue(Files.exists(root.resolve("configs/skin_iron.yml"))); assertTrue(Files.exists(root.resolve("configs/skin_steel.yml")));
         assertArrayEquals(PNG, Files.readAllBytes(root.resolve("resourcepack/assets/curated/textures/armor_icons/skin_iron_helmet.png")));
         assertTrue(Files.readString(root.resolve("resourcepack/assets/curated/models/item/skin_steel_helmet.json")).contains("curated:item/skin"));
@@ -248,6 +264,10 @@ class PackApplyServiceTest {
         client.when(() -> ProvinceSystemClient.downloadSubmissionFile("skin", "iron_helmet_model.json")).thenReturn(DownloadResult.success(MODEL));
         client.when(() -> ProvinceSystemClient.downloadSubmissionFile("skin", "iron_helmet_texture.png")).thenReturn(DownloadResult.fail("offline"));
         assertFailure(sub, "download iron_helmet_texture.png: offline");
+        sub.helmet3d = List.of(); sub.files = new ArrayList<>(armorFiles("iron", false)); sub.files.add("iron_chestplate.png.mcmeta");
+        client.when(() -> ProvinceSystemClient.downloadSubmissionFile("skin", "iron_boots.png")).thenReturn(DownloadResult.success(PNG));
+        client.when(() -> ProvinceSystemClient.downloadSubmissionFile("skin", "iron_chestplate.png.mcmeta")).thenReturn(DownloadResult.fail("offline"));
+        assertFailure(sub, "download iron_chestplate.png.mcmeta: offline");
     }
 
     @Test void nonArmorFilesAndRequiredStemsAreValidated() {
@@ -262,6 +282,9 @@ class PackApplyServiceTest {
         sub.files = List.of("skin.png"); assertFailure(sub, "missing model");
         sub.kind = "bow"; assertFailure(sub, "missing stem: pull_0");
         sub.kind = "large_bow"; sub.files = filesFor("bow"); assertFailure(sub, "missing stem: model");
+        sub.kind = "bow_3d"; sub.files = List.of("skin.json"); assertFailure(sub, "missing texture");
+        sub.files = List.of("skin.png", "skin.json", "skin_0.json", "skin_1.json"); assertFailure(sub, "missing stem: model_2");
+        sub.kind = "crossbow_3d"; sub.files = filesFor("bow_3d"); assertFailure(sub, "missing stem: model_charged");
         sub.kind = "item_3d"; sub.files = List.of("skin.json"); assertFailure(sub, "missing texture");
         sub.files = List.of("skin.png"); assertFailure(sub, "missing model");
         sub.kind = "shield"; sub.files = filesFor("item_3d"); assertFailure(sub, "missing model_blocking");
@@ -310,6 +333,22 @@ class PackApplyServiceTest {
         for (String frame : List.of("carry", "reload", "aim", "aim_charged")) assertEquals(frame, PackApplyService.stemFromFilename("gun", "skin", "skin_" + frame + ".json"));
         assertNull(PackApplyService.stemFromFilename("gun", "skin", "skin_other.json"));
         assertNull(PackApplyService.stemFromFilename("gun", "skin", "other.txt"));
+        for (String kind : List.of("bow_3d", "crossbow_3d")) {
+            assertEquals("texture", PackApplyService.stemFromFilename(kind, "skin", "skin.png"));
+            assertEquals("model", PackApplyService.stemFromFilename(kind, "skin", "skin.json"));
+            for (String frame : List.of("0", "1", "2")) assertEquals("model_" + frame, PackApplyService.stemFromFilename(kind, "skin", "skin_" + frame + ".json"));
+            assertNull(PackApplyService.stemFromFilename(kind, "skin", "skin_0.png"));
+            assertNull(PackApplyService.stemFromFilename(kind, "skin", "skin_firework.json"));
+        }
+        assertEquals("model_charged", PackApplyService.stemFromFilename("crossbow_3d", "skin", "skin_charged.json"));
+        assertNull(PackApplyService.stemFromFilename("bow_3d", "skin", "skin_charged.json"));
+        assertEquals("texture.mcmeta", PackApplyService.stemFromFilename("handheld", "skin", "skin.png.mcmeta"));
+        assertEquals("pull_1.mcmeta", PackApplyService.stemFromFilename("bow", "skin", "skin_1.png.mcmeta"));
+        assertEquals("charged.mcmeta", PackApplyService.stemFromFilename("crossbow", "skin", "skin_arrow.png.mcmeta"));
+        assertEquals("unsigned.mcmeta", PackApplyService.stemFromFilename("book", "skin", "skin_unsigned.png.mcmeta"));
+        assertEquals("texture.mcmeta", PackApplyService.stemFromFilename("crossbow_3d", "skin", "skin.png.mcmeta"));
+        assertNull(PackApplyService.stemFromFilename("handheld", "skin", "skin.json.mcmeta"));
+        assertNull(PackApplyService.stemFromFilename("handheld", "skin", "other.png.mcmeta"));
         assertEquals("model_blocking", PackApplyService.stemFromFilename("shield", "skin", "skin_blocking.json"));
         assertEquals("model", PackApplyService.stemFromFilename("item_3d", "skin", "skin.json"));
         assertEquals("texture", PackApplyService.stemFromFilename("item_3d", "skin", "skin.png"));
