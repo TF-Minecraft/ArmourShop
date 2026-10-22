@@ -997,3 +997,7 @@ minor mana:
 major mana:
   item:
   - consumables.major_mana_potion
+crutches:
+  item:
+  - props.forearm_crutch
+  - props.forearm_crutch_slim
