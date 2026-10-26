@@ -15,6 +15,7 @@ public class SkinCategory {
 	private boolean isItem;
 	private List<SkinSet> sets = new ArrayList<>();
 	private Optional<String> permission = Optional.empty();
+	private boolean hiddenFromCatalog;
 	
 	public SkinCategory(String key, ConfigurationSection config) {
 		this.id = key;
@@ -24,6 +25,7 @@ public class SkinCategory {
 			this.permission = Optional.of(config.getString("permission"));
 		}
 		isItem = config.getBoolean("is-item", false);
+		hiddenFromCatalog = !config.getBoolean("catalog", true);
 	}
 
 	public String getId() {
@@ -49,6 +51,11 @@ public class SkinCategory {
 		return permission.isPresent();
 	}
 	
+	/** catalog: false keeps the category off the website catalog sync, e.g. a hidden class's skins. */
+	public boolean isHiddenFromCatalog() {
+		return hiddenFromCatalog;
+	}
+
 	public List<SkinSet> getSets(){
 		return sets;
 	}
@@ -63,5 +70,6 @@ public class SkinCategory {
 		this.item = another.getItem();
 		this.permission = another.permission;
 		this.isItem = another.isItem();
+		this.hiddenFromCatalog = another.hiddenFromCatalog;
 	}
 }
