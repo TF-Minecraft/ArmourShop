@@ -284,7 +284,14 @@ class ConfigurationModelsTest {
     @Test void copyingPublicCategoriesPreservesTheirLackOfPermission() {
         var config = new YamlConfiguration(); config.set("name", "Public"); config.set("item", "v.STONE");
         SkinCategory copy = assertDoesNotThrow(() -> new SkinCategory(new SkinCategory("public", config)));
-        assertFalse(copy.hasPermission()); assertEquals("Public", copy.getName());
+        assertFalse(copy.hasPermission()); assertEquals("Public", copy.getName()); assertFalse(copy.isHiddenFromCatalog());
+        assertFalse(new SkinSet("public", config).isHiddenFromCatalog());
+    }
+
+    @Test void catalogFalseHidesCategoriesAndSkinsFromTheCatalog() {
+        var config = new YamlConfiguration(); config.set("name", "Hidden"); config.set("catalog", false);
+        assertTrue(new SkinCategory(new SkinCategory("hidden", config)).isHiddenFromCatalog());
+        assertTrue(new SkinSet("hidden", config).isHiddenFromCatalog());
     }
 
     @Test void pieceSuffixesAreIndependentOfServerLocale() {

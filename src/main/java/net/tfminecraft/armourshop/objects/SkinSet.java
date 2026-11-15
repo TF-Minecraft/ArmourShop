@@ -26,6 +26,7 @@ public class SkinSet {
 	private Optional<String> item = Optional.empty();
 	private boolean addName;
 	private String permission;
+	private boolean hiddenFromCatalog;
 	
 	public SkinSet(String key, ConfigurationSection config) {
 		this.id = key;
@@ -59,6 +60,12 @@ public class SkinSet {
 			addName = false;
 		}
 		permission = config.getString("permission", "none");
+		hiddenFromCatalog = !config.getBoolean("catalog", true);
+	}
+
+	/** catalog: false keeps the skin off the website catalog sync. */
+	public boolean isHiddenFromCatalog() {
+		return hiddenFromCatalog;
 	}
 
 	public boolean hasPermission() {

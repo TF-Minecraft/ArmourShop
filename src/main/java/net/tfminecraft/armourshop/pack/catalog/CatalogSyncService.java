@@ -33,7 +33,7 @@ public final class CatalogSyncService {
 		sb.append("{\"categories\":[");
 		boolean firstCat = true;
 		for (SkinCategory cat : CategoryLoader.get()) {
-			if (cat == null || cat.getId() == null || cat.getId().isBlank()) {
+			if (cat == null || cat.getId() == null || cat.getId().isBlank() || cat.isHiddenFromCatalog()) {
 				continue;
 			}
 			if (!firstCat) {
@@ -50,7 +50,7 @@ public final class CatalogSyncService {
 			List<SkinSet> sets = cat.getSets();
 			if (sets != null) {
 				for (SkinSet set : sets) {
-					if (set == null || set.getId() == null || set.getId().isBlank()) {
+					if (set == null || set.getId() == null || set.getId().isBlank() || set.isHiddenFromCatalog()) {
 						continue;
 					}
 					if (!firstSet) {

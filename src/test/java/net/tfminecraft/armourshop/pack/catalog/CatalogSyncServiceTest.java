@@ -49,6 +49,20 @@ class CatalogSyncServiceTest {
     }
     private static JsonObject payload() { return JsonParser.parseString(CatalogSyncService.buildPayloadJson()).getAsJsonObject(); }
 
+    @Test void categoriesAndSkinsHiddenFromTheCatalogAreLeftOut() {
+        var hiddenSkin = skin("secret"); when(hiddenSkin.isHiddenFromCatalog()).thenReturn(true);
+        var inside = skin("inside");
+        var shown = skin("shown");
+        var hiddenCategory = category("hidden", "Hidden", false, List.of(inside));
+        when(hiddenCategory.isHiddenFromCatalog()).thenReturn(true);
+        var armor = category("armor", "Armor", false, List.of(shown, hiddenSkin));
+        categories.when(CategoryLoader::get).thenReturn(List.of(hiddenCategory, armor));
+        var listed = payload().getAsJsonArray("categories");
+        assertEquals(1, listed.size());
+        assertEquals("armor", listed.get(0).getAsJsonObject().get("id").getAsString());
+        assertEquals(JsonParser.parseString("[\"shown\"]"), listed.get(0).getAsJsonObject().get("skin_sets"));
+    }
+
     @Test void serializesCategoriesScrollsAndEntitlementsWhileSkippingInvalidRows() {
         var rows = Arrays.asList(null, category(null, "invalid", false, null),
             category(" ", "invalid", false, null), category("armor", "§aArmor", false, Arrays.asList(null, skin(null), skin(" "), skin("first"), skin("second"))),
