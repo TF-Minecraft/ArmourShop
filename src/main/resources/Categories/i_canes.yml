@@ -1,0 +1,21 @@
+# Free cane looks. They use the crutches base set (props.walking_cane and the two
+# forearm crutches), so player crutch skins apply to canes as well. A skinned cane
+# keeps its MMOItems id, so it still works as a cane for blind characters.
+walking_cane:
+  name: "Walking Cane"
+  colour: "#ffffff"
+  add-name: true
+  set: crutches
+  item: localmodel(STICK.55)
+forearm_crutch:
+  name: "Forearm Crutch"
+  colour: "#ffffff"
+  add-name: true
+  set: crutches
+  item: localmodel(STICK.77)
+forearm_crutch_slim:
+  name: "Slim Forearm Crutch"
+  colour: "#ffffff"
+  add-name: true
+  set: crutches
+  item: localmodel(STICK.78)

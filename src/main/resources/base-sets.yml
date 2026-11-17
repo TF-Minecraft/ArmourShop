@@ -999,5 +999,6 @@ major mana:
   - consumables.major_mana_potion
 crutches:
   item:
+  - props.walking_cane
   - props.forearm_crutch
   - props.forearm_crutch_slim
