@@ -298,6 +298,12 @@ i_tools:
   item: m.miscellanea.steel_tools
   is-item: true
 
+i_canes:
+  name: "Canes"
+  colour: "#7f7d80"
+  item: m.props.walking_cane
+  is-item: true
+
 i_consumables:
   name: "Consumables"
   colour: "#7f7d80"
