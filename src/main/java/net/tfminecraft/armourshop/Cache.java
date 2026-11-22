@@ -26,6 +26,15 @@ public class Cache {
 	 */
 	public static String masksYmlPath = "plugins/RPCharacters/custom-masks.yml";
 
+	/** ModelEngine blueprints/ folder; website vehicle skins go in its tfmc_submissions/ subfolder. */
+	public static String modelEngineBlueprintsPath = "plugins/ModelEngine/blueprints";
+	/** VehicleFramework vehicles/ folder, read to find each vehicle's default model. */
+	public static String vfVehiclesPath = "plugins/VehicleFramework/vehicles";
+	/** VehicleFramework player-skins.yml (website vehicle skins). */
+	public static String vfPlayerSkinsYmlPath = "plugins/VehicleFramework/player-skins.yml";
+	/** Seconds between meg reload and the vf/IA steps when vehicle skins changed. */
+	public static int modelEngineReloadDelaySeconds = 15;
+
 	/** Daily force pull+reload at HH:mm server local; blank disables. */
 	public static String forceReloadTime = "06:00";
 	/** Seconds between iareload and iazip. */

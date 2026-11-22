@@ -9,7 +9,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import net.tfminecraft.armourshop.api.ProvinceSystemClient.ApprovedSubmission;
+import net.tfminecraft.armourshop.Cache;
 import net.tfminecraft.armourshop.pack.model.PackPaths;
+import net.tfminecraft.armourshop.pack.writer.vehicle.VehicleSkinWriter;
 
 /**
  * Decides which queued submission ids may be marked applied after a pack zip.
@@ -102,9 +104,15 @@ public final class ApplyAckPlanner {
 		if (contentsRoot == null || sub == null) {
 			return false;
 		}
+		String kind = sub.kind == null ? "" : sub.kind.trim().toLowerCase(Locale.ROOT);
+		if ("vehicle".equals(kind)) {
+			// Vehicle skins live in ModelEngine, not in ItemsAdder contents.
+			String slug = sub.slug == null ? "" : sub.slug.trim();
+			return !slug.isEmpty() && Files.isRegularFile(
+				VehicleSkinWriter.blueprintPath(Path.of(Cache.modelEngineBlueprintsPath), slug));
+		}
 		String namespace = sub.resolveNamespace();
 		Path configs = PackPaths.configsDir(contentsRoot, namespace);
-		String kind = sub.kind == null ? "" : sub.kind.trim().toLowerCase(Locale.ROOT);
 		if ("armor_set".equals(kind)) {
 			if (sub.tiers == null || sub.tiers.isEmpty() || sub.slug == null || sub.slug.isBlank()) {
 				return false;

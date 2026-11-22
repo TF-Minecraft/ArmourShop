@@ -28,11 +28,24 @@ public final class ShopSubmissionWriter {
 		if (sub == null) {
 			throw new IllegalArgumentException("submission is null");
 		}
+		if (isVehicle(sub)) {
+			// Vehicle skins are picked with Vehicle Paint, not in the shop: no SkinSet to write.
+			return;
+		}
 		if (sub.staff) {
 			writeStaff(sub, log);
 		} else {
 			writePlayer(sub, log);
 		}
+	}
+
+	/** The node that owns a player submission, granted to its uploader by {@link LuckPermsGrant}. */
+	public static String permissionFor(String slug) {
+		return "armourshop.submission." + slug;
+	}
+
+	public static boolean isVehicle(ApprovedSubmission sub) {
+		return sub != null && sub.kind != null && "vehicle".equals(sub.kind.trim().toLowerCase(Locale.ROOT));
 	}
 
 	private static void writePlayer(ApprovedSubmission sub, Logger log) throws IOException {
@@ -57,7 +70,7 @@ public final class ShopSubmissionWriter {
 		String display = sub.displayName == null || sub.displayName.isBlank()
 			? slug
 			: sub.displayName.trim();
-		String permission = "armourshop.submission." + slug;
+		String permission = permissionFor(slug);
 		List<String> colours = sub.nameColours == null ? List.of() : sub.nameColours;
 		List<String> styles = sub.nameStyles == null ? List.of() : sub.nameStyles;
 		boolean addName = sub.addName;

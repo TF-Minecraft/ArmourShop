@@ -20,6 +20,7 @@ import net.tfminecraft.armourshop.pack.writer.large.LargeHandheldWriter;
 import net.tfminecraft.armourshop.pack.writer.mask.MasksYml;
 import net.tfminecraft.armourshop.pack.writer.model3d.Item3dWriter;
 import net.tfminecraft.armourshop.pack.writer.model3d.ShieldWriter;
+import net.tfminecraft.armourshop.pack.writer.vehicle.VehicleSkinWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ import net.tfminecraft.armourshop.api.ProvinceSystemClient.ListResult;
  * Shop YAML + LuckPerms run on the main thread after this returns.
  */
 public final class PackApplyService {
+
+	static final String VEHICLE_TEXTURE_STEM = "vehicle_texture_";
 
 	private static final String[] ARMOR_BODY_STEMS = {
 		"chestplate", "leggings", "boots", "layer_1", "layer_2"
@@ -339,6 +342,10 @@ public final class PackApplyService {
 			return null;
 		}
 		String name = filename.trim();
+		if ("vehicle".equals(kind)) {
+			// Vehicle textures are still images; animation files are not used.
+			return vehicleTextureStem(slug, name);
+		}
 		// {png}.mcmeta animates that PNG: stem is the PNG's stem + ".mcmeta"
 		if (name.endsWith(".png" + TextureFiles.MCMETA_SUFFIX)) {
 			String pngStem = stemFromFilename(
@@ -569,6 +576,22 @@ public final class PackApplyService {
 					ns
 				);
 				return;
+			case "vehicle":
+				if (sub.staff) {
+					// Staff skins are scroll items with no owner; a vehicle skin is one player's.
+					throw new IllegalStateException("vehicle skins have no staff lane");
+				}
+				VehicleSkinWriter.write(
+					Path.of(Cache.modelEngineBlueprintsPath),
+					Path.of(Cache.vfVehiclesPath),
+					Path.of(Cache.vfPlayerSkinsYmlPath),
+					sub.baseSet,
+					slug,
+					display,
+					ownerUuid(sub.playerUuid),
+					vehicleTextures(files)
+				);
+				return;
 			case "book":
 				if (!packFiles.containsKey(BookWriter.UNSIGNED_STEM)) {
 					throw new IllegalStateException("missing unsigned");
@@ -585,6 +608,40 @@ public final class PackApplyService {
 			default:
 				throw new IllegalStateException("unsupported kind: " + kind);
 		}
+	}
+
+	/** Vehicle skins upload one PNG per texture of the vehicle: {@code {slug}_{index}.png}. */
+	static String vehicleTextureStem(String slug, String name) {
+		String prefix = slug + "_";
+		if (!name.startsWith(prefix) || !name.endsWith(".png")) {
+			return null;
+		}
+		String index = name.substring(prefix.length(), name.length() - 4);
+		if (index.isEmpty() || index.length() > 3 || !index.chars().allMatch(Character::isDigit)) {
+			return null;
+		}
+		return VEHICLE_TEXTURE_STEM + Integer.parseInt(index);
+	}
+
+	static java.util.UUID ownerUuid(String raw) {
+		try {
+			return java.util.UUID.fromString(raw == null ? "" : raw.trim());
+		} catch (IllegalArgumentException e) {
+			throw new IllegalStateException("vehicle skin needs the uploader's uuid, got: " + raw);
+		}
+	}
+
+	/** The uploaded textures in model order; every index from 0 up must be present. */
+	static List<byte[]> vehicleTextures(Map<String, byte[]> files) {
+		List<byte[]> out = new ArrayList<>();
+		for (int i = 0; files.containsKey(VEHICLE_TEXTURE_STEM + i); i++) {
+			out.add(files.get(VEHICLE_TEXTURE_STEM + i));
+		}
+		long listed = files.keySet().stream().filter(k -> k.startsWith(VEHICLE_TEXTURE_STEM)).count();
+		if (out.isEmpty() || listed != out.size()) {
+			throw new IllegalStateException("vehicle textures must be numbered 0.." + (listed - 1) + " without gaps");
+		}
+		return out;
 	}
 
 	/** Rewrite the shared web-model namespace for staff and realm-specific packs. */

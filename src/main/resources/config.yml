@@ -13,6 +13,14 @@ pack-apply:
   force-reload-time: "06:00"
   # Seconds to wait after /iareload before /iazip
   ia-reload-delay-seconds: 5
+  # Website vehicle skins: a copy of the vehicle's ModelEngine model with the player's
+  # textures goes in <blueprints>/tfmc_submissions/, and its entry in VehicleFramework's
+  # player-skins.yml (owner-only, armourshop.submission.<slug>).
+  modelengine-blueprints-path: "plugins/ModelEngine/blueprints"
+  vf-vehicles-path: "plugins/VehicleFramework/vehicles"
+  vf-player-skins-yml: "plugins/VehicleFramework/player-skins.yml"
+  # Seconds to wait after /meg reload before /vf skins reload and /iareload
+  modelengine-reload-delay-seconds: 15
 
 # Scrolls offered to staff skins UI (synced to ProvinceSystem catalog)
 scrolls:

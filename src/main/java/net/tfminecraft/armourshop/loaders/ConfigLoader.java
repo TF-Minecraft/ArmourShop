@@ -45,6 +45,16 @@ public class ConfigLoader implements LoaderInterface{
 
         Cache.iaReloadDelaySeconds = Math.max(0, config.getInt("pack-apply.ia-reload-delay-seconds", 5));
 
+        // Website vehicle skins. Live configs predate these keys, so blanks use the defaults.
+        Cache.modelEngineBlueprintsPath = pathOr(config.getString("pack-apply.modelengine-blueprints-path"),
+            "plugins/ModelEngine/blueprints");
+        Cache.vfVehiclesPath = pathOr(config.getString("pack-apply.vf-vehicles-path"),
+            "plugins/VehicleFramework/vehicles");
+        Cache.vfPlayerSkinsYmlPath = pathOr(config.getString("pack-apply.vf-player-skins-yml"),
+            "plugins/VehicleFramework/player-skins.yml");
+        Cache.modelEngineReloadDelaySeconds = Math.max(0,
+            config.getInt("pack-apply.modelengine-reload-delay-seconds", 15));
+
         List<ScrollOption> scrolls = new ArrayList<>();
         List<Map<?, ?>> rawScrolls = config.getMapList("scrolls");
         if (rawScrolls != null) {
@@ -67,4 +77,8 @@ public class ConfigLoader implements LoaderInterface{
         }
         Cache.scrolls = scrolls;
 	}
+
+    private static String pathOr(String value, String fallback) {
+        return value == null || value.isBlank() ? fallback : value.trim();
+    }
 }
