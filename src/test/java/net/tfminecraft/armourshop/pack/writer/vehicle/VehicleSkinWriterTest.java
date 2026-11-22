@@ -59,7 +59,7 @@ class VehicleSkinWriterTest {
     @Test void writesAReskinnedCopyAndAnOwnerOnlyEntry() throws Exception {
         long before = VehicleSkinWriter.generation();
         write(List.of(other4, other2));
-        assertEquals(before + 1, VehicleSkinWriter.generation());
+        assertTrue(VehicleSkinWriter.generation() > before);
         Path out = VehicleSkinWriter.blueprintPath(blueprints, "drumleaf_sunrise");
         assertEquals(blueprints.resolve("tfmc_submissions/vskin_drumleaf_sunrise.bbmodel"), out);
         JsonObject model = JsonParser.parseString(Files.readString(out)).getAsJsonObject();
@@ -93,11 +93,12 @@ class VehicleSkinWriterTest {
         write(List.of(other4, other2));
         long before = VehicleSkinWriter.generation();
         assertTrue(VehicleSkinWriter.remove(blueprints, skinsYml, "drumleaf_sunrise"));
-        assertEquals(before + 1, VehicleSkinWriter.generation());
+        long afterRemove = VehicleSkinWriter.generation();
+        assertTrue(afterRemove > before);
         assertFalse(Files.exists(VehicleSkinWriter.blueprintPath(blueprints, "drumleaf_sunrise")));
         assertFalse(YamlConfiguration.loadConfiguration(skinsYml.toFile()).contains("vskin_drumleaf_sunrise"));
         assertFalse(VehicleSkinWriter.remove(blueprints, skinsYml, "drumleaf_sunrise"));
-        assertEquals(before + 1, VehicleSkinWriter.generation(), "nothing removed, nothing to reload");
+        assertEquals(afterRemove, VehicleSkinWriter.generation(), "nothing removed, nothing to reload");
         assertFalse(VehicleSkinWriter.remove(blueprints, null, "drumleaf_sunrise"));
         // Only the entry left (copy deleted by hand): still a change.
         write(List.of(other4, other2));
@@ -105,6 +106,14 @@ class VehicleSkinWriterTest {
         assertTrue(VehicleSkinWriter.remove(blueprints, skinsYml, "drumleaf_sunrise"));
         Files.writeString(skinsYml, "broken: [unterminated\n");
         assertThrows(java.io.IOException.class, () -> VehicleSkinWriter.remove(blueprints, skinsYml, "drumleaf_sunrise"));
+        // A model changed before a broken registry stopped the edit still counts as a change.
+        long beforeBroken = VehicleSkinWriter.generation();
+        assertThrows(java.io.IOException.class, () -> write(List.of(other4, other2)));
+        assertTrue(Files.exists(VehicleSkinWriter.blueprintPath(blueprints, "drumleaf_sunrise")));
+        assertEquals(beforeBroken + 1, VehicleSkinWriter.generation());
+        assertThrows(java.io.IOException.class, () -> VehicleSkinWriter.remove(blueprints, skinsYml, "drumleaf_sunrise"));
+        assertFalse(Files.exists(VehicleSkinWriter.blueprintPath(blueprints, "drumleaf_sunrise")));
+        assertEquals(beforeBroken + 2, VehicleSkinWriter.generation());
         assertThrows(IllegalArgumentException.class, () -> VehicleSkinWriter.remove(blueprints, skinsYml, "Bad-Slug"));
         assertThrows(IllegalArgumentException.class, () -> VehicleSkinWriter.remove(blueprints, skinsYml, " "));
     }

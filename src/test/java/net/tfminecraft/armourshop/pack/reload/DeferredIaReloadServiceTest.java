@@ -339,6 +339,29 @@ class DeferredIaReloadServiceTest {
         }
     }
 
+    @Test void aFailedModelStepIsRetriedEvenAfterTheZipCompletes() throws Exception {
+        int oldMeg = Cache.modelEngineReloadDelaySeconds; Cache.modelEngineReloadDelaySeconds = 0;
+        try {
+            vehicleFramework(true); queue.enqueue(List.of("a")); writeConfig("a"); changeVehicleSkins();
+            bukkit.when(() -> Bukkit.dispatchCommand(console, "meg reload")).thenReturn(false);
+            start(true, false); delayed.removeFirst().run(); delayed.removeFirst().run(); compressed(); workers.clear(); main.clear();
+            // The zip went through, but ModelEngine never imported: the next refresh imports again.
+            bukkit.when(() -> Bukkit.dispatchCommand(console, "meg reload")).thenReturn(true);
+            bukkit.when(() -> Bukkit.dispatchCommand(console, "vf skins reload")).thenReturn(false);
+            start(true, false); delayed.removeFirst().run(); delayed.removeFirst().run(); compressed(); workers.clear(); main.clear();
+            verify(log).warning(contains("failed to dispatch vf skins reload"));
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "meg reload"), times(2));
+            // VehicleFramework missed the new entry too, so it runs once more, then settles.
+            bukkit.when(() -> Bukkit.dispatchCommand(console, "vf skins reload")).thenReturn(true);
+            start(true, false); delayed.removeFirst().run(); delayed.removeFirst().run(); compressed(); workers.clear(); main.clear();
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "meg reload"), times(3));
+            start(true, false);
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "meg reload"), times(3));
+        } finally {
+            Cache.modelEngineReloadDelaySeconds = oldMeg;
+        }
+    }
+
     /** Ends a flush that will never see its zip event, the way a failed iazip does. */
     private void resetForTest() throws Exception {
         var reset = DeferredIaReloadService.class.getDeclaredMethod("resetFlight"); reset.setAccessible(true); reset.invoke(service);

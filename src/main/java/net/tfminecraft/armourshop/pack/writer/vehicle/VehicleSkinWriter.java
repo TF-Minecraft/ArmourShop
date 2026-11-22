@@ -90,6 +90,8 @@ public final class VehicleSkinWriter {
 			Path out = blueprintPath(blueprintsRoot, slug);
 			Files.createDirectories(out.getParent());
 			writeAtomically(out, copy);
+			// Counted as soon as the model changes, so a failed registry edit still re-imports it.
+			GENERATION.incrementAndGet();
 			upsertEntry(playerSkinsYml, id, vehicle, displayName, owner);
 			GENERATION.incrementAndGet();
 		}
@@ -100,16 +102,18 @@ public final class VehicleSkinWriter {
 		YamlUtil.validateSlug(require(slug, "slug"));
 		synchronized (LOCK) {
 			boolean removed = Files.deleteIfExists(blueprintPath(blueprintsRoot, slug));
+			if (removed) {
+				// Counted before the registry edit, so a failure there still unloads the model.
+				GENERATION.incrementAndGet();
+			}
 			if (playerSkinsYml != null && Files.isRegularFile(playerSkinsYml)) {
 				YamlConfiguration yml = load(playerSkinsYml);
 				if (yml.contains(modelId(slug))) {
 					yml.set(modelId(slug), null);
 					writeAtomically(playerSkinsYml, yml.saveToString().getBytes(StandardCharsets.UTF_8));
+					GENERATION.incrementAndGet();
 					removed = true;
 				}
-			}
-			if (removed) {
-				GENERATION.incrementAndGet();
 			}
 			return removed;
 		}

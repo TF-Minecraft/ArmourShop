@@ -159,13 +159,15 @@ public final class DeferredIaReloadService implements Listener {
 			+ megDelay + "s");
 		try {
 			if (!Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "meg reload")) {
+				keepModelsPending();
 				log.warning("[ia-reload] failed to dispatch meg reload — new vehicle skins load at the next restart");
 			}
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				try {
 					if (Bukkit.getPluginManager().isPluginEnabled("VehicleFramework")
 						&& !Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "vf skins reload")) {
-						log.warning("[ia-reload] failed to dispatch vf skins reload");
+						keepModelsPending();
+						log.warning("[ia-reload] failed to dispatch vf skins reload — the next refresh tries again");
 					}
 					startItemsAdderRefresh(log, force, refreshEvenIfEmpty);
 				} catch (RuntimeException | Error failure) {
@@ -215,6 +217,16 @@ public final class DeferredIaReloadService implements Listener {
 			resetFlight();
 			log.warning("[ia-reload] refresh could not start — pending ids retained: " + failure.getMessage());
 			throw failure;
+		}
+	}
+
+	/**
+	 * A model step failed: the zip at the end of this flush must not count the vehicle skins as
+	 * imported, so the next refresh runs meg reload and vf skins reload again (a restart loads them too).
+	 */
+	private void keepModelsPending() {
+		synchronized (flightLock) {
+			flushingModelGeneration = appliedModelGeneration;
 		}
 	}
 
