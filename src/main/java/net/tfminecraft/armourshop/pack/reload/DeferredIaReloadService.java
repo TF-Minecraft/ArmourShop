@@ -21,6 +21,7 @@ import net.tfminecraft.armourshop.api.ProvinceSystemClient.ApprovedSubmission;
 import net.tfminecraft.armourshop.api.ProvinceSystemClient.ListResult;
 import net.tfminecraft.armourshop.pack.apply.PackPullRunner;
 import net.tfminecraft.armourshop.pack.reload.ApplyAckPlanner.Plan;
+import net.tfminecraft.armourshop.pack.writer.vehicle.VehicleSkinWriter;
 
 /**
  * Defers ItemsAdder refresh until the server is empty (or force), runs
@@ -40,6 +41,10 @@ public final class DeferredIaReloadService implements Listener {
 	private volatile boolean awaitingZipEvent;
 	/** Only ids present when iareload began belong to this compressed pack. */
 	private Map<String, Long> flushingVersions = Map.of();
+	/** Vehicle-skin generation this flush imports into ModelEngine. */
+	private long flushingModelGeneration;
+	/** Last vehicle-skin generation a finished zip contained (written before this server start counts as imported). */
+	private long appliedModelGeneration = VehicleSkinWriter.generation();
 	private final Object flightLock = new Object();
 
 	public DeferredIaReloadService(JavaPlugin plugin, PendingReloadQueue queue) {
@@ -133,12 +138,51 @@ public final class DeferredIaReloadService implements Listener {
 			return;
 		}
 
+		long modelGeneration = VehicleSkinWriter.generation();
+		boolean modelsChanged;
 		synchronized (flightLock) {
 			inFlight = true;
 			awaitingZipEvent = false;
 			flushingVersions = queue.snapshotVersions();
+			flushingModelGeneration = modelGeneration;
+			modelsChanged = modelGeneration != appliedModelGeneration;
 		}
 		Logger log = plugin.getLogger();
+		if (!modelsChanged) {
+			startItemsAdderRefresh(log, force, refreshEvenIfEmpty);
+			return;
+		}
+		// Vehicle skins are ModelEngine models: ItemsAdder only merges the pack ModelEngine last
+		// generated, so the import has to finish before iareload/iazip.
+		int megDelay = Math.max(0, Cache.modelEngineReloadDelaySeconds);
+		log.info("[ia-reload] vehicle skins changed — meg reload, then vf skins reload and the IA refresh in "
+			+ megDelay + "s");
+		try {
+			if (!Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "meg reload")) {
+				log.warning("[ia-reload] failed to dispatch meg reload — new vehicle skins load at the next restart");
+			}
+			Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				try {
+					if (Bukkit.getPluginManager().isPluginEnabled("VehicleFramework")
+						&& !Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "vf skins reload")) {
+						log.warning("[ia-reload] failed to dispatch vf skins reload");
+					}
+					startItemsAdderRefresh(log, force, refreshEvenIfEmpty);
+				} catch (RuntimeException | Error failure) {
+					resetFlight();
+					log.warning("[ia-reload] refresh after meg reload failed — pending ids retained: "
+						+ failure.getMessage());
+					throw failure;
+				}
+			}, megDelay * 20L);
+		} catch (RuntimeException | Error failure) {
+			resetFlight();
+			log.warning("[ia-reload] refresh could not start — pending ids retained: " + failure.getMessage());
+			throw failure;
+		}
+	}
+
+	private void startItemsAdderRefresh(Logger log, boolean force, boolean refreshEvenIfEmpty) {
 		int delaySec = Math.max(0, Cache.iaReloadDelaySeconds);
 		log.info("[ia-reload] running iareload then iazip in " + delaySec
 			+ "s for " + queue.size() + " pending submission(s) (force=" + force
@@ -190,6 +234,7 @@ public final class DeferredIaReloadService implements Listener {
 				return;
 			}
 			versions = flushingVersions;
+			appliedModelGeneration = Math.max(appliedModelGeneration, flushingModelGeneration);
 			resetFlight();
 		}
 		if (versions.isEmpty()) {

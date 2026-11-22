@@ -30,7 +30,7 @@ groups:
     display-name: "&#FDAA17G&#FB9C14i&#F98E12l&#F67F10d&#F4710Ee&#F2630Bd&#F05509"
     name-colour-stops: 2
     skin-token-cooldown-days: 21
-    skin-kinds: [armor_set]
+    skin-kinds: [armor_set, vehicle]
   ascended:
     tier: 3
     permission: rpchar.group.ascended

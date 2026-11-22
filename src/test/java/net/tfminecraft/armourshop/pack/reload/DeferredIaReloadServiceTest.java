@@ -272,4 +272,91 @@ class DeferredIaReloadServiceTest {
         var plan = ApplyAckPlanner.plan(List.of(armor.id), List.of(armor), Path.of(Cache.iaContentsPath));
         assertEquals(List.of(armor.id), plan.ack()); assertTrue(plan.missingFiles().isEmpty());
     }
+
+    private void changeVehicleSkins() throws Exception {
+        Path root = temp.resolve("blueprints"); Path copy = net.tfminecraft.armourshop.pack.writer.vehicle.VehicleSkinWriter.blueprintPath(root, "x");
+        Files.createDirectories(copy.getParent()); Files.writeString(copy, "{}");
+        assertTrue(net.tfminecraft.armourshop.pack.writer.vehicle.VehicleSkinWriter.remove(root, null, "x"));
+    }
+
+    private org.bukkit.plugin.PluginManager vehicleFramework(boolean enabled) {
+        var pm = mock(org.bukkit.plugin.PluginManager.class); when(pm.isPluginEnabled("VehicleFramework")).thenReturn(enabled);
+        bukkit.when(Bukkit::getPluginManager).thenReturn(pm); return pm;
+    }
+
+    @Test void vehicleSkinChangesImportModelsBeforeTheItemsAdderRefreshOnce() throws Exception {
+        int oldMeg = Cache.modelEngineReloadDelaySeconds; Cache.modelEngineReloadDelaySeconds = 3;
+        try {
+            vehicleFramework(true); queue.enqueue(List.of("a")); writeConfig("a"); changeVehicleSkins();
+            start(false, false);
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "meg reload"));
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "iareload"), never());
+            verify(scheduler).runTaskLater(eq(plugin), any(Runnable.class), eq(60L));
+            delayed.removeFirst().run();
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "vf skins reload"));
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "iareload"));
+            delayed.removeFirst().run(); compressed(); workers.removeFirst().run(); main.removeFirst().run();
+            assertTrue(queue.isEmpty());
+            // The next flush has nothing new for ModelEngine.
+            queue.enqueue(List.of("a")); start(false, false);
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "meg reload"), times(1));
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "iareload"), times(2));
+        } finally {
+            Cache.modelEngineReloadDelaySeconds = oldMeg;
+        }
+    }
+
+    @Test void vehicleSkinRefreshCopesWithMissingPluginsAndRetriesAfterFailure() throws Exception {
+        int oldMeg = Cache.modelEngineReloadDelaySeconds; Cache.modelEngineReloadDelaySeconds = -1;
+        try {
+            vehicleFramework(false); queue.enqueue(List.of("a")); writeConfig("a"); changeVehicleSkins();
+            bukkit.when(() -> Bukkit.dispatchCommand(console, "meg reload")).thenReturn(false);
+            start(false, false);
+            verify(log).warning(contains("failed to dispatch meg reload"));
+            verify(scheduler).runTaskLater(eq(plugin), any(Runnable.class), eq(0L));
+            delayed.removeFirst().run();
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "vf skins reload"), never());
+            // No zip finished, so the next flush imports the models again.
+            delayed.clear(); resetForTest();
+            vehicleFramework(true); bukkit.when(() -> Bukkit.dispatchCommand(console, "vf skins reload")).thenReturn(false);
+            start(false, false); delayed.removeFirst().run();
+            verify(log).warning(contains("failed to dispatch vf skins reload"));
+            bukkit.verify(() -> Bukkit.dispatchCommand(console, "meg reload"), times(2));
+            // A failure after meg reload releases the flight and keeps the ids.
+            delayed.clear(); resetForTest();
+            bukkit.when(() -> Bukkit.dispatchCommand(console, "iareload")).thenThrow(new IllegalStateException("ia broke"));
+            start(false, false);
+            assertThrows(IllegalStateException.class, () -> delayed.removeFirst().run());
+            verify(log).warning(contains("refresh after meg reload failed"));
+            assertEquals(List.of("a"), queue.snapshot());
+            // So does a scheduler that rejects the delayed step.
+            doThrow(new IllegalStateException("scheduler rejected")).when(scheduler).runTaskLater(eq(plugin), any(Runnable.class), anyLong());
+            service.requestFlush(); workers.removeFirst().run();
+            assertThrows(IllegalStateException.class, () -> main.removeFirst().run());
+            service.requestFlush(); assertEquals(1, workers.size(), "the flight guard was released");
+        } finally {
+            Cache.modelEngineReloadDelaySeconds = oldMeg;
+        }
+    }
+
+    /** Ends a flush that will never see its zip event, the way a failed iazip does. */
+    private void resetForTest() throws Exception {
+        var reset = DeferredIaReloadService.class.getDeclaredMethod("resetFlight"); reset.setAccessible(true); reset.invoke(service);
+    }
+
+    @Test void vehicleAckChecksTheModelEngineCopy() throws Exception {
+        String oldBlueprints = Cache.modelEngineBlueprintsPath; Cache.modelEngineBlueprintsPath = temp.resolve("blueprints").toString();
+        try {
+            var vehicle = submission("v1", "ship", "vehicle", List.of());
+            var noSlug = submission("v2", " ", "vehicle", List.of());
+            var nullSlug = submission("v3", null, "vehicle", List.of());
+            var plan = ApplyAckPlanner.plan(List.of("v1", "v2", "v3"), List.of(vehicle, noSlug, nullSlug), Path.of(Cache.iaContentsPath));
+            assertEquals(List.of("v1", "v2", "v3"), plan.missingFiles());
+            Path copy = net.tfminecraft.armourshop.pack.writer.vehicle.VehicleSkinWriter.blueprintPath(temp.resolve("blueprints"), "ship");
+            Files.createDirectories(copy.getParent()); Files.writeString(copy, "{}");
+            assertEquals(List.of("v1"), ApplyAckPlanner.plan(List.of("v1"), List.of(vehicle), Path.of(Cache.iaContentsPath)).ack());
+        } finally {
+            Cache.modelEngineBlueprintsPath = oldBlueprints;
+        }
+    }
 }

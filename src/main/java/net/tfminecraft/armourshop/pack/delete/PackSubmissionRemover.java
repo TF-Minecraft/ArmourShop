@@ -7,6 +7,7 @@ import net.tfminecraft.armourshop.pack.util.TextureFiles;
 import net.tfminecraft.armourshop.pack.writer.flat.BookWriter;
 import net.tfminecraft.armourshop.pack.writer.gun.GunWriter;
 import net.tfminecraft.armourshop.pack.writer.mask.MasksYml;
+import net.tfminecraft.armourshop.pack.writer.vehicle.VehicleSkinWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -99,6 +100,12 @@ public final class PackSubmissionRemover {
 				if (log != null) {
 					log.warning("[pack-delete] mask registry remove failed: " + e.getMessage());
 				}
+			}
+		} else if ("vehicle".equals(k)) {
+			Path blueprint = VehicleSkinWriter.blueprintPath(Path.of(Cache.modelEngineBlueprintsPath), s);
+			if (VehicleSkinWriter.remove(
+				Path.of(Cache.modelEngineBlueprintsPath), Path.of(Cache.vfPlayerSkinsYmlPath), s)) {
+				removed.add(blueprint);
 			}
 		} else if ("book".equals(k)) {
 			removed.addAll(BookWriter.remove(contentsRoot, ns, s));

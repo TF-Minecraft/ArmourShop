@@ -73,8 +73,9 @@ public final class PackPullRunner {
 						}
 
 						boolean lpSucceeded = false;
-						if (sub.staff) {
+						if (sub.staff && !ShopSubmissionWriter.isVehicle(sub)) {
 							// Staff curated skins use scroll consume — no submission LP.
+							// Vehicle skins have no scroll lane: the uploader always gets the node.
 							lpSucceeded = true;
 						} else {
 							UUID uuid = parseUuid(sub.playerUuid);
