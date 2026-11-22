@@ -21,7 +21,6 @@ import net.tfminecraft.armourshop.pack.writer.mask.MasksYml;
 import net.tfminecraft.armourshop.pack.writer.model3d.Item3dWriter;
 import net.tfminecraft.armourshop.pack.writer.model3d.ShieldWriter;
 import net.tfminecraft.armourshop.pack.writer.vehicle.VehicleSkinWriter;
-import net.tfminecraft.armourshop.pack.shop.ShopSubmissionWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -578,6 +577,10 @@ public final class PackApplyService {
 				);
 				return;
 			case "vehicle":
+				if (sub.staff) {
+					// Staff skins are scroll items with no owner; a vehicle skin is one player's.
+					throw new IllegalStateException("vehicle skins have no staff lane");
+				}
 				VehicleSkinWriter.write(
 					Path.of(Cache.modelEngineBlueprintsPath),
 					Path.of(Cache.vfVehiclesPath),
@@ -585,7 +588,7 @@ public final class PackApplyService {
 					sub.baseSet,
 					slug,
 					display,
-					ShopSubmissionWriter.permissionFor(slug),
+					ownerUuid(sub.playerUuid),
 					vehicleTextures(files)
 				);
 				return;
@@ -618,6 +621,14 @@ public final class PackApplyService {
 			return null;
 		}
 		return VEHICLE_TEXTURE_STEM + Integer.parseInt(index);
+	}
+
+	static java.util.UUID ownerUuid(String raw) {
+		try {
+			return java.util.UUID.fromString(raw == null ? "" : raw.trim());
+		} catch (IllegalArgumentException e) {
+			throw new IllegalStateException("vehicle skin needs the uploader's uuid, got: " + raw);
+		}
 	}
 
 	/** The uploaded textures in model order; every index from 0 up must be present. */

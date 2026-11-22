@@ -172,17 +172,4 @@ class PackPullRunnerTest {
         }
         daily.stop(); daily.stop(); verify(task, times(3)).cancel();
     }
-
-    @Test void staffLaneVehicleSkinsStillGrantTheUploader() {
-        var vehicle = new ApprovedSubmission("ship", OWNER.toString(), "ship", "vehicle", "Ship", null, "karve", null, null, null,
-            false, null, null, null, true, null, null, null, null);
-        shop.when(() -> ShopSubmissionWriter.isVehicle(any())).thenCallRealMethod();
-        apply.when(() -> PackApplyService.pullAndWrite(log)).thenReturn(new PackApplyService.ApplySummary(1, 0, 0, List.of(), List.of(vehicle)));
-        grants.when(() -> LuckPermsGrant.grantSubmission(OWNER, "ship", log)).thenReturn(true);
-        var reload = mock(DeferredIaReloadService.class); var queue = new PendingReloadQueue(plugin);
-        when(reload.queue()).thenReturn(queue); when(plugin.getDeferredIaReloadService()).thenReturn(reload);
-        assertTrue(PackPullRunner.run(false, null)); finish();
-        grants.verify(() -> LuckPermsGrant.grantSubmission(OWNER, "ship", log));
-        assertEquals(List.of("ship"), queue.snapshot());
-    }
 }

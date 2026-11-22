@@ -50,9 +50,10 @@ class VehicleSkinWriterTest {
             + ".png\",\"source\":\"data:image/png;base64," + Base64.getEncoder().encodeToString(png) + "\"}";
     }
 
+    private static final java.util.UUID OWNER = java.util.UUID.fromString("b58b582f-c305-3ce8-8e43-02a2a84b297d");
+
     private void write(List<byte[]> textures) throws Exception {
-        VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "drumleaf_sunrise", "Sunrise",
-            "armourshop.submission.drumleaf_sunrise", textures);
+        VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "drumleaf_sunrise", "Sunrise", OWNER, textures);
     }
 
     @Test void writesAReskinnedCopyAndAnOwnerOnlyEntry() throws Exception {
@@ -77,11 +78,12 @@ class VehicleSkinWriterTest {
         assertEquals("karve", yml.getString("vskin_drumleaf_sunrise.vehicle"));
         assertEquals("Sunrise", yml.getString("vskin_drumleaf_sunrise.name"));
         assertEquals("vskin_drumleaf_sunrise", yml.getString("vskin_drumleaf_sunrise.model"));
-        assertEquals("armourshop.submission.drumleaf_sunrise", yml.getString("vskin_drumleaf_sunrise.permission"));
+        assertEquals(OWNER.toString(), yml.getString("vskin_drumleaf_sunrise.owner"));
+        assertFalse(yml.contains("vskin_drumleaf_sunrise.permission"));
         assertTrue(Files.readString(skinsYml).startsWith("# Website vehicle skins"));
         // A second skin keeps the first; a rewrite of the same skin replaces it.
-        VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "other_skin", " ", "armourshop.submission.other_skin", List.of(hull4, sail2));
-        VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "other_skin", null, "armourshop.submission.other_skin", List.of(hull4, sail2));
+        VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "other_skin", " ", OWNER, List.of(hull4, sail2));
+        VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "other_skin", null, OWNER, List.of(hull4, sail2));
         yml = YamlConfiguration.loadConfiguration(skinsYml.toFile());
         assertEquals("vskin_other_skin", yml.getString("vskin_other_skin.name"));
         assertTrue(yml.contains("vskin_drumleaf_sunrise"));
@@ -162,7 +164,7 @@ class VehicleSkinWriterTest {
             () -> VehicleSkinWriter.defaultModel(null, "karve")).getMessage());
         assertThrows(IllegalStateException.class, () -> VehicleSkinWriter.defaultModel(temp.resolve("missing"), "karve"));
         IllegalStateException noBlueprint = assertThrows(IllegalStateException.class, () ->
-            VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "s", "S", "p", List.of()));
+            VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "s", "S", OWNER, List.of()));
         assertNotNull(noBlueprint.getMessage());
         Files.delete(blueprints.resolve("ships/Karve_Model.bbmodel"));
         assertEquals("no ModelEngine blueprint karve_model.bbmodel for vehicle karve",
@@ -181,12 +183,12 @@ class VehicleSkinWriterTest {
 
     @Test void inputsAreValidated() throws Exception {
         assertThrows(IllegalArgumentException.class, () ->
-            VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "Bad-Slug", "x", "p", List.of(other4, other2)));
+            VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "Bad-Slug", "x", OWNER, List.of(other4, other2)));
         assertEquals("vehicle (base_set) is required", assertThrows(IllegalArgumentException.class, () ->
-            VehicleSkinWriter.write(blueprints, vehicles, skinsYml, " ", "s", "x", "p", List.of(other4, other2))).getMessage());
+            VehicleSkinWriter.write(blueprints, vehicles, skinsYml, " ", "s", "x", OWNER, List.of(other4, other2))).getMessage());
         assertEquals("slug is required", assertThrows(IllegalArgumentException.class, () ->
-            VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", null, "x", "p", List.of(other4, other2))).getMessage());
-        assertEquals("permission is required", assertThrows(IllegalArgumentException.class, () ->
+            VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", null, "x", OWNER, List.of(other4, other2))).getMessage());
+        assertEquals("owner (player uuid) is required", assertThrows(IllegalArgumentException.class, () ->
             VehicleSkinWriter.write(blueprints, vehicles, skinsYml, "karve", "s", "x", null, List.of(other4, other2))).getMessage());
         Files.writeString(skinsYml, "broken: [unterminated\n");
         assertThrows(java.io.IOException.class, () -> write(List.of(other4, other2)));

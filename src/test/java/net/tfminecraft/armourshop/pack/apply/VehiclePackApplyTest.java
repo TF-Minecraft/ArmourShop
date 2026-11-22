@@ -66,9 +66,15 @@ class VehiclePackApplyTest {
         Cache.vfPlayerSkinsYmlPath = oldSkins; Cache.categoriesPath = oldCategories;
     }
 
+    private static final String OWNER = "b58b582f-c305-3ce8-8e43-02a2a84b297d";
+
     private static ApprovedSubmission vehicle(List<String> files) {
-        return new ApprovedSubmission("id1", "owner", "ship", "vehicle", "Sea Wolf", null, "karve", List.of(), List.of(),
-            Map.of(), false, null, null, files, false, null, null, null, null);
+        return vehicle(files, OWNER, false);
+    }
+
+    private static ApprovedSubmission vehicle(List<String> files, String owner, boolean staff) {
+        return new ApprovedSubmission("id1", owner, "ship", "vehicle", "Sea Wolf", null, "karve", List.of(), List.of(),
+            Map.of(), false, null, null, files, staff, null, null, null, null);
     }
 
     private PackApplyService.ApplySummary apply(ApprovedSubmission sub) {
@@ -83,7 +89,7 @@ class VehiclePackApplyTest {
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(skinsYml.toFile());
         assertEquals("karve", yml.getString("vskin_ship.vehicle"));
         assertEquals("Sea Wolf", yml.getString("vskin_ship.name"));
-        assertEquals("armourshop.submission.ship", yml.getString("vskin_ship.permission"));
+        assertEquals(OWNER, yml.getString("vskin_ship.owner"));
         client.verify(() -> ProvinceSystemClient.downloadSubmissionFile("id1", "ship_preview.png"), never());
         // No shop entry: vehicle skins are picked with Vehicle Paint.
         ShopSubmissionWriter.write(vehicle(List.of()), log);
@@ -104,6 +110,13 @@ class VehiclePackApplyTest {
         downloads.put("ship_1.png", downloads.get("ship_0.png"));
         var size = apply(vehicle(List.of("ship_0.png", "ship_1.png")));
         assertEquals(1, size.failed); assertTrue(size.messages.getFirst().contains("texture 1 must be 2x2"), size.messages.toString());
+        downloads.put("ship_1.png", downloads.get("ship_0.png"));
+        var staff = apply(vehicle(List.of("ship_0.png"), OWNER, true));
+        assertTrue(staff.messages.getFirst().contains("vehicle skins have no staff lane"), staff.messages.toString());
+        for (String owner : new String[] {null, "someone"}) {
+            var noOwner = apply(vehicle(List.of("ship_0.png"), owner, false));
+            assertTrue(noOwner.messages.getFirst().contains("needs the uploader's uuid"), noOwner.messages.toString());
+        }
         assertFalse(Files.exists(VehicleSkinWriter.blueprintPath(blueprints, "ship")));
     }
 

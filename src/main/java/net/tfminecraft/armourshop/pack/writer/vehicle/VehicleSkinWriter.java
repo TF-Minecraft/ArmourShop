@@ -11,6 +11,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
@@ -34,7 +35,7 @@ import net.tfminecraft.armourshop.pack.util.YamlUtil;
  * current default model, so VehicleFramework finds the same seats, weapons and effects. Each
  * uploaded PNG must have the exact size of the texture it replaces. The copy goes to
  * {@code <blueprints>/tfmc_submissions/vskin_<slug>.bbmodel}, and VehicleFramework's
- * {@code player-skins.yml} gets an owner-only entry ({@code armourshop.submission.<slug>}).
+ * {@code player-skins.yml} gets an entry that only the uploader's account may use.
  */
 public final class VehicleSkinWriter {
 
@@ -71,9 +72,12 @@ public final class VehicleSkinWriter {
 		String vehicleId,
 		String slug,
 		String displayName,
-		String permission,
+		UUID owner,
 		List<byte[]> textures
 	) throws IOException {
+		if (owner == null) {
+			throw new IllegalArgumentException("owner (player uuid) is required");
+		}
 		YamlUtil.validateSlug(require(slug, "slug"));
 		String vehicle = require(vehicleId, "vehicle (base_set)");
 		String baseModel = defaultModel(vehiclesDir, vehicle);
@@ -86,7 +90,7 @@ public final class VehicleSkinWriter {
 			Path out = blueprintPath(blueprintsRoot, slug);
 			Files.createDirectories(out.getParent());
 			writeAtomically(out, copy);
-			upsertEntry(playerSkinsYml, id, vehicle, displayName, permission);
+			upsertEntry(playerSkinsYml, id, vehicle, displayName, owner);
 			GENERATION.incrementAndGet();
 		}
 	}
@@ -225,7 +229,7 @@ public final class VehicleSkinWriter {
 		String id,
 		String vehicle,
 		String displayName,
-		String permission
+		UUID owner
 	) throws IOException {
 		YamlConfiguration yml = Files.isRegularFile(playerSkinsYml) ? load(playerSkinsYml) : new YamlConfiguration();
 		if (!yml.contains(id)) {
@@ -237,7 +241,7 @@ public final class VehicleSkinWriter {
 		yml.set(id + ".vehicle", vehicle);
 		yml.set(id + ".name", displayName == null || displayName.isBlank() ? id : displayName.trim());
 		yml.set(id + ".model", id);
-		yml.set(id + ".permission", require(permission, "permission"));
+		yml.set(id + ".owner", owner.toString());
 		Files.createDirectories(playerSkinsYml.toAbsolutePath().getParent());
 		writeAtomically(playerSkinsYml, yml.saveToString().getBytes(StandardCharsets.UTF_8));
 	}
