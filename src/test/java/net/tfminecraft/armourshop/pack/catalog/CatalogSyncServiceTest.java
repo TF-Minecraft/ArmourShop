@@ -36,7 +36,7 @@ class CatalogSyncServiceTest {
         categories = mockStatic(CategoryLoader.class); categories.when(CategoryLoader::get).thenReturn(List.of());
     }
     @AfterEach void restore() {
-        categories.close(); Cache.scrolls = oldScrolls; Cache.permissionGroups = oldGroups; Cache.permissionGroupDefaultSkinKinds = oldKinds;
+        categories.close(); Cache.catalogSync = true; Cache.scrolls = oldScrolls; Cache.permissionGroups = oldGroups; Cache.permissionGroupDefaultSkinKinds = oldKinds;
         Cache.permissionGroupDefaults = oldDefaults; Cache.permissionGroupDefaultAllowArmor3dHelmet = oldHelmet; ArmourShop.plugin = oldPlugin;
     }
     private static SkinCategory category(String id, String name, boolean item, List<SkinSet> sets) {
@@ -133,6 +133,19 @@ class CatalogSyncServiceTest {
             client.when(() -> ProvinceSystemClient.pushCatalog(anyString())).thenReturn(expected);
             assertSame(expected, CatalogSyncService.pushNow());
             client.verify(() -> ProvinceSystemClient.pushCatalog(argThat(json -> JsonParser.parseString(json).getAsJsonObject().has("entitlements"))));
+        }
+    }
+
+    @Test void serversWithCatalogSyncOffNeverPushTheCatalog() {
+        try (var bukkit = mockStatic(Bukkit.class); var client = mockStatic(ProvinceSystemClient.class)) {
+            var scheduler = mock(BukkitScheduler.class); bukkit.when(Bukkit::getScheduler).thenReturn(scheduler);
+            var plugin = mock(ArmourShop.class); var logger = mock(Logger.class); when(plugin.getLogger()).thenReturn(logger);
+            Cache.catalogSync = false;
+            CatalogSyncService.pushAsync(plugin);
+            verifyNoInteractions(scheduler); verify(logger).info("[catalog] not synced: catalog-sync is false on this server");
+            var result = CatalogSyncService.pushNow();
+            assertFalse(result.ok); assertEquals("catalog-sync is false on this server", result.error);
+            client.verifyNoInteractions();
         }
     }
 

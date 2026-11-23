@@ -40,6 +40,9 @@ public class Cache {
 	/** Seconds between iareload and iazip. */
 	public static int iaReloadDelaySeconds = 5;
 
+	/** False on servers that must not overwrite the website catalog (one shared catalog, Main's). */
+	public static boolean catalogSync = true;
+
 	/** Scroll ids+labels from config.yml (staff skins catalog). */
 	public static List<ScrollOption> scrolls = new ArrayList<>();
 
