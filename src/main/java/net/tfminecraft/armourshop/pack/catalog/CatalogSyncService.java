@@ -145,6 +145,10 @@ public final class CatalogSyncService {
 		if (plugin == null) {
 			return;
 		}
+		if (!Cache.catalogSync) {
+			plugin.getLogger().info("[catalog] not synced: catalog-sync is false on this server");
+			return;
+		}
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			ProvinceSystemClient.CatalogPushResult result = pushNow();
 			Logger log = plugin.getLogger();
@@ -161,6 +165,9 @@ public final class CatalogSyncService {
 
 	/** Synchronous push (async task or command feedback). */
 	public static ProvinceSystemClient.CatalogPushResult pushNow() {
+		if (!Cache.catalogSync) {
+			return ProvinceSystemClient.CatalogPushResult.fail("catalog-sync is false on this server");
+		}
 		return ProvinceSystemClient.pushCatalog(buildPayloadJson());
 	}
 

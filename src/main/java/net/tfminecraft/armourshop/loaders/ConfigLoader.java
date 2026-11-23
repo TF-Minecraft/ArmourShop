@@ -55,6 +55,8 @@ public class ConfigLoader implements LoaderInterface{
         Cache.modelEngineReloadDelaySeconds = Math.max(0,
             config.getInt("pack-apply.modelengine-reload-delay-seconds", 15));
 
+        Cache.catalogSync = config.getBoolean("catalog-sync", true);
+
         List<ScrollOption> scrolls = new ArrayList<>();
         List<Map<?, ?>> rawScrolls = config.getMapList("scrolls");
         if (rawScrolls != null) {

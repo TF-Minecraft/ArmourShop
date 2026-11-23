@@ -22,6 +22,11 @@ pack-apply:
   # Seconds to wait after /meg reload before /vf skins reload and /iareload
   modelengine-reload-delay-seconds: 15
 
+# Push the catalog (categories, scrolls, permission-groups ranks) to the website. The website
+# keeps one catalog, so only Main should push it: set false on other servers that share Main's
+# website (Tutorial), or each restart replaces Main's ranks and skin sets with theirs.
+catalog-sync: true
+
 # Scrolls offered to staff skins UI (synced to ProvinceSystem catalog)
 scrolls:
   - id: m.loot.common_item_skin_scroll
