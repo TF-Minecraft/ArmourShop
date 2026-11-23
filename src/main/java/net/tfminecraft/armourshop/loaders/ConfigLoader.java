@@ -17,8 +17,10 @@ import net.tfminecraft.armourshop.objects.ScrollOption;
 public class ConfigLoader implements LoaderInterface{
 	public void load(File configFile) {
 		FileConfiguration config = new YamlConfiguration();
+		boolean loaded = false;
         try {
         	config.load(configFile);
+        	loaded = true;
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
@@ -55,7 +57,10 @@ public class ConfigLoader implements LoaderInterface{
         Cache.modelEngineReloadDelaySeconds = Math.max(0,
             config.getInt("pack-apply.modelengine-reload-delay-seconds", 15));
 
-        Cache.catalogSync = config.getBoolean("catalog-sync", true);
+        // A broken file keeps the loaded value, so it never turns a disabled sync back on.
+        if (loaded) {
+            Cache.catalogSync = config.getBoolean("catalog-sync", true);
+        }
 
         List<ScrollOption> scrolls = new ArrayList<>();
         List<Map<?, ?>> rawScrolls = config.getMapList("scrolls");

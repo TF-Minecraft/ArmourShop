@@ -102,6 +102,17 @@ class ConfigurationModelsTest {
         var empty = new ScrollOption(null, null); assertEquals("", empty.getId()); assertEquals("", empty.getLabel());
     }
 
+    @Test void catalogSyncDefaultsOnAndABrokenFileNeverTurnsItBackOn() throws Exception {
+        new ConfigLoader().load(yaml("off.yml", "catalog-sync: false\n"));
+        assertFalse(Cache.catalogSync);
+        new ConfigLoader().load(yaml("broken.yml", "catalog-sync: [unclosed\n"));
+        assertFalse(Cache.catalogSync);
+        new ConfigLoader().load(directory.resolve("absent.yml").toFile());
+        assertFalse(Cache.catalogSync);
+        new ConfigLoader().load(yaml("default.yml", "scrolls: []\n"));
+        assertTrue(Cache.catalogSync);
+    }
+
     @Test void configFallsBackForMissingSettingsAndDefensivelySkipsNullReaderRows() throws Exception {
         new ConfigLoader().load(yaml("empty.yml", "pack-apply:\n  masks-yml: ' '\n"));
         assertEquals("plugins/RPCharacters/custom-masks.yml", Cache.masksYmlPath);
